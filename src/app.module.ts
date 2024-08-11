@@ -1,25 +1,12 @@
 import { Module } from '@nestjs/common';
 import { AppController } from './app.controller';
 import { AppService } from './app.service';
-import { TypeOrmModule } from '@nestjs/typeorm';
-import { DataSource } from 'typeorm';
+import { AuthModule } from './auth/auth.module';
+import { RoleModule } from './role/role.module';
 
 @Module({
-  imports: [
-    TypeOrmModule.forRoot({
-      type: 'mysql',
-      host: 'localhost',
-      port: 3306,
-      username: 'root',
-      password: 'Admin@123',
-      database: 'restaurant_db',
-      entities: [],
-      synchronize: true,
-    }),
-  ],
+  imports: [AuthModule, RoleModule],
   controllers: [AppController],
   providers: [AppService],
 })
-export class AppModule {
-  constructor(private dataSource: DataSource){}
-}
+export class AppModule {}
