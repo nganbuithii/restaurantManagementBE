@@ -20,6 +20,7 @@ CREATE TABLE `Account` (
     `roleId` INTEGER NOT NULL,
     `createdAt` DATETIME(3) NOT NULL DEFAULT CURRENT_TIMESTAMP(3),
     `updatedAt` DATETIME(3) NULL,
+    `isActive` BOOLEAN NOT NULL DEFAULT true,
 
     UNIQUE INDEX `Account_username_key`(`username`),
     PRIMARY KEY (`id`)

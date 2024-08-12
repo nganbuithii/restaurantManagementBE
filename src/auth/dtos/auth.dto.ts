@@ -10,10 +10,19 @@ export class RegisterDto {
         message: 'Số điện thoại không hợp lệ',
     })
     phone: string
-    @IsEmail({}, { message: 'Email không đúng định dạng' })
+    @IsEmail({}, { message: 'Email is not correct format' })
     email: string
     @IsNotEmpty({ message: 'Họ và tên không được để trống' })
     fullName: string
     avatar: string
+
+}
+
+export class LoginDto {
+    @IsNotEmpty({ message: 'Username can not empty' })
+    username:string
+    @IsNotEmpty({ message: 'Password can not empty' })
+    @MinLength(8)
+    password:string
 
 }
