@@ -60,11 +60,13 @@ export class AuthService {
             // Bước 5: Tạo người dùng mới và liên kết với tài khoản
             const newUser = await prisma.user.create({
                 data: {
+                    fullName:userData.fullName,
                     email: userData.email,
                     phone: userData.phone || null,
-                    accountId: newAccount.id,
+                    account: { connect: { id: newAccount.id } }, // Kết nối tài khoản
                 },
             });
+            
 
             return newUser;
         });

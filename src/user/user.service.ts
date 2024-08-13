@@ -1,15 +1,25 @@
 
 import { HttpException, HttpStatus, Injectable } from '@nestjs/common';
 import { PrismaService } from 'src/prisma.service';
-import { CreateUserDto } from './dto/user.dto';
+import { CreateUserDto, UserFilterType, UserpaginationResponseType } from './dto/user.dto';
 import { hash } from 'bcrypt'; 
 import { User } from '@prisma/client'; 
+import { contains } from 'class-validator';
 
 @Injectable()
 export class UserService {
     constructor(private prismaService: PrismaService) { }
-
     async create(body: CreateUserDto): Promise<User> {
+        const role = await this.prismaService.role.findUnique({
+            where: { id: body.roleId },
+        });
+
+        if (!role) {
+            throw new HttpException(
+                { message: 'Invalid role ID' },
+                HttpStatus.BAD_REQUEST
+            );
+        }
         // Bước 1: Kiểm tra xem email đã tồn tại hay chưa
         const existingUser = await this.prismaService.user.findUnique({
             where: {
@@ -46,6 +56,7 @@ export class UserService {
             data: {
                 email: body.email,
                 phone: body.phone, // Có thể để undefined nếu không có giá trị
+                fullName: body.fullName, // Thêm thuộc tính này nếu cần
                 account: {
                     create: {
                         username: body.username,
@@ -62,7 +73,78 @@ export class UserService {
                 account: true,
             },
         });
+        
 
         return result;
     }
+
+
+
+    async getAll(filters: UserFilterType): Promise<UserpaginationResponseType> {
+        const items_per_page = Number(filters.items_per_page) || 10;
+        const page = Number(filters.page) || 1;  // Sửa thành 1 để bắt đầu từ trang đầu tiên
+        const search = filters.search || "";
+    
+        const skip = page > 1 ? (page - 1) * items_per_page : 0;
+        const users = await this.prismaService.user.findMany({
+            take: items_per_page,
+            skip,
+            where: {
+                OR: [
+                    {
+                        fullName: {
+                            contains: search,
+                        },
+                    },
+                    {
+                        email: {
+                            contains: search,
+                        },
+                    },
+                ],
+                AND: [
+                    { account: { isActive: true } },  // Giả sử bạn muốn lọc theo trạng thái tài khoản
+                ],
+            },
+            orderBy: {
+                createdAt: "desc",
+            },
+            include: {
+                account: {
+                    include: {
+                        role: true,  // Bao gồm thông tin vai trò của tài khoản
+                    },
+                },
+            },
+        });
+    
+        // Tính tổng số người dùng
+        const total = await this.prismaService.user.count({
+            where: {
+                OR: [
+                    {
+                        fullName: {
+                            contains: search,
+                        },
+                    },
+                    {
+                        email: {
+                            contains: search,
+                        },
+                    },
+                ],
+                AND: [
+                    { account: { isActive: true } },  // Giả sử bạn muốn lọc theo trạng thái tài khoản
+                ],
+            },
+        });
+    
+        return {
+            data: users,
+            total,
+            currentPage: page,
+            itemsPerPage: items_per_page,
+        };
+    }
+    
 }

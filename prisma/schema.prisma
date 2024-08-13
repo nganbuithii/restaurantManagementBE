@@ -16,6 +16,7 @@ datasource db {
 model User {
   id        Int       @id @default(autoincrement())
   email     String    @unique
+  fullName String
   phone     String?
   account   Account   @relation(fields: [accountId], references: [id])
   accountId Int @unique

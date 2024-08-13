@@ -1,3 +1,4 @@
+import { User } from "@prisma/client";
 import { IsEmail, IsNotEmpty, Matches, MinLength } from "class-validator"
 
 
@@ -16,10 +17,32 @@ import { IsEmail, IsNotEmpty, Matches, MinLength } from "class-validator"
 // }
 // src/user/dto/user.dto.ts
 export class CreateUserDto {
-    email: string;
-    phone?: string;
-    username: string;
-    password: string;
-    roleId: number; // hoặc tùy thuộc vào cách bạn muốn chỉ định role
-  }
-  
+  @IsEmail({}, { message: 'Email is not correct format' })
+  email: string;
+  @Matches(/^(?:\+84|0)[3|5|7|8|9]\d{8}$/, {
+    message: 'phone number is not correct',
+  })
+  phone?: string;
+  @IsNotEmpty({ message: 'Username can not empty' })
+  username: string;
+  @MinLength(8)
+  password: string;
+  @IsNotEmpty({ message: 'Role can not empty' })
+  roleId: number;
+  @IsNotEmpty({ message: 'Fullname can not empty' })
+  fullName:string;
+}
+
+
+export interface UserFilterType {
+  items_per_page?:number;
+  page?:number;
+  search?:string
+}
+
+export interface UserpaginationResponseType{
+  data:User[]
+  total:number
+  currentPage:number
+  itemsPerPage:number
+}
