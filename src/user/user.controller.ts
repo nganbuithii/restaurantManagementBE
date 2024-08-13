@@ -1,5 +1,5 @@
-import { Body, Controller, Get, Param, ParseIntPipe, Post, Query } from '@nestjs/common';
-import { CreateUserDto, UserFilterType, UserpaginationResponseType } from './dto/user.dto';
+import { Body, Controller, Get, Param, ParseIntPipe, Patch, Post, Query } from '@nestjs/common';
+import { CreateUserDto, UpdateUserDto, UserFilterType, UserpaginationResponseType } from './dto/user.dto';
 import { UserService } from './user.service';
 import { User } from '@prisma/client';
 
@@ -13,13 +13,18 @@ export class UserController {
     }
 
     @Get()
-    getAll(@Query() params: UserFilterType):Promise<UserpaginationResponseType>{
+    getAll(@Query() params: UserFilterType): Promise<UserpaginationResponseType> {
         return this.userService.getAll(params);
     }
 
     @Get(':id')
-    getDetail(@Param('id', ParseIntPipe) id:number) : Promise<User>{
+    getDetail(@Param('id', ParseIntPipe) id: number): Promise<User> {
         return this.userService.getDetail(id);
+    }
+
+    @Patch(':id')
+    update(@Param('id', ParseIntPipe) id: number, @Body() data: UpdateUserDto): Promise<User> {
+        return this.userService.update(id, data);
     }
 
 }

@@ -1,5 +1,5 @@
 import { User } from "@prisma/client";
-import { IsEmail, IsNotEmpty, Matches, MinLength } from "class-validator"
+import { IsEmail, IsNotEmpty, IsOptional, Matches, MinLength } from "class-validator"
 
 
 // export class CreateUserDto{
@@ -45,4 +45,24 @@ export interface UserpaginationResponseType{
   total:number
   currentPage:number
   itemsPerPage:number
+}
+
+
+
+export class UpdateUserDto {
+  @IsOptional()
+  @IsEmail({}, { message: 'Email is not correct format' })
+  email: string;
+  @IsOptional()
+  @Matches(/^(?:\+84|0)[3|5|7|8|9]\d{8}$/, {
+    message: 'phone number is not correct',
+  })
+  phone?: string;
+  @IsOptional()
+  @IsNotEmpty({ message: 'Username can not empty' })
+  username: string;
+
+  
+  @IsOptional()
+  fullName:string;
 }
