@@ -19,7 +19,7 @@ export class UserController {
 
     @Get(':id')
     getDetail(@Param('id', ParseIntPipe) id:number) : Promise<User>{
-        
+        return this.userService.getDetail(id);
     }
 
 }

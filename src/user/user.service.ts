@@ -146,5 +146,13 @@ export class UserService {
             itemsPerPage: items_per_page,
         };
     }
+
+    async getDetail(id:number):Promise <User>{
+        return this.prismaService.user.findFirst({
+            where:{
+                id
+            }
+        })
+    }
     
 }
