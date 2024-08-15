@@ -14,18 +14,28 @@ datasource db {
 }
 
 model User {
-  id        Int       @id @default(autoincrement())
-  email     String    @unique
-  fullName  String
-  phone     String?
-  
+  id       Int     @id @default(autoincrement())
+  email    String  @unique
+  fullName String
+  phone    String?
+
+// quan hệ với account
   account   Account   @relation(fields: [accountId], references: [id])
   accountId Int       @unique
+  
   createdAt DateTime  @default(now())
   updatedAt DateTime? @updatedAt
 
   employee Employee? @relation
   customer Customer? @relation
+
+  feeckbacks Feedbacks? @relation
+
+  orders Order? @relation
+
+  suppliers Suppliers? @relation
+
+  menuItems MenuItems? @relation
 }
 
 model Account {
@@ -45,6 +55,7 @@ model Role {
   name      String    @unique
   createdAt DateTime  @default(now())
   updatedAt DateTime? @updatedAt
+  isActive Boolean @default(true)
   accounts  Account[]
 }
 
@@ -55,9 +66,13 @@ model Employee {
   position  String
   createdAt DateTime  @default(now())
   updatedAt DateTime? @updatedAt
+  
 
   user   User @relation(fields: [userId], references: [id])
   userId Int  @unique
+
+  // 1 nv - n phiếu nhập
+  slips WarehouseSlip[]
 }
 
 model Customer {
@@ -68,6 +83,12 @@ model Customer {
 
   user   User @relation(fields: [userId], references: [id])
   userId Int  @unique
+
+  // 1 kh - n lịch hẹn
+  reservations Reservation[]
+
+  // 1KH - n voucher
+  vouchers Voucher[]
 }
 
 model Order {
@@ -76,40 +97,93 @@ model Order {
   totalPrice    Float
   discountPrice Float  @default(0)
 
+  // một user - nhiều hóa đơn
+  userId Int  @unique
+  user   User @relation(fields: [userId], references: [id])
+
   createdAt DateTime  @default(now())
   updatedAt DateTime? @updatedAt
+
+  // 1 hóa đơn - n chi tiết hóa đơn
+  details DetailOrder[]
+}
+
+model DetailOrder {
+  id       Int @id @default(autoincrement())
+  quantity Int
+
+  createdAt DateTime  @default(now())
+  updatedAt DateTime? @updatedAt
+
+  // 1 hóa đơn - n chi tiết hóa đơn
+  orderId Int @unique
+  order Order @relation(fields: [orderId], references: [id])
+
+  // 1 chi tiết - n món ăn
+  menuItems MenuItems[]
 }
 
 model Table {
   id        Int       @id @default(autoincrement())
   number    Int       @unique // Số hiệu bàn
   seats     Int // Số lượng ghế
+  status String
   createdAt DateTime  @default(now())
   updatedAt DateTime? @updatedAt
 
   // 1 bàn có thể có nhiêu lịch hẹn
+  reservations Reservation[]
 }
 
 model Reservation {
-  id        Int       @id @default(autoincrement())
+  id        Int      @id @default(autoincrement())
   startTime DateTime // Thời gian bắt đầu
   endTime   DateTime // Thời gian kết thúc
   status    String // Trạng thái: "Reserved", "Occupied", "Available", etc.
+
   createdAt DateTime  @default(now())
   updatedAt DateTime? @updatedAt
 
   // quan hệ 1 lịch hẹn cho 1 bàn
   // 1 bàn có nhiều lịch hẹn
+  tableId Int   @unique
+  table   Table @relation(fields: [tableId], references: [id])
+
+  // 1 KH-  n lịch hẹn
+  customerId Int      @unique
+  customer   Customer @relation(fields: [customerId], references: [userId])
 }
 
-model MenuItem {
-  id        Int       @id @default(autoincrement())
-  name      String
-  price     String
-  status    String // Trạng thái: "Reserved", "Occupied", "Available", etc.
-  isActive  Boolean   @default(true)
+model MenuItems {
+  id       Int     @id @default(autoincrement())
+  name     String
+  price    String
+  status   String // Trạng thái: "Reserved", "Occupied", "Available", etc.
+  isActive Boolean @default(true)
+
   createdAt DateTime  @default(now())
   updatedAt DateTime? @updatedAt
+
+  // 1 user -- nhiều món ăn
+  userId Int  @unique
+  user   User @relation(fields: [userId], references: [id])
+
+  // 1 chi tiết - nhiều món ăn
+  detailId Int @unique
+  detail DetailOrder @relation(fields: [detailId], references: [id])
+
+   // Quan hệ với FoodImage
+  images    FoodImage[]
+
+  // 1 menu - n mons
+  menuId Int @unique
+  menu Menus @relation(fields: [menuId], references: [id])
+}
+model FoodImage {
+  id       Int    @id @default(autoincrement())
+  url      String 
+  menuItem MenuItems @relation(fields: [menuItemId], references: [id])
+  menuItemId Int @unique
 }
 
 model Menus {
@@ -119,23 +193,38 @@ model Menus {
 
   createdAt DateTime  @default(now())
   updatedAt DateTime? @updatedAt
+
+  // 1 menu - n món ăn
+  menuItems MenuItems[]
 }
 
-model FoodImage {
-  id Int @id @default(autoincrement())
-}
 
-model Supplier {
+
+model Suppliers {
   id      Int    @id @default(autoincrement())
   name    String
   address String
   email   String
+  isActive String
+
+  createdAt DateTime  @default(now())
+  updatedAt DateTime? @updatedAt
+
+  // 1 user -- nhiều nhà c ung cấp
+  userId Int  @unique
+  user   User @relation(fields: [userId], references: [id])
+
+  // 1 nhà cc - n phiếu nhập
+  slips WarehouseSlip[]
 }
 
+// nguyên liệu
 model Ingredient {
   id          Int      @id @default(autoincrement())
   productDate DateTime
   price       Float
+  isActive Boolean @default(true)
+  status String
   init        String
 }
 
@@ -143,25 +232,44 @@ model Voucher {
   id          Int      @id @default(autoincrement())
   percent     Int
   description String
-  startDate   DateTime
+  startDate   DateTime @default(now())
   endDate     DateTime
+  isActive    Boolean @default(true)
 
   createdAt DateTime  @default(now())
   updatedAt DateTime? @updatedAt
+  
+  // 1kh - n voucher
+  customerId Int @unique
+  customer Customer @relation(fields: [customerId], references: [userId])
 }
 
 model Feedbacks {
   id      Int    @id @default(autoincrement())
   content String
   rating  Int    @default(5)
+  isActive Boolean @default(true)
 
   createdAt DateTime  @default(now())
   updatedAt DateTime? @updatedAt
+
+  // quan hệ 1 nhiều : 1 user - n feedback
+  userId Int  @unique
+  user   User @relation(fields: [userId], references: [id])
 }
 
+// phiếu nhập xuất kho
 model WarehouseSlip {
   id        Int       @id @default(autoincrement())
+
   createdAt DateTime  @default(now())
   updatedAt DateTime? @updatedAt
-}
 
+  // 1 nv - n phiếu
+  employeeId Int @unique
+  employee Employee @relation(fields: [employeeId], references: [userId])
+
+  // 1 ncc- n phiếu
+  supplierId Int @unique
+  supplier Suppliers @relation(fields: [supplierId], references: [id])
+}
