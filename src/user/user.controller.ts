@@ -1,7 +1,11 @@
-import { Body, Controller, Get, Param, ParseIntPipe, Patch, Post, Query } from '@nestjs/common';
+import { Body, Controller, Get, Param, ParseIntPipe, Patch, Post, Query, Req, UseGuards } from '@nestjs/common';
 import { CreateUserDto, UpdateUserDto, UserFilterType, UserpaginationResponseType } from './dto/user.dto';
 import { UserService } from './user.service';
 import { User } from '@prisma/client';
+import { Request } from 'express';
+import { JwtAuthGuard } from 'src/auth/jwt-auth.guard';
+
+
 
 @Controller('users')
 export class UserController {
@@ -27,4 +31,6 @@ export class UserController {
         return this.userService.update(id, data);
     }
 
+
+   
 }

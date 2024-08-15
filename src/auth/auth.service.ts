@@ -1,4 +1,4 @@
-import { HttpException, HttpStatus, Injectable } from '@nestjs/common';
+import { HttpException, HttpStatus, Injectable, NotFoundException } from '@nestjs/common';
 
 import { RegisterDto } from './dtos/auth.dto';
 import { createHash } from 'crypto';
@@ -6,12 +6,14 @@ import { User } from '@prisma/client';
 import { PrismaService } from 'src/prisma.service';
 import { compare } from 'bcrypt';
 import { JwtService } from '@nestjs/jwt';
+import { UserService } from 'src/user/user.service';
 
 @Injectable()
 export class AuthService {
     constructor(
         private prismaService: PrismaService,
-        private jwtService: JwtService
+        private jwtService: JwtService,
+        private userService: UserService
     ) { }
 
     register = async (userData: RegisterDto): Promise<User> => {
@@ -60,13 +62,13 @@ export class AuthService {
             // Bước 5: Tạo người dùng mới và liên kết với tài khoản
             const newUser = await prisma.user.create({
                 data: {
-                    fullName:userData.fullName,
+                    fullName: userData.fullName,
                     email: userData.email,
                     phone: userData.phone || null,
                     account: { connect: { id: newAccount.id } }, // Kết nối tài khoản
                 },
             });
-            
+
 
             return newUser;
         });
@@ -94,15 +96,21 @@ export class AuthService {
             );
         }
         // Bước 3: generate access token
-        const payload = { id: account.id, username: account.username }
+        const payload = { 
+           
+            username: account.username ,
+            sub:account.id
+        }
         const accessToken = await this.jwtService.signAsync(payload, {
-            secret: process.env.ACCESS_TOKEN_KEY,
+            secret: process.env.JWT_SECRET,  
             expiresIn: '1h'
-        })
+        });
+        
         const refreshToken = await this.jwtService.signAsync(payload, {
-            secret: process.env.REFRESH_TOKEN_KEY,
+            secret: process.env.JWT_SECRET,  
             expiresIn: '7d'
-        })
+        });
+        
 
 
         return {
@@ -110,4 +118,18 @@ export class AuthService {
             refreshToken: refreshToken
         };
     };
+
+    async validateUser(username: string, pass: string): Promise<any> {
+        // check xem người dùng đăng nhập có hợp lệ không
+        const user = await this.userService.findOne(username);
+        
+        
+        if(user){
+            const isValid = this.userService.isValidPassword(pass, user.password)
+            if(isValid){
+                return user;
+            }
+        }
+        return null;
+    }
 }

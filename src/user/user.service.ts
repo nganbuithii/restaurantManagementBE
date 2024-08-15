@@ -1,9 +1,9 @@
 
-import { HttpException, HttpStatus, Injectable } from '@nestjs/common';
+import { HttpException, HttpStatus, Injectable, NotFoundException } from '@nestjs/common';
 import { PrismaService } from 'src/prisma.service';
 import { CreateUserDto, UpdateUserDto, UserFilterType, UserpaginationResponseType } from './dto/user.dto';
-import { hash } from 'bcrypt'; 
-import { User } from '@prisma/client'; 
+import { hash, compare, compareSync } from 'bcrypt';
+import { User } from '@prisma/client';
 import { contains } from 'class-validator';
 
 @Injectable()
@@ -73,7 +73,7 @@ export class UserService {
                 account: true,
             },
         });
-        
+
 
         return result;
     }
@@ -84,7 +84,7 @@ export class UserService {
         const items_per_page = Number(filters.items_per_page) || 10;
         const page = Number(filters.page) || 1;  // Sửa thành 1 để bắt đầu từ trang đầu tiên
         const search = filters.search || "";
-    
+
         const skip = page > 1 ? (page - 1) * items_per_page : 0;
         const users = await this.prismaService.user.findMany({
             take: items_per_page,
@@ -117,7 +117,7 @@ export class UserService {
                 },
             },
         });
-    
+
         // Tính tổng số người dùng
         const total = await this.prismaService.user.count({
             where: {
@@ -138,7 +138,7 @@ export class UserService {
                 ],
             },
         });
-    
+
         return {
             data: users,
             total,
@@ -147,23 +147,40 @@ export class UserService {
         };
     }
 
-    async getDetail(id:number):Promise <User>{
+    async getDetail(id: number): Promise<User> {
         return this.prismaService.user.findFirst({
-            where:{
+            where: {
                 id
             }
         })
     }
 
 
-    async update (id:number, data:UpdateUserDto):Promise<User>
-    {
+    async update(id: number, data: UpdateUserDto): Promise<User> {
         return await this.prismaService.user.update({
-            where:{
+            where: {
                 id
             },
             data
         })
     }
-    
+    async getMe() {
+        return "hiii"
+    }
+    async findOne(username: string): Promise<any> {
+        const user = await this.prismaService.account.findUnique({
+            where: { username: username },
+        });
+
+        if (!user) {
+            throw new NotFoundException(`User with username ${username} not found`);
+        }
+
+        return user;
+    }
+
+    async isValidPassword(password: string, hash: string) {
+        return compareSync(password, hash)
+    }
+
 }
