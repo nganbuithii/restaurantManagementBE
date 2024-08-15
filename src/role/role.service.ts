@@ -23,7 +23,11 @@ export class RoleService {
                 name: body.name,
             },
         });
-    
+
         return role;
+    }
+
+    async getAll(): Promise<Role[]> {
+        return this.prismaService.role.findMany();
     }
 }

@@ -1,4 +1,4 @@
-import { Body, Controller, Post } from '@nestjs/common';
+import { Body, Controller, Get, Post, Query } from '@nestjs/common';
 import { RoleService } from './role.service';
 import { Role } from '@prisma/client';
 import { CreateRoleDto } from './dto/role.dto';
@@ -10,4 +10,10 @@ export class RoleController {
     create(@Body() body: CreateRoleDto): Promise<Role> {
         return this.roleService.create(body);
     }
+
+    @Get()
+    async getAll(): Promise<Role[]> {
+      return this.roleService.getAll();
+    }
+
 }

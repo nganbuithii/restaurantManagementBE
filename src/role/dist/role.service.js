@@ -76,6 +76,13 @@ var RoleService = /** @class */ (function () {
             });
         });
     };
+    RoleService.prototype.getAll = function () {
+        return __awaiter(this, void 0, Promise, function () {
+            return __generator(this, function (_a) {
+                return [2 /*return*/, this.prismaService.role.findMany()];
+            });
+        });
+    };
     RoleService = __decorate([
         common_1.Injectable()
     ], RoleService);
