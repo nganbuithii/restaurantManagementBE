@@ -83,6 +83,48 @@ var RoleService = /** @class */ (function () {
             });
         });
     };
+    RoleService.prototype.getById = function (id) {
+        return __awaiter(this, void 0, Promise, function () {
+            var role;
+            return __generator(this, function (_a) {
+                switch (_a.label) {
+                    case 0: return [4 /*yield*/, this.prismaService.role.findUnique({
+                            where: { id: id }
+                        })];
+                    case 1:
+                        role = _a.sent();
+                        if (!role) {
+                            throw new common_1.NotFoundException("Role with ID " + id + " not found");
+                        }
+                        return [2 /*return*/, role];
+                }
+            });
+        });
+    };
+    RoleService.prototype.update = function (id, name) {
+        return __awaiter(this, void 0, Promise, function () {
+            var role;
+            return __generator(this, function (_a) {
+                switch (_a.label) {
+                    case 0: return [4 /*yield*/, this.prismaService.role.findUnique({
+                            where: { id: id }
+                        })];
+                    case 1:
+                        role = _a.sent();
+                        if (!role) {
+                            throw new common_1.NotFoundException("Role with ID " + id + " not found");
+                        }
+                        return [2 /*return*/, this.prismaService.role.update({
+                                where: { id: id },
+                                data: {
+                                    name: name,
+                                    updatedAt: new Date()
+                                }
+                            })];
+                }
+            });
+        });
+    };
     RoleService = __decorate([
         common_1.Injectable()
     ], RoleService);
