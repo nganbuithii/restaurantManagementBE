@@ -14,6 +14,7 @@ export class RegisterDto {
     email: string
     @IsNotEmpty({ message: 'Fullname can not empty' })
     fullName: string
+    // @IsNotEmpty({ message: 'Fullname can not empty' })
     avatar: string
 
 }

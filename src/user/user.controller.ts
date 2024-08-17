@@ -12,7 +12,7 @@ export class UserController {
     constructor(private readonly userService: UserService) { }
 
     @Post()
-    create(@Body() body: CreateUserDto): Promise<User> {
+    create(@Body() body: CreateUserDto): Promise<Omit<User, 'password'>> {
         return this.userService.create(body);
     }
 
@@ -22,7 +22,7 @@ export class UserController {
     }
 
     @Get(':id')
-    getDetail(@Param('id', ParseIntPipe) id: number): Promise<User> {
+    getDetail(@Param('id', ParseIntPipe) id: number):Promise<Omit<User, 'password'>> {
         return this.userService.getDetail(id);
     }
 

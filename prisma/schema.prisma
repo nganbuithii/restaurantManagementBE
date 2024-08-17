@@ -1,9 +1,3 @@
-// This is your Prisma schema file,
-// learn more about it in the docs: https://pris.ly/d/prisma-schema
-
-// Looking for ways to speed up your queries, or scale easily with your serverless or edge functions?
-// Try Prisma Accelerate: https://pris.ly/cli/accelerate-init
-// NEST JS KHÔNG HỖ TRỢ KẾ THỪA MODEL NÀY VỚI MODEL KHáC
 generator client {
   provider = "prisma-client-js"
 }
@@ -14,49 +8,53 @@ datasource db {
 }
 
 model User {
-  id       Int     @id @default(autoincrement())
-  email    String  @unique
-  fullName String
-  phone    String?
-
-// quan hệ với account
-  account   Account   @relation(fields: [accountId], references: [id])
-  accountId Int       @unique
-  
-  createdAt DateTime  @default(now())
-  updatedAt DateTime? @updatedAt
-
-  employee Employee? @relation
-  customer Customer? @relation
-
-  feeckbacks Feedbacks? @relation
-
-  orders Order? @relation
-
-  suppliers Suppliers? @relation
-
-  menuItems MenuItems? @relation
-}
-
-model Account {
-  id        Int       @id @default(autoincrement())
-  username  String    @unique
+  id        Int      @id @default(autoincrement())
+  email     String   @unique
+  fullName  String
+  phone     String?
+  username  String   @unique
   password  String
-  role      Role      @relation(fields: [roleId], references: [id])
+  avatar String
+  role      Role     @relation(fields: [roleId], references: [id])
   roleId    Int
-  createdAt DateTime  @default(now())
-  updatedAt DateTime? @updatedAt
-  user      User?     @relation
-  isActive  Boolean   @default(true)
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  employee  Employee?
+  customer  Customer?
+  feedbacks Feedback[]
+  orders    Order[]
+  supplier  Supplier?
+  menuItems MenuItem[]
 }
 
 model Role {
-  id        Int       @id @default(autoincrement())
-  name      String    @unique
-  createdAt DateTime  @default(now())
-  updatedAt DateTime? @updatedAt
-  isActive Boolean @default(true)
-  accounts  Account[]
+  id          Int             @id @default(autoincrement())
+  name        String          @unique
+  createdAt   DateTime        @default(now())
+  updatedAt   DateTime        @updatedAt
+  isActive    Boolean         @default(true)
+  permissions RolePermission[]
+  users       User[]
+}
+
+model Permission {
+  id          Int             @id @default(autoincrement())
+  action      String
+  description String?
+  createdAt   DateTime        @default(now())
+  updatedAt   DateTime        @updatedAt
+  roles       RolePermission[]
+}
+
+model RolePermission {
+  roleId       Int
+  permissionId Int
+  createdAt    DateTime   @default(now())
+  role         Role       @relation(fields: [roleId], references: [id])
+  permission   Permission @relation(fields: [permissionId], references: [id])
+
+  @@id([roleId, permissionId])
 }
 
 model Employee {
@@ -65,211 +63,193 @@ model Employee {
   salary    Float
   position  String
   createdAt DateTime  @default(now())
-  updatedAt DateTime? @updatedAt
-  
-
-  user   User @relation(fields: [userId], references: [id])
-  userId Int  @unique
-
-  // 1 nv - n phiếu nhập
-  slips WarehouseSlip[]
+  updatedAt DateTime  @updatedAt
+  user      User      @relation(fields: [userId], references: [id])
+  userId    Int       @unique
+  slips     WarehouseSlip[]
 }
 
 model Customer {
-  id        Int       @id @default(autoincrement())
-  points    Int       @default(0)
-  createdAt DateTime  @default(now())
-  updatedAt DateTime? @updatedAt
-
-  user   User @relation(fields: [userId], references: [id])
-  userId Int  @unique
-
-  // 1 kh - n lịch hẹn
+  id           Int          @id @default(autoincrement())
+  points       Int          @default(0)
+  createdAt    DateTime     @default(now())
+  updatedAt    DateTime     @updatedAt
+  user         User         @relation(fields: [userId], references: [id])
+  userId       Int          @unique
   reservations Reservation[]
-
-  // 1KH - n voucher
-  vouchers Voucher[]
+  vouchers     Voucher[]
 }
 
 model Order {
-  id            Int    @id @default(autoincrement())
+  id            Int           @id @default(autoincrement())
   status        String
   totalPrice    Float
-  discountPrice Float  @default(0)
-
-  // một user - nhiều hóa đơn
-  userId Int  @unique
-  user   User @relation(fields: [userId], references: [id])
-
-  createdAt DateTime  @default(now())
-  updatedAt DateTime? @updatedAt
-
-  // 1 hóa đơn - n chi tiết hóa đơn
-  details DetailOrder[]
+  discountPrice Float         @default(0)
+  userId        Int
+  user          User          @relation(fields: [userId], references: [id])
+  createdAt     DateTime      @default(now())
+  updatedAt     DateTime      @updatedAt
+  details       OrderDetail[]
 }
 
-model DetailOrder {
-  id       Int @id @default(autoincrement())
-  quantity Int
-
-  createdAt DateTime  @default(now())
-  updatedAt DateTime? @updatedAt
-
-  // 1 hóa đơn - n chi tiết hóa đơn
-  orderId Int @unique
-  order Order @relation(fields: [orderId], references: [id])
-
-  // 1 chi tiết - n món ăn
-  menuItems MenuItems[]
+model OrderDetail {
+  id         Int      @id @default(autoincrement())
+  quantity   Int
+  createdAt  DateTime @default(now())
+  updatedAt  DateTime @updatedAt
+  orderId    Int
+  order      Order    @relation(fields: [orderId], references: [id])
+  menuItemId Int
+  menuItem   MenuItem @relation(fields: [menuItemId], references: [id])
 }
 
 model Table {
-  id        Int       @id @default(autoincrement())
-  number    Int       @unique // Số hiệu bàn
-  seats     Int // Số lượng ghế
-  status String
-  createdAt DateTime  @default(now())
-  updatedAt DateTime? @updatedAt
-
-  // 1 bàn có thể có nhiêu lịch hẹn
+  id           Int           @id @default(autoincrement())
+  number       Int           @unique
+  seats        Int
+  status       String
+  createdAt    DateTime      @default(now())
+  updatedAt    DateTime      @updatedAt
   reservations Reservation[]
 }
 
 model Reservation {
-  id        Int      @id @default(autoincrement())
-  startTime DateTime // Thời gian bắt đầu
-  endTime   DateTime // Thời gian kết thúc
-  status    String // Trạng thái: "Reserved", "Occupied", "Available", etc.
+  id         Int      @id @default(autoincrement())
+  startTime  DateTime
+  endTime    DateTime
+  status     String
+  createdAt  DateTime @default(now())
+  updatedAt  DateTime @updatedAt
+  tableId    Int
+  table      Table    @relation(fields: [tableId], references: [id])
+  customerId Int
+  customer   Customer @relation(fields: [customerId], references: [id])
 
-  createdAt DateTime  @default(now())
-  updatedAt DateTime? @updatedAt
-
-  // quan hệ 1 lịch hẹn cho 1 bàn
-  // 1 bàn có nhiều lịch hẹn
-  tableId Int   @unique
-  table   Table @relation(fields: [tableId], references: [id])
-
-  // 1 KH-  n lịch hẹn
-  customerId Int      @unique
-  customer   Customer @relation(fields: [customerId], references: [userId])
+  
 }
 
-model MenuItems {
-  id       Int     @id @default(autoincrement())
-  name     String
-  price    String
-  status   String // Trạng thái: "Reserved", "Occupied", "Available", etc.
-  isActive Boolean @default(true)
-
-  createdAt DateTime  @default(now())
-  updatedAt DateTime? @updatedAt
-
-  // 1 user -- nhiều món ăn
-  userId Int  @unique
-  user   User @relation(fields: [userId], references: [id])
-
-  // 1 chi tiết - nhiều món ăn
-  detailId Int @unique
-  detail DetailOrder @relation(fields: [detailId], references: [id])
-
-   // Quan hệ với FoodImage
-  images    FoodImage[]
-
-  // 1 menu - n mons
-  menuId Int @unique
-  menu Menus @relation(fields: [menuId], references: [id])
+model MenuItem {
+  id          Int           @id @default(autoincrement())
+  name        String
+  price       Float
+  status      String
+  isActive    Boolean       @default(true)
+  createdAt   DateTime      @default(now())
+  updatedAt   DateTime      @updatedAt
+  userId      Int
+  user        User          @relation(fields: [userId], references: [id])
+  images      FoodImage[]
+  menuId      Int
+  menu        Menu          @relation(fields: [menuId], references: [id])
+  orderDetails OrderDetail[]
+  ingredients MenuItemIngredient[]
 }
+
 model FoodImage {
-  id       Int    @id @default(autoincrement())
-  url      String 
-  menuItem MenuItems @relation(fields: [menuItemId], references: [id])
-  menuItemId Int @unique
+  id         Int      @id @default(autoincrement())
+  url        String
+  menuItem   MenuItem @relation(fields: [menuItemId], references: [id])
+  menuItemId Int
 }
 
-model Menus {
-  id       Int     @id @default(autoincrement())
-  name     String
-  isActive Boolean @default(true)
-
-  createdAt DateTime  @default(now())
-  updatedAt DateTime? @updatedAt
-
-  // 1 menu - n món ăn
-  menuItems MenuItems[]
+model Menu {
+  id        Int        @id @default(autoincrement())
+  name      String
+  isActive  Boolean    @default(true)
+  createdAt DateTime   @default(now())
+  updatedAt DateTime   @updatedAt
+  menuItems MenuItem[]
 }
 
-
-
-model Suppliers {
-  id      Int    @id @default(autoincrement())
-  name    String
-  address String
-  email   String
-  isActive String
-
-  createdAt DateTime  @default(now())
-  updatedAt DateTime? @updatedAt
-
-  // 1 user -- nhiều nhà c ung cấp
-  userId Int  @unique
-  user   User @relation(fields: [userId], references: [id])
-
-  // 1 nhà cc - n phiếu nhập
-  slips WarehouseSlip[]
+model Supplier {
+  id        Int             @id @default(autoincrement())
+  name      String
+  address   String
+  email     String
+  isActive  Boolean         @default(true)
+  createdAt DateTime        @default(now())
+  updatedAt DateTime        @updatedAt
+  userId    Int             @unique
+  user      User            @relation(fields: [userId], references: [id])
+  slips     WarehouseSlip[]
 }
 
-// nguyên liệu
 model Ingredient {
-  id          Int      @id @default(autoincrement())
+  id          Int                   @id @default(autoincrement())
+  name        String
+  unit        String
   productDate DateTime
   price       Float
-  isActive Boolean @default(true)
-  status String
-  init        String
+  isActive    Boolean               @default(true)
+  status      String
+  createdAt   DateTime              @default(now())
+  updatedAt   DateTime              @updatedAt
+  menuItems   MenuItemIngredient[]
+  slipDetails WarehouseSlipDetail[]
+
+  inventory   Inventory?  
+}
+
+model MenuItemIngredient {
+  menuItemId   Int
+  ingredientId Int
+  quantity     Float
+  menuItem     MenuItem   @relation(fields: [menuItemId], references: [id])
+  ingredient   Ingredient @relation(fields: [ingredientId], references: [id])
+
+  @@id([menuItemId, ingredientId])
 }
 
 model Voucher {
   id          Int      @id @default(autoincrement())
+  code        String   @unique
   percent     Int
   description String
   startDate   DateTime @default(now())
   endDate     DateTime
-  isActive    Boolean @default(true)
-
-  createdAt DateTime  @default(now())
-  updatedAt DateTime? @updatedAt
-  
-  // 1kh - n voucher
-  customerId Int @unique
-  customer Customer @relation(fields: [customerId], references: [userId])
+  isActive    Boolean  @default(true)
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+  customerId  Int
+  customer    Customer @relation(fields: [customerId], references: [id])
 }
 
-model Feedbacks {
-  id      Int    @id @default(autoincrement())
-  content String
-  rating  Int    @default(5)
-  isActive Boolean @default(true)
-
-  createdAt DateTime  @default(now())
-  updatedAt DateTime? @updatedAt
-
-  // quan hệ 1 nhiều : 1 user - n feedback
-  userId Int  @unique
-  user   User @relation(fields: [userId], references: [id])
+model Feedback {
+  id        Int      @id @default(autoincrement())
+  content   String
+  rating    Int      @default(5)
+  isActive  Boolean  @default(true)
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+  userId    Int
+  user      User     @relation(fields: [userId], references: [id])
 }
 
-// phiếu nhập xuất kho
 model WarehouseSlip {
-  id        Int       @id @default(autoincrement())
+  id         Int                   @id @default(autoincrement())
+  type       String // "IN" or "OUT"
+  createdAt  DateTime              @default(now())
+  updatedAt  DateTime              @updatedAt
+  employeeId Int
+  employee   Employee              @relation(fields: [employeeId], references: [id])
+  supplierId Int
+  supplier   Supplier              @relation(fields: [supplierId], references: [id])
+  details    WarehouseSlipDetail[]
+}
 
-  createdAt DateTime  @default(now())
-  updatedAt DateTime? @updatedAt
+model WarehouseSlipDetail {
+  id              Int           @id @default(autoincrement())
+  quantity        Float
+  warehouseSlipId Int
+  warehouseSlip   WarehouseSlip @relation(fields: [warehouseSlipId], references: [id])
+  ingredientId    Int
+  ingredient      Ingredient    @relation(fields: [ingredientId], references: [id])
+}
 
-  // 1 nv - n phiếu
-  employeeId Int @unique
-  employee Employee @relation(fields: [employeeId], references: [userId])
-
-  // 1 ncc- n phiếu
-  supplierId Int @unique
-  supplier Suppliers @relation(fields: [supplierId], references: [id])
+model Inventory {
+  id           Int       @id @default(autoincrement())
+  quantity     Float
+  lastChecked  DateTime
+  ingredientId Int       @unique
+  ingredient   Ingredient @relation(fields: [ingredientId], references: [id])
 }

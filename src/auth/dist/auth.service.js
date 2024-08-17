@@ -55,10 +55,10 @@ var AuthService = /** @class */ (function () {
             var _this = this;
             return __generator(this, function (_a) {
                 return [2 /*return*/, this.prismaService.$transaction(function (prisma) { return __awaiter(_this, void 0, void 0, function () {
-                        var existingAccount, existingUser, hashedPassword, defaultRole, newAccount, newUser;
+                        var existingAccount, existingUser, hashedPassword, defaultRole, newUser;
                         return __generator(this, function (_a) {
                             switch (_a.label) {
-                                case 0: return [4 /*yield*/, this.prismaService.account.findUnique({
+                                case 0: return [4 /*yield*/, prisma.user.findUnique({
                                         where: { username: userData.username }
                                     })];
                                 case 1:
@@ -82,24 +82,20 @@ var AuthService = /** @class */ (function () {
                                         })];
                                 case 3:
                                     defaultRole = _a.sent();
-                                    return [4 /*yield*/, prisma.account.create({
-                                            data: {
-                                                username: userData.username,
-                                                password: hashedPassword,
-                                                role: { connect: { id: defaultRole.id } }
-                                            }
-                                        })];
-                                case 4:
-                                    newAccount = _a.sent();
                                     return [4 /*yield*/, prisma.user.create({
                                             data: {
                                                 fullName: userData.fullName,
                                                 email: userData.email,
                                                 phone: userData.phone || null,
-                                                account: { connect: { id: newAccount.id } }
+                                                username: userData.username,
+                                                password: hashedPassword,
+                                                role: {
+                                                    connect: { id: defaultRole.id } // Liên kết với role mặc định
+                                                },
+                                                avatar: userData.avatar || ''
                                             }
                                         })];
-                                case 5:
+                                case 4:
                                     newUser = _a.sent();
                                     return [2 /*return*/, newUser];
                             }
@@ -111,7 +107,7 @@ var AuthService = /** @class */ (function () {
             var account, payload, accessToken, refreshToken;
             return __generator(this, function (_a) {
                 switch (_a.label) {
-                    case 0: return [4 /*yield*/, this.prismaService.account.findUnique({
+                    case 0: return [4 /*yield*/, this.prismaService.user.findUnique({
                             where: { username: data.username }
                         })];
                     case 1:

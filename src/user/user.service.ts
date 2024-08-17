@@ -1,25 +1,26 @@
-
 import { HttpException, HttpStatus, Injectable, NotFoundException } from '@nestjs/common';
 import { PrismaService } from 'src/prisma.service';
-import { CreateUserDto, UpdateUserDto, UserFilterType, UserpaginationResponseType } from './dto/user.dto';
-import { hash, compare, compareSync } from 'bcrypt';
+import { CreateUserDto, UpdateUserDto, UserDto, UserFilterType, UserpaginationResponseType } from './dto/user.dto';
+import { hash, compareSync } from 'bcrypt';
 import { User } from '@prisma/client';
-import { contains } from 'class-validator';
+import { plainToClass } from 'class-transformer';
 
 @Injectable()
 export class UserService {
     constructor(private prismaService: PrismaService) { }
-    async create(body: CreateUserDto): Promise<User> {
+
+    async create(body: CreateUserDto): Promise<Omit<User, 'password'>> {
         const role = await this.prismaService.role.findUnique({
             where: { id: body.roleId },
         });
 
-        if (!role) {
+        if (!role || !role.isActive) {
             throw new HttpException(
-                { message: 'Invalid role ID' },
+                { message: 'Invalid or inactive role ID' },
                 HttpStatus.BAD_REQUEST
             );
         }
+
         // Bước 1: Kiểm tra xem email đã tồn tại hay chưa
         const existingUser = await this.prismaService.user.findUnique({
             where: {
@@ -35,7 +36,7 @@ export class UserService {
         }
 
         // Bước 2: Kiểm tra xem username đã tồn tại hay chưa
-        const existingAccount = await this.prismaService.account.findUnique({
+        const existingAccount = await this.prismaService.user.findUnique({
             where: {
                 username: body.username,
             },
@@ -55,34 +56,27 @@ export class UserService {
         const result = await this.prismaService.user.create({
             data: {
                 email: body.email,
-                phone: body.phone, // Có thể để undefined nếu không có giá trị
-                fullName: body.fullName, // Thêm thuộc tính này nếu cần
-                account: {
-                    create: {
-                        username: body.username,
-                        password: hashedPassword, // Sử dụng password đã băm
-                        role: {
-                            connect: {
-                                id: body.roleId, // Truyền id hợp lệ của role
-                            },
-                        },
+                phone: body.phone,
+                fullName: body.fullName,
+                username: body.username,
+                password: hashedPassword,
+                avatar: body.avatar || "",
+                role: {
+                    connect: {
+                        id: body.roleId,
                     },
                 },
             },
-            include: {
-                account: true,
-            },
         });
 
+        const { password, ...dataWithoutPassword } = result;
 
-        return result;
+        return dataWithoutPassword;
     }
-
-
 
     async getAll(filters: UserFilterType): Promise<UserpaginationResponseType> {
         const items_per_page = Number(filters.items_per_page) || 10;
-        const page = Number(filters.page) || 1;  // Sửa thành 1 để bắt đầu từ trang đầu tiên
+        const page = Number(filters.page) || 1;
         const search = filters.search || "";
 
         const skip = page > 1 ? (page - 1) * items_per_page : 0;
@@ -102,21 +96,14 @@ export class UserService {
                         },
                     },
                 ],
-                AND: [
-                    { account: { isActive: true } },  // Giả sử bạn muốn lọc theo trạng thái tài khoản
-                ],
             },
             orderBy: {
                 createdAt: "desc",
             },
-            include: {
-                account: {
-                    include: {
-                        role: true,  // Bao gồm thông tin vai trò của tài khoản
-                    },
-                },
-            },
         });
+
+        // Chuyển đổi dữ liệu thành UserDto
+        const userDtos = users.map(user => plainToClass(UserDto, user));
 
         // Tính tổng số người dùng
         const total = await this.prismaService.user.count({
@@ -133,43 +120,56 @@ export class UserService {
                         },
                     },
                 ],
-                AND: [
-                    { account: { isActive: true } },  // Giả sử bạn muốn lọc theo trạng thái tài khoản
-                ],
             },
         });
 
         return {
-            data: users,
+            data: userDtos,
             total,
             currentPage: page,
             itemsPerPage: items_per_page,
         };
     }
 
-    async getDetail(id: number): Promise<User> {
-        return this.prismaService.user.findFirst({
+    async getDetail(id: number): Promise<Omit<User, 'password'>> {
+        const user = await this.prismaService.user.findUnique({
             where: {
-                id
-            }
-        })
+                id,
+            },
+        });
+
+        if (!user) {
+            throw new NotFoundException(`User with ID ${id} not found`);
+        }
+
+        // Loại bỏ thuộc tính password
+        const { password, ...userData } = user;
+
+        return userData;
     }
 
-
     async update(id: number, data: UpdateUserDto): Promise<User> {
+        // Xử lý dữ liệu cập nhật
+        const updateData: any = { ...data };
+
+
+
         return await this.prismaService.user.update({
             where: {
                 id
             },
-            data
-        })
+            data: updateData,
+        });
     }
+
+
     async getMe() {
-        return "hiii"
+        return "hiii";
     }
-    async findOne(username: string): Promise<any> {
-        const user = await this.prismaService.account.findUnique({
-            where: { username: username },
+
+    async findOne(username: string): Promise<User> {
+        const user = await this.prismaService.user.findUnique({
+            where: { username },
         });
 
         if (!user) {
@@ -180,7 +180,6 @@ export class UserService {
     }
 
     async isValidPassword(password: string, hash: string) {
-        return compareSync(password, hash)
+        return compareSync(password, hash);
     }
-
 }

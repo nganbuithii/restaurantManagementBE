@@ -18,65 +18,63 @@ export class AuthService {
 
     register = async (userData: RegisterDto): Promise<User> => {
         return this.prismaService.$transaction(async (prisma) => {
-            const existingAccount = await this.prismaService.account.findUnique({
+            // Bước 1: Kiểm tra tên người dùng đã tồn tại chưa
+            const existingAccount = await prisma.user.findUnique({
                 where: { username: userData.username },
             });
-
+    
             if (existingAccount) {
                 throw new HttpException(
                     { message: 'This username has been used' },
                     HttpStatus.BAD_REQUEST
                 );
             }
-            // Bước 1: Kiểm tra email đã tồn tại chưa
+    
+            // Bước 2: Kiểm tra email đã tồn tại chưa
             const existingUser = await prisma.user.findUnique({
                 where: { email: userData.email },
             });
-
+    
             if (existingUser) {
                 throw new HttpException(
                     { message: 'This email has been used' },
                     HttpStatus.BAD_REQUEST
                 );
             }
-
-            // Bước 2: Băm mật khẩu
+    
+            // Bước 3: Băm mật khẩu
             const hashedPassword = createHash('sha256').update(userData.password).digest('hex');
-
-            // Bước 3: Tạo hoặc lấy role mặc định
+    
+            // Bước 4: Tạo hoặc lấy role mặc định
             const defaultRole = await prisma.role.upsert({
                 where: { name: 'NORMAL_USER' },
                 update: {},
                 create: { name: 'NORMAL_USER' },
             });
-
-            // Bước 4: Tạo tài khoản mới
-            const newAccount = await prisma.account.create({
-                data: {
-                    username: userData.username,
-                    password: hashedPassword,
-                    role: { connect: { id: defaultRole.id } },
-                },
-            });
-
-            // Bước 5: Tạo người dùng mới và liên kết với tài khoản
+    
+            // Bước 5: Tạo người dùng mới và liên kết với role mặc định
             const newUser = await prisma.user.create({
                 data: {
                     fullName: userData.fullName,
                     email: userData.email,
                     phone: userData.phone || null,
-                    account: { connect: { id: newAccount.id } }, // Kết nối tài khoản
+                    username: userData.username,
+                    password: hashedPassword,  // Lưu mật khẩu đã được băm
+                    role: {
+                        connect: { id: defaultRole.id }  // Liên kết với role mặc định
+                    },
+                    avatar: userData.avatar || '', 
                 },
             });
-
-
+    
             return newUser;
         });
     };
+    
 
     login = async (data: { username: string, password: string }): Promise<any> => {
         // Kiểm tra tài khoản có tồn tại không
-        const account = await this.prismaService.account.findUnique({
+        const account = await this.prismaService.user.findUnique({
             where: { username: data.username },
         });
 

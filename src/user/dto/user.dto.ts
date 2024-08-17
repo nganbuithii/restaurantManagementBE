@@ -1,4 +1,5 @@
 import { User } from "@prisma/client";
+import { Exclude, Expose } from "class-transformer";
 import { IsEmail, IsNotEmpty, IsOptional, Matches, MinLength } from "class-validator"
 
 
@@ -31,6 +32,8 @@ export class CreateUserDto {
   roleId: number;
   @IsNotEmpty({ message: 'Fullname can not empty' })
   fullName:string;
+  @IsOptional()
+  avatar?: string; 
 }
 
 
@@ -41,7 +44,7 @@ export interface UserFilterType {
 }
 
 export interface UserpaginationResponseType{
-  data:User[]
+  data:UserDto[]
   total:number
   currentPage:number
   itemsPerPage:number
@@ -65,4 +68,33 @@ export class UpdateUserDto {
   
   @IsOptional()
   fullName:string;
+}
+@Exclude()
+export class UserDto {
+  @Expose()
+  id: number;
+
+  @Expose()
+  email: string;
+
+  @Expose()
+  fullName: string;
+
+  @Expose()
+  phone: string;
+
+  @Expose()
+  username: string;
+
+  @Expose()
+  avatar: string;
+
+  @Expose()
+  roleId: number;
+
+  @Expose()
+  createdAt: Date;
+
+  @Expose()
+  updatedAt: Date;
 }
