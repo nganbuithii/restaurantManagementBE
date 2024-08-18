@@ -7,6 +7,9 @@ import { APP_PIPE } from '@nestjs/core';
 import { UserModule } from './user/user.module';
 import { ConfigModule, ConfigService } from '@nestjs/config';
 import { JwtModule } from '@nestjs/jwt';
+import { PermissionModule } from './permission/permission.module';
+
+
 
 
 @Module({
@@ -22,7 +25,7 @@ import { JwtModule } from '@nestjs/jwt';
     
     ConfigModule,
     UserModule,
-    AuthModule, RoleModule
+    AuthModule, RoleModule, PermissionModule, 
   ],
   controllers: [AppController],
   providers: [

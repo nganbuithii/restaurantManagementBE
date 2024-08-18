@@ -14,7 +14,7 @@ model User {
   phone     String?
   username  String   @unique
   password  String
-  avatar String
+  avatar    String
   role      Role     @relation(fields: [roleId], references: [id])
   roleId    Int
   createdAt DateTime @default(now())
@@ -29,21 +29,22 @@ model User {
 }
 
 model Role {
-  id          Int             @id @default(autoincrement())
-  name        String          @unique
-  createdAt   DateTime        @default(now())
-  updatedAt   DateTime        @updatedAt
-  isActive    Boolean         @default(true)
+  id          Int              @id @default(autoincrement())
+  name        String           @unique
+  createdAt   DateTime         @default(now())
+  updatedAt   DateTime         @updatedAt
+  isActive    Boolean          @default(true)
   permissions RolePermission[]
   users       User[]
 }
 
 model Permission {
-  id          Int             @id @default(autoincrement())
+  id          Int              @id @default(autoincrement())
   action      String
   description String?
-  createdAt   DateTime        @default(now())
-  updatedAt   DateTime        @updatedAt
+  createdAt   DateTime         @default(now())
+  updatedAt   DateTime         @updatedAt
+  deletedAt   DateTime?
   roles       RolePermission[]
 }
 
@@ -58,24 +59,24 @@ model RolePermission {
 }
 
 model Employee {
-  id        Int       @id @default(autoincrement())
+  id        Int             @id @default(autoincrement())
   hireDate  DateTime
   salary    Float
   position  String
-  createdAt DateTime  @default(now())
-  updatedAt DateTime  @updatedAt
-  user      User      @relation(fields: [userId], references: [id])
-  userId    Int       @unique
+  createdAt DateTime        @default(now())
+  updatedAt DateTime        @updatedAt
+  user      User            @relation(fields: [userId], references: [id])
+  userId    Int             @unique
   slips     WarehouseSlip[]
 }
 
 model Customer {
-  id           Int          @id @default(autoincrement())
-  points       Int          @default(0)
-  createdAt    DateTime     @default(now())
-  updatedAt    DateTime     @updatedAt
-  user         User         @relation(fields: [userId], references: [id])
-  userId       Int          @unique
+  id           Int           @id @default(autoincrement())
+  points       Int           @default(0)
+  createdAt    DateTime      @default(now())
+  updatedAt    DateTime      @updatedAt
+  user         User          @relation(fields: [userId], references: [id])
+  userId       Int           @unique
   reservations Reservation[]
   vouchers     Voucher[]
 }
@@ -124,25 +125,23 @@ model Reservation {
   table      Table    @relation(fields: [tableId], references: [id])
   customerId Int
   customer   Customer @relation(fields: [customerId], references: [id])
-
-  
 }
 
 model MenuItem {
-  id          Int           @id @default(autoincrement())
-  name        String
-  price       Float
-  status      String
-  isActive    Boolean       @default(true)
-  createdAt   DateTime      @default(now())
-  updatedAt   DateTime      @updatedAt
-  userId      Int
-  user        User          @relation(fields: [userId], references: [id])
-  images      FoodImage[]
-  menuId      Int
-  menu        Menu          @relation(fields: [menuId], references: [id])
+  id           Int                  @id @default(autoincrement())
+  name         String
+  price        Float
+  status       String
+  isActive     Boolean              @default(true)
+  createdAt    DateTime             @default(now())
+  updatedAt    DateTime             @updatedAt
+  userId       Int
+  user         User                 @relation(fields: [userId], references: [id])
+  images       FoodImage[]
+  menuId       Int
+  menu         Menu                 @relation(fields: [menuId], references: [id])
   orderDetails OrderDetail[]
-  ingredients MenuItemIngredient[]
+  ingredients  MenuItemIngredient[]
 }
 
 model FoodImage {
@@ -187,7 +186,7 @@ model Ingredient {
   menuItems   MenuItemIngredient[]
   slipDetails WarehouseSlipDetail[]
 
-  inventory   Inventory?  
+  inventory Inventory?
 }
 
 model MenuItemIngredient {
@@ -247,9 +246,9 @@ model WarehouseSlipDetail {
 }
 
 model Inventory {
-  id           Int       @id @default(autoincrement())
+  id           Int        @id @default(autoincrement())
   quantity     Float
   lastChecked  DateTime
-  ingredientId Int       @unique
+  ingredientId Int        @unique
   ingredient   Ingredient @relation(fields: [ingredientId], references: [id])
 }

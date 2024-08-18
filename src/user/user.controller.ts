@@ -4,6 +4,8 @@ import { UserService } from './user.service';
 import { User } from '@prisma/client';
 import { Request } from 'express';
 import { JwtAuthGuard } from 'src/auth/jwt-auth.guard';
+import { Permissions } from 'decorators/permission';
+import { PermissionsGuard } from 'guards/role.guard';
 
 
 
@@ -12,6 +14,8 @@ export class UserController {
     constructor(private readonly userService: UserService) { }
 
     @Post()
+    // @Permissions('create:user')  // Quyền yêu cầu để tạo người dùng
+    // @UseGuards(PermissionsGuard)
     create(@Body() body: CreateUserDto): Promise<Omit<User, 'password'>> {
         return this.userService.create(body);
     }

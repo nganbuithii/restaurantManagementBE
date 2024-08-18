@@ -15,6 +15,8 @@ var UserController = /** @class */ (function () {
     function UserController(userService) {
         this.userService = userService;
     }
+    // @Permissions('create:user')  // Quyền yêu cầu để tạo người dùng
+    // @UseGuards(PermissionsGuard)
     UserController.prototype.create = function (body) {
         return this.userService.create(body);
     };
