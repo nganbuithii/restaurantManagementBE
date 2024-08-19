@@ -8,27 +8,32 @@ import { UserModule } from './user/user.module';
 import { ConfigModule, ConfigService } from '@nestjs/config';
 import { JwtModule } from '@nestjs/jwt';
 import { PermissionModule } from './permission/permission.module';
+import { MenuItemModule } from './menu-item/menu-item.module';
+import { JwtAuthGuard } from './auth/jwt-auth.guard';
+
 
 
 
 
 @Module({
   imports: [
+    ConfigModule.forRoot(),
     JwtModule.registerAsync({
       imports: [ConfigModule],
       useFactory: async (configService: ConfigService) => ({
         secret: configService.get<string>('JWT_SECRET'),
-        signOptions: { expiresIn: '60s' },
+        signOptions: { expiresIn: '60m' },
       }),
       inject: [ConfigService],
     }),
     
     ConfigModule,
     UserModule,
-    AuthModule, RoleModule, PermissionModule, 
+    AuthModule, RoleModule, PermissionModule, MenuItemModule, 
   ],
   controllers: [AppController],
   providers: [
+    JwtAuthGuard,
     AppService,
     {
       provide:APP_PIPE,

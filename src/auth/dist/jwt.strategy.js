@@ -1,4 +1,17 @@
 "use strict";
+var __extends = (this && this.__extends) || (function () {
+    var extendStatics = function (d, b) {
+        extendStatics = Object.setPrototypeOf ||
+            ({ __proto__: [] } instanceof Array && function (d, b) { d.__proto__ = b; }) ||
+            function (d, b) { for (var p in b) if (b.hasOwnProperty(p)) d[p] = b[p]; };
+        return extendStatics(d, b);
+    };
+    return function (d, b) {
+        extendStatics(d, b);
+        function __() { this.constructor = d; }
+        d.prototype = b === null ? Object.create(b) : (__.prototype = b.prototype, new __());
+    };
+})();
 var __decorate = (this && this.__decorate) || function (decorators, target, key, desc) {
     var c = arguments.length, r = c < 3 ? target : desc === null ? desc = Object.getOwnPropertyDescriptor(target, key) : desc, d;
     if (typeof Reflect === "object" && typeof Reflect.decorate === "function") r = Reflect.decorate(decorators, target, key, desc);
@@ -42,53 +55,34 @@ var __generator = (this && this.__generator) || function (thisArg, body) {
     }
 };
 exports.__esModule = true;
-exports.AppModule = void 0;
+exports.JwtStrategy = void 0;
+var passport_jwt_1 = require("passport-jwt");
+var passport_1 = require("@nestjs/passport");
 var common_1 = require("@nestjs/common");
-var app_controller_1 = require("./app.controller");
-var app_service_1 = require("./app.service");
-var auth_module_1 = require("./auth/auth.module");
-var role_module_1 = require("./role/role.module");
-var core_1 = require("@nestjs/core");
-var user_module_1 = require("./user/user.module");
-var config_1 = require("@nestjs/config");
-var jwt_1 = require("@nestjs/jwt");
-var permission_module_1 = require("./permission/permission.module");
-var menu_item_module_1 = require("./menu-item/menu-item.module");
-var jwt_auth_guard_1 = require("./auth/jwt-auth.guard");
-var AppModule = /** @class */ (function () {
-    function AppModule() {
+var JwtStrategy = /** @class */ (function (_super) {
+    __extends(JwtStrategy, _super);
+    function JwtStrategy(configService) {
+        var _this = this;
+        var jwtSecret = configService.get('JWT_SECRET');
+        // console.log('JWT_SECRET in JwtStrategy:', jwtSecret); // In giá trị secret để kiểm tra
+        _this = _super.call(this, {
+            jwtFromRequest: passport_jwt_1.ExtractJwt.fromAuthHeaderAsBearerToken(),
+            ignoreExpiration: false,
+            secretOrKey: jwtSecret
+        }) || this;
+        _this.configService = configService;
+        return _this;
     }
-    AppModule = __decorate([
-        common_1.Module({
-            imports: [
-                config_1.ConfigModule.forRoot(),
-                jwt_1.JwtModule.registerAsync({
-                    imports: [config_1.ConfigModule],
-                    useFactory: function (configService) { return __awaiter(void 0, void 0, void 0, function () {
-                        return __generator(this, function (_a) {
-                            return [2 /*return*/, ({
-                                    secret: configService.get('JWT_SECRET'),
-                                    signOptions: { expiresIn: '60m' }
-                                })];
-                        });
-                    }); },
-                    inject: [config_1.ConfigService]
-                }),
-                config_1.ConfigModule,
-                user_module_1.UserModule,
-                auth_module_1.AuthModule, role_module_1.RoleModule, permission_module_1.PermissionModule, menu_item_module_1.MenuItemModule,
-            ],
-            controllers: [app_controller_1.AppController],
-            providers: [
-                jwt_auth_guard_1.JwtAuthGuard,
-                app_service_1.AppService,
-                {
-                    provide: core_1.APP_PIPE,
-                    useClass: common_1.ValidationPipe
-                },
-            ]
-        })
-    ], AppModule);
-    return AppModule;
-}());
-exports.AppModule = AppModule;
+    JwtStrategy.prototype.validate = function (payload) {
+        return __awaiter(this, void 0, void 0, function () {
+            return __generator(this, function (_a) {
+                return [2 /*return*/, { userId: payload.sub, username: payload.username }];
+            });
+        });
+    };
+    JwtStrategy = __decorate([
+        common_1.Injectable()
+    ], JwtStrategy);
+    return JwtStrategy;
+}(passport_1.PassportStrategy(passport_jwt_1.Strategy)));
+exports.JwtStrategy = JwtStrategy;

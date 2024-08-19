@@ -71,6 +71,9 @@ var UpdateUserDto = /** @class */ (function () {
     __decorate([
         class_validator_1.IsOptional()
     ], UpdateUserDto.prototype, "fullName");
+    __decorate([
+        class_validator_1.IsOptional()
+    ], UpdateUserDto.prototype, "avatar");
     return UpdateUserDto;
 }());
 exports.UpdateUserDto = UpdateUserDto;

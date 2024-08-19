@@ -1,4 +1,4 @@
-import { HttpException, HttpStatus, Injectable, NotFoundException } from '@nestjs/common';
+import { BadRequestException, HttpException, HttpStatus, Injectable, NotFoundException } from '@nestjs/common';
 import { PrismaService } from 'src/prisma.service';
 import { CreateUserDto, UpdateUserDto, UserDto, UserFilterType, UserpaginationResponseType } from './dto/user.dto';
 import { hash, compareSync } from 'bcrypt';
@@ -182,4 +182,35 @@ export class UserService {
     async isValidPassword(password: string, hash: string) {
         return compareSync(password, hash);
     }
+
+
+    async updateAvt(id: number, avatar: string): Promise<Omit<User, 'password'>> {
+        // Kiểm tra xem id có hợp lệ không
+        if (!id) {
+            throw new BadRequestException('Invalid user ID');
+        }
+    
+        // Kiểm tra xem người dùng có tồn tại không
+        const user = await this.prismaService.user.findUnique({
+            where: {
+                id, // Đảm bảo id không phải là undefined
+            },
+        });
+    
+        if (!user) {
+            throw new NotFoundException(`User with ID ${id} not found`);
+        }
+    
+        // Cập nhật avatar
+        const updatedUser = await this.prismaService.user.update({
+            where: { id },
+            data: { avatar },
+        });
+    
+        // Loại bỏ thuộc tính password
+        const { password, ...userData } = updatedUser;
+    
+        return userData;
+    }
+    
 }

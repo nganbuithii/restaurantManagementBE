@@ -68,6 +68,9 @@ export class UpdateUserDto {
   
   @IsOptional()
   fullName:string;
+
+  @IsOptional()
+  avatar:string;
 }
 @Exclude()
 export class UserDto {

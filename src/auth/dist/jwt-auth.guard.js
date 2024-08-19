@@ -42,53 +42,58 @@ var __generator = (this && this.__generator) || function (thisArg, body) {
     }
 };
 exports.__esModule = true;
-exports.AppModule = void 0;
+exports.JwtAuthGuard = void 0;
 var common_1 = require("@nestjs/common");
-var app_controller_1 = require("./app.controller");
-var app_service_1 = require("./app.service");
-var auth_module_1 = require("./auth/auth.module");
-var role_module_1 = require("./role/role.module");
-var core_1 = require("@nestjs/core");
-var user_module_1 = require("./user/user.module");
-var config_1 = require("@nestjs/config");
-var jwt_1 = require("@nestjs/jwt");
-var permission_module_1 = require("./permission/permission.module");
-var menu_item_module_1 = require("./menu-item/menu-item.module");
-var jwt_auth_guard_1 = require("./auth/jwt-auth.guard");
-var AppModule = /** @class */ (function () {
-    function AppModule() {
+var JwtAuthGuard = /** @class */ (function () {
+    function JwtAuthGuard(jwtService, configService) {
+        this.jwtService = jwtService;
+        this.configService = configService;
     }
-    AppModule = __decorate([
-        common_1.Module({
-            imports: [
-                config_1.ConfigModule.forRoot(),
-                jwt_1.JwtModule.registerAsync({
-                    imports: [config_1.ConfigModule],
-                    useFactory: function (configService) { return __awaiter(void 0, void 0, void 0, function () {
-                        return __generator(this, function (_a) {
-                            return [2 /*return*/, ({
-                                    secret: configService.get('JWT_SECRET'),
-                                    signOptions: { expiresIn: '60m' }
-                                })];
-                        });
-                    }); },
-                    inject: [config_1.ConfigService]
-                }),
-                config_1.ConfigModule,
-                user_module_1.UserModule,
-                auth_module_1.AuthModule, role_module_1.RoleModule, permission_module_1.PermissionModule, menu_item_module_1.MenuItemModule,
-            ],
-            controllers: [app_controller_1.AppController],
-            providers: [
-                jwt_auth_guard_1.JwtAuthGuard,
-                app_service_1.AppService,
-                {
-                    provide: core_1.APP_PIPE,
-                    useClass: common_1.ValidationPipe
-                },
-            ]
-        })
-    ], AppModule);
-    return AppModule;
+    JwtAuthGuard.prototype.canActivate = function (context) {
+        return __awaiter(this, void 0, Promise, function () {
+            var request, token, secret, payload, error_1;
+            return __generator(this, function (_a) {
+                switch (_a.label) {
+                    case 0:
+                        request = context.switchToHttp().getRequest();
+                        token = this.extractTokenFromHeader(request);
+                        if (!token) {
+                            throw new common_1.UnauthorizedException();
+                        }
+                        _a.label = 1;
+                    case 1:
+                        _a.trys.push([1, 3, , 4]);
+                        secret = this.configService.get('SECRET');
+                        if (!secret) {
+                            throw new Error('Secret key is not defined');
+                        }
+                        return [4 /*yield*/, this.jwtService.verifyAsync(token, {
+                                secret: secret
+                            })];
+                    case 2:
+                        payload = _a.sent();
+                        request.user = payload;
+                        return [3 /*break*/, 4];
+                    case 3:
+                        error_1 = _a.sent();
+                        console.error('JWT Error:', error_1.message);
+                        throw new common_1.UnauthorizedException();
+                    case 4: return [2 /*return*/, true];
+                }
+            });
+        });
+    };
+    JwtAuthGuard.prototype.extractTokenFromHeader = function (request) {
+        var authorizationHeader = request.headers.authorization;
+        if (!authorizationHeader) {
+            return null;
+        }
+        var _a = authorizationHeader.split(' '), type = _a[0], token = _a[1];
+        return type === 'Bearer' ? token : null;
+    };
+    JwtAuthGuard = __decorate([
+        common_1.Injectable()
+    ], JwtAuthGuard);
+    return JwtAuthGuard;
 }());
-exports.AppModule = AppModule;
+exports.JwtAuthGuard = JwtAuthGuard;

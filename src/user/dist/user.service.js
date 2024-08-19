@@ -265,6 +265,38 @@ var UserService = /** @class */ (function () {
             });
         });
     };
+    UserService.prototype.updateAvt = function (id, avatar) {
+        return __awaiter(this, void 0, Promise, function () {
+            var user, updatedUser, password, userData;
+            return __generator(this, function (_a) {
+                switch (_a.label) {
+                    case 0:
+                        // Kiểm tra xem id có hợp lệ không
+                        if (!id) {
+                            throw new common_1.BadRequestException('Invalid user ID');
+                        }
+                        return [4 /*yield*/, this.prismaService.user.findUnique({
+                                where: {
+                                    id: id
+                                }
+                            })];
+                    case 1:
+                        user = _a.sent();
+                        if (!user) {
+                            throw new common_1.NotFoundException("User with ID " + id + " not found");
+                        }
+                        return [4 /*yield*/, this.prismaService.user.update({
+                                where: { id: id },
+                                data: { avatar: avatar }
+                            })];
+                    case 2:
+                        updatedUser = _a.sent();
+                        password = updatedUser.password, userData = __rest(updatedUser, ["password"]);
+                        return [2 /*return*/, userData];
+                }
+            });
+        });
+    };
     UserService = __decorate([
         common_1.Injectable()
     ], UserService);

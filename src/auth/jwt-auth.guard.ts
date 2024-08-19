@@ -1,37 +1,49 @@
-import { ExecutionContext, Injectable, UnauthorizedException } from "@nestjs/common";
-import { JwtService } from "@nestjs/jwt";
-import { AuthGuard } from "@nestjs/passport";
+import { Injectable, CanActivate, ExecutionContext, UnauthorizedException } from '@nestjs/common';
+import { JwtService } from '@nestjs/jwt';
+import { ConfigService } from '@nestjs/config';
 
 @Injectable()
-export class JwtAuthGuard extends AuthGuard('jwt') {
-    constructor(private readonly jwtService: JwtService) {
-        super();
-    }
+export class JwtAuthGuard implements CanActivate {
+    constructor(
+        private jwtService: JwtService,
+        private configService: ConfigService,
+    ) { }
 
     async canActivate(context: ExecutionContext): Promise<boolean> {
         const request = context.switchToHttp().getRequest();
-        const token = request.headers.authorization?.split(' ')[1]; // Lấy token từ header Authorization
+        const token = this.extractTokenFromHeader(request);
 
         if (!token) {
-            console.log('No token provided'); // Debug
-            throw new UnauthorizedException('No token provided');
+            throw new UnauthorizedException();
         }
 
         try {
-            // Debug: Kiểm tra jwtService
-            console.log('JwtService:', this.jwtService);
-            if (!this.jwtService) {
-                throw new Error('JwtService is not initialized');
+            const secret = this.configService.get<string>('SECRET');
+            if (!secret) {
+                throw new Error('Secret key is not defined');
             }
 
-            const decoded = this.jwtService.verify(token); // Giải mã token
-            console.log('Token decoded:', decoded); // Debug
-            request.user = decoded; // Gán thông tin người dùng vào request
+            const payload = await this.jwtService.verifyAsync(token, {
+                secret,
+            });
+
+            request.user = payload;
+
         } catch (error) {
-            console.log('Invalid token:', error.message); // Debug
-            throw new UnauthorizedException('Invalid token');
+            console.error('JWT Error:', error.message);
+            throw new UnauthorizedException();
         }
 
         return true;
     }
+
+    private extractTokenFromHeader(request: any): string | null {
+        const authorizationHeader = request.headers.authorization;
+        if (!authorizationHeader) {
+            return null;
+        }
+        const [type, token] = authorizationHeader.split(' ');
+        return type === 'Bearer' ? token : null;
+    }
 }
+
