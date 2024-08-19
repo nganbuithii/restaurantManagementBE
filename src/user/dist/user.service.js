@@ -70,8 +70,9 @@ var user_dto_1 = require("./dto/user.dto");
 var bcrypt_1 = require("bcrypt");
 var class_transformer_1 = require("class-transformer");
 var UserService = /** @class */ (function () {
-    function UserService(prismaService) {
+    function UserService(prismaService, cloudinaryService) {
         this.prismaService = prismaService;
+        this.cloudinaryService = cloudinaryService;
     }
     UserService.prototype.create = function (body) {
         return __awaiter(this, void 0, Promise, function () {
@@ -265,9 +266,9 @@ var UserService = /** @class */ (function () {
             });
         });
     };
-    UserService.prototype.updateAvt = function (id, avatar) {
+    UserService.prototype.updateAvt = function (id, file) {
         return __awaiter(this, void 0, Promise, function () {
-            var user, updatedUser, password, userData;
+            var user, result, updatedUser, password, userData;
             return __generator(this, function (_a) {
                 switch (_a.label) {
                     case 0:
@@ -276,20 +277,21 @@ var UserService = /** @class */ (function () {
                             throw new common_1.BadRequestException('Invalid user ID');
                         }
                         return [4 /*yield*/, this.prismaService.user.findUnique({
-                                where: {
-                                    id: id
-                                }
+                                where: { id: id }
                             })];
                     case 1:
                         user = _a.sent();
                         if (!user) {
                             throw new common_1.NotFoundException("User with ID " + id + " not found");
                         }
+                        return [4 /*yield*/, this.cloudinaryService.uploadImage(file.path)];
+                    case 2:
+                        result = _a.sent();
                         return [4 /*yield*/, this.prismaService.user.update({
                                 where: { id: id },
-                                data: { avatar: avatar }
+                                data: { avatar: result.secure_url }
                             })];
-                    case 2:
+                    case 3:
                         updatedUser = _a.sent();
                         password = updatedUser.password, userData = __rest(updatedUser, ["password"]);
                         return [2 /*return*/, userData];

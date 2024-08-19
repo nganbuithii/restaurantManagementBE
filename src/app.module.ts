@@ -10,9 +10,8 @@ import { JwtModule } from '@nestjs/jwt';
 import { PermissionModule } from './permission/permission.module';
 import { MenuItemModule } from './menu-item/menu-item.module';
 import { JwtAuthGuard } from './auth/jwt-auth.guard';
-
-
-
+import { CloudinaryService } from './cloudinary/cloudinary.service';
+import { CloudinaryModule } from './cloudinary/cloudinary.module';
 
 
 @Module({
@@ -29,7 +28,7 @@ import { JwtAuthGuard } from './auth/jwt-auth.guard';
     
     ConfigModule,
     UserModule,
-    AuthModule, RoleModule, PermissionModule, MenuItemModule, 
+    AuthModule, RoleModule, PermissionModule, MenuItemModule, CloudinaryModule,  
   ],
   controllers: [AppController],
   providers: [
@@ -39,6 +38,7 @@ import { JwtAuthGuard } from './auth/jwt-auth.guard';
       provide:APP_PIPE,
       useClass:ValidationPipe
     },
+    CloudinaryService,
   ],
 })
 export class AppModule {}

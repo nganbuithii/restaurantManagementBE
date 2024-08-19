@@ -42,56 +42,45 @@ var __generator = (this && this.__generator) || function (thisArg, body) {
     }
 };
 exports.__esModule = true;
-exports.AppModule = void 0;
+exports.AuthModule = void 0;
 var common_1 = require("@nestjs/common");
-var app_controller_1 = require("./app.controller");
-var app_service_1 = require("./app.service");
-var auth_module_1 = require("./auth/auth.module");
-var role_module_1 = require("./role/role.module");
-var core_1 = require("@nestjs/core");
-var user_module_1 = require("./user/user.module");
-var config_1 = require("@nestjs/config");
+var auth_controller_1 = require("./auth.controller");
+var auth_service_1 = require("./auth.service");
+var prisma_service_1 = require("src/prisma.service");
 var jwt_1 = require("@nestjs/jwt");
-var permission_module_1 = require("./permission/permission.module");
-var menu_item_module_1 = require("./menu-item/menu-item.module");
-var jwt_auth_guard_1 = require("./auth/jwt-auth.guard");
-var cloudinary_service_1 = require("./cloudinary/cloudinary.service");
-var cloudinary_module_1 = require("./cloudinary/cloudinary.module");
-var AppModule = /** @class */ (function () {
-    function AppModule() {
+var config_1 = require("@nestjs/config");
+var user_service_1 = require("src/user/user.service");
+var passport_1 = require("@nestjs/passport");
+var local_strategy_1 = require("./passport/local.strategy");
+var user_module_1 = require("src/user/user.module");
+var jwt_strategy_1 = require("./jwt.strategy");
+var cloudinary_module_1 = require("src/cloudinary/cloudinary.module");
+var AuthModule = /** @class */ (function () {
+    function AuthModule() {
     }
-    AppModule = __decorate([
+    AuthModule = __decorate([
         common_1.Module({
-            imports: [
-                config_1.ConfigModule.forRoot(),
+            imports: [user_module_1.UserModule, passport_1.PassportModule, cloudinary_module_1.CloudinaryModule, 
+                // khai báo jwwt và sự dụng biến trong .env
                 jwt_1.JwtModule.registerAsync({
                     imports: [config_1.ConfigModule],
                     useFactory: function (configService) { return __awaiter(void 0, void 0, void 0, function () {
                         return __generator(this, function (_a) {
                             return [2 /*return*/, ({
                                     secret: configService.get('JWT_SECRET'),
-                                    signOptions: { expiresIn: '60m' }
+                                    signOptions: {
+                                        expiresIn: configService.get('JWT_EXPIRE')
+                                    }
                                 })];
                         });
                     }); },
                     inject: [config_1.ConfigService]
                 }),
-                config_1.ConfigModule,
-                user_module_1.UserModule,
-                auth_module_1.AuthModule, role_module_1.RoleModule, permission_module_1.PermissionModule, menu_item_module_1.MenuItemModule, cloudinary_module_1.CloudinaryModule,
             ],
-            controllers: [app_controller_1.AppController],
-            providers: [
-                jwt_auth_guard_1.JwtAuthGuard,
-                app_service_1.AppService,
-                {
-                    provide: core_1.APP_PIPE,
-                    useClass: common_1.ValidationPipe
-                },
-                cloudinary_service_1.CloudinaryService,
-            ]
+            controllers: [auth_controller_1.AuthController],
+            providers: [auth_service_1.AuthService, prisma_service_1.PrismaService, jwt_1.JwtService, jwt_strategy_1.JwtStrategy, config_1.ConfigService, user_service_1.UserService, local_strategy_1.LocalStrategy]
         })
-    ], AppModule);
-    return AppModule;
+    ], AuthModule);
+    return AuthModule;
 }());
-exports.AppModule = AppModule;
+exports.AuthModule = AuthModule;

@@ -87,7 +87,7 @@ var UserController = /** @class */ (function () {
                         _a.label = 1;
                     case 1:
                         _a.trys.push([1, 3, , 4]);
-                        return [4 /*yield*/, this.userService.updateAvt(req.user.sub, file.path)];
+                        return [4 /*yield*/, this.userService.updateAvt(req.user.sub, file)];
                     case 2:
                         updatedUser = _a.sent();
                         return [2 /*return*/, updatedUser];

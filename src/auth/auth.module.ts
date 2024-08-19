@@ -9,9 +9,10 @@ import { PassportModule } from '@nestjs/passport';
 import { LocalStrategy } from './passport/local.strategy';
 import { UserModule } from 'src/user/user.module';
 import { JwtStrategy } from './jwt.strategy';
+import { CloudinaryModule } from 'src/cloudinary/cloudinary.module';
 
 @Module({
-  imports: [UserModule, PassportModule,
+  imports: [UserModule, PassportModule,CloudinaryModule,
     // khai báo jwwt và sự dụng biến trong .env
     JwtModule.registerAsync({
       imports: [ConfigModule],

@@ -4,10 +4,13 @@ import { CreateUserDto, UpdateUserDto, UserDto, UserFilterType, UserpaginationRe
 import { hash, compareSync } from 'bcrypt';
 import { User } from '@prisma/client';
 import { plainToClass } from 'class-transformer';
+import { CloudinaryService } from 'src/cloudinary/cloudinary.service';
 
 @Injectable()
 export class UserService {
-    constructor(private prismaService: PrismaService) { }
+    constructor(private prismaService: PrismaService,
+        private cloudinaryService: CloudinaryService,
+    ) { }
 
     async create(body: CreateUserDto): Promise<Omit<User, 'password'>> {
         const role = await this.prismaService.role.findUnique({
@@ -184,33 +187,29 @@ export class UserService {
     }
 
 
-    async updateAvt(id: number, avatar: string): Promise<Omit<User, 'password'>> {
+    async updateAvt(id: number, file: Express.Multer.File): Promise<any> {
         // Kiểm tra xem id có hợp lệ không
         if (!id) {
             throw new BadRequestException('Invalid user ID');
         }
-    
         // Kiểm tra xem người dùng có tồn tại không
         const user = await this.prismaService.user.findUnique({
-            where: {
-                id, // Đảm bảo id không phải là undefined
-            },
+            where: { id },
         });
-    
         if (!user) {
             throw new NotFoundException(`User with ID ${id} not found`);
         }
-    
-        // Cập nhật avatar
+        // Upload hình ảnh lên Cloudinary
+        const result = await this.cloudinaryService.uploadImage(file.path);
+        // Cập nhật đường link avatar trong cơ sở dữ liệu
         const updatedUser = await this.prismaService.user.update({
             where: { id },
-            data: { avatar },
+            data: { avatar: result.secure_url }, // Lưu đường link avatar
         });
-    
         // Loại bỏ thuộc tính password
         const { password, ...userData } = updatedUser;
-    
+
         return userData;
     }
-    
+
 }

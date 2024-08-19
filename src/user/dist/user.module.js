@@ -13,13 +13,14 @@ var user_service_1 = require("./user.service");
 var prisma_service_1 = require("src/prisma.service");
 var config_1 = require("@nestjs/config");
 var jwt_1 = require("@nestjs/jwt");
+var cloudinary_module_1 = require("src/cloudinary/cloudinary.module");
 var UserModule = /** @class */ (function () {
     function UserModule() {
     }
     UserModule = __decorate([
         common_1.Module({
             controllers: [user_controller_1.UserController],
-            imports: [jwt_1.JwtModule],
+            imports: [jwt_1.JwtModule, cloudinary_module_1.CloudinaryModule],
             providers: [user_service_1.UserService, prisma_service_1.PrismaService, config_1.ConfigService],
             exports: [user_service_1.UserService]
         })

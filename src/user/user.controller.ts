@@ -64,7 +64,7 @@ export class UserController {
         console.log('Upload avatar');
     
         try {
-            const updatedUser = await this.userService.updateAvt(req.user.sub, file.path);
+            const updatedUser = await this.userService.updateAvt(req.user.sub, file);
             return updatedUser;
         } catch (error) {
             console.error('Error updating avatar:', error.message);
