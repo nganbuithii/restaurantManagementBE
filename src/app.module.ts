@@ -12,6 +12,7 @@ import { MenuItemModule } from './menu-item/menu-item.module';
 import { JwtAuthGuard } from './auth/jwt-auth.guard';
 import { CloudinaryService } from './cloudinary/cloudinary.service';
 import { CloudinaryModule } from './cloudinary/cloudinary.module';
+import { IngredientModule } from './ingredient/ingredient.module';
 
 
 @Module({
@@ -28,7 +29,7 @@ import { CloudinaryModule } from './cloudinary/cloudinary.module';
     
     ConfigModule,
     UserModule,
-    AuthModule, RoleModule, PermissionModule, MenuItemModule, CloudinaryModule,  
+    AuthModule, RoleModule, PermissionModule, MenuItemModule, CloudinaryModule, IngredientModule,  
   ],
   controllers: [AppController],
   providers: [
