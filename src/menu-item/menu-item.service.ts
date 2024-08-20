@@ -1,8 +1,9 @@
-import { BadRequestException, Injectable } from '@nestjs/common';
+import { BadRequestException, Injectable, NotFoundException } from '@nestjs/common';
 import { PrismaService } from 'src/prisma.service';
 import { CreateMenuItemDto, MenuItemFilterType, MenuItemPaginationResponseType } from './dto/menu-item.dto';
 import { IUser } from 'interfaces/user.interface';
 import { CloudinaryService } from 'src/cloudinary/cloudinary.service';
+import { MenuItem } from '@prisma/client';
 
 @Injectable()
 export class MenuItemService {
@@ -88,5 +89,20 @@ export class MenuItemService {
         };
     }
     
-    
+    async getDetail(id: number): Promise<MenuItem> {
+        const menuItem = await this.prismaService.menuItem.findUnique({
+            where: { id },
+            include: {
+                images: true,
+                ingredients: true,
+
+            },
+        });
+
+        if (!menuItem) {
+            throw new NotFoundException(`Menu item with id ${id} not found`);
+        }
+
+        return menuItem;
+    }
 }

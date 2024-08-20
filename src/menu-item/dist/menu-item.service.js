@@ -133,6 +133,28 @@ var MenuItemService = /** @class */ (function () {
             });
         });
     };
+    MenuItemService.prototype.getDetail = function (id) {
+        return __awaiter(this, void 0, Promise, function () {
+            var menuItem;
+            return __generator(this, function (_a) {
+                switch (_a.label) {
+                    case 0: return [4 /*yield*/, this.prismaService.menuItem.findUnique({
+                            where: { id: id },
+                            include: {
+                                images: true,
+                                ingredients: true
+                            }
+                        })];
+                    case 1:
+                        menuItem = _a.sent();
+                        if (!menuItem) {
+                            throw new common_1.NotFoundException("Menu item with id " + id + " not found");
+                        }
+                        return [2 /*return*/, menuItem];
+                }
+            });
+        });
+    };
     MenuItemService = __decorate([
         common_1.Injectable()
     ], MenuItemService);

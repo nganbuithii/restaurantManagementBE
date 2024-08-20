@@ -24,6 +24,9 @@ var MenuItemController = /** @class */ (function () {
     MenuItemController.prototype.getAll = function (params) {
         return this.menuItemService.getAll(params);
     };
+    MenuItemController.prototype.getDetail = function (id) {
+        return this.menuItemService.getDetail(id);
+    };
     __decorate([
         common_1.Post(),
         common_1.HttpCode(common_1.HttpStatus.CREATED),
@@ -40,6 +43,12 @@ var MenuItemController = /** @class */ (function () {
         customize_1.ResponseMessage("get all menu item with pagination"),
         __param(0, common_1.Query())
     ], MenuItemController.prototype, "getAll");
+    __decorate([
+        common_1.Get(':id'),
+        common_1.UseGuards(jwt_auth_guard_1.JwtAuthGuard),
+        customize_1.ResponseMessage(" get detail menu item by id"),
+        __param(0, common_1.Param('id', common_1.ParseIntPipe))
+    ], MenuItemController.prototype, "getDetail");
     MenuItemController = __decorate([
         common_1.Controller('menu-item')
     ], MenuItemController);

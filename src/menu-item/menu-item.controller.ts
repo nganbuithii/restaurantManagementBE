@@ -1,10 +1,11 @@
-import { Body, Controller, Get, HttpCode, HttpStatus, Post, Query, UploadedFiles, UseGuards, UseInterceptors } from '@nestjs/common';
+import { Body, Controller, Get, HttpCode, HttpStatus, Param, ParseIntPipe, Post, Query, UploadedFiles, UseGuards, UseInterceptors } from '@nestjs/common';
 import { MenuItemService } from './menu-item.service';
 import { FilesInterceptor } from '@nestjs/platform-express';
 import { JwtAuthGuard } from 'src/auth/jwt-auth.guard';
 import { CreateMenuItemDto, MenuItemFilterType, MenuItemPaginationResponseType } from './dto/menu-item.dto';
 import { CurrentUser, ResponseMessage } from 'decorators/customize';
 import { IUser } from 'interfaces/user.interface';
+import { MenuItem } from '@prisma/client';
 
 @Controller('menu-item')
 export class MenuItemController {
@@ -30,4 +31,13 @@ export class MenuItemController {
   getAll(@Query() params: MenuItemFilterType): Promise<MenuItemPaginationResponseType> {
     return this.menuItemService.getAll(params);
   }
+
+
+  @Get(':id')
+  @UseGuards(JwtAuthGuard)
+  @ResponseMessage(" get detail menu item by id")
+  getDetail(@Param('id', ParseIntPipe) id: number): Promise<MenuItem> {
+    return this.menuItemService.getDetail(id)
+  }
+
 }
