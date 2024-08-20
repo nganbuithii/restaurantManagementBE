@@ -19,8 +19,10 @@ var MenuItemController = /** @class */ (function () {
         this.menuItemService = menuItemService;
     }
     MenuItemController.prototype.createIngredient = function (body, user, files) {
-        console.log("BODY", body);
         return this.menuItemService.create(body, user, files);
+    };
+    MenuItemController.prototype.getAll = function (params) {
+        return this.menuItemService.getAll(params);
     };
     __decorate([
         common_1.Post(),
@@ -32,6 +34,12 @@ var MenuItemController = /** @class */ (function () {
         __param(1, customize_1.CurrentUser()),
         __param(2, common_1.UploadedFiles())
     ], MenuItemController.prototype, "createIngredient");
+    __decorate([
+        common_1.Get(),
+        common_1.UseGuards(jwt_auth_guard_1.JwtAuthGuard),
+        customize_1.ResponseMessage("get all menu item with pagination"),
+        __param(0, common_1.Query())
+    ], MenuItemController.prototype, "getAll");
     MenuItemController = __decorate([
         common_1.Controller('menu-item')
     ], MenuItemController);

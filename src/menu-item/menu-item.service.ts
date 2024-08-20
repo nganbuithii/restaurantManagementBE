@@ -1,6 +1,6 @@
 import { BadRequestException, Injectable } from '@nestjs/common';
 import { PrismaService } from 'src/prisma.service';
-import { CreateMenuItemDto } from './dto/menu-item.dto';
+import { CreateMenuItemDto, MenuItemFilterType, MenuItemPaginationResponseType } from './dto/menu-item.dto';
 import { IUser } from 'interfaces/user.interface';
 import { CloudinaryService } from 'src/cloudinary/cloudinary.service';
 
@@ -56,6 +56,37 @@ export class MenuItemService {
         return menuItem;
     }
     
+
+    async getAll(filter: MenuItemFilterType): Promise<MenuItemPaginationResponseType> {
+        const { page = 1, items_per_page = 10, search } = filter;
+
+        // Xác định skip và take để phân trang
+        const skip = (page - 1) * items_per_page;
+        const take = items_per_page;
+
+        const where = search ? { name: { contains: search} } : {};
+
+        // Lấy danh sách menu items với phân trang và lọc
+        const [menuItems, total] = await this.prismaService.$transaction([
+            this.prismaService.menuItem.findMany({
+                where,
+                skip,
+                take,
+                include: {
+                    images: true,
+                    ingredients: true,
+                },
+            }),
+            this.prismaService.menuItem.count({ where }),
+        ]);
+
+        return {
+            data: menuItems,
+            total,
+            currentPage: page,
+            itemsPerPage: items_per_page,
+        };
+    }
     
     
 }
