@@ -5,6 +5,7 @@ import { PrismaService } from 'src/prisma.service';
 import { UserHelper } from 'helper/user.helper';
 import { plainToClass } from 'class-transformer';
 import { Ingredient } from '@prisma/client';
+import { IUser } from 'interfaces/user.interface';
 
 @Injectable()
 export class IngredientService {
@@ -103,25 +104,30 @@ export class IngredientService {
     }
 
 
-    async update(id: number, data: UpdateIngredientDto): Promise<Ingredient> {
+    async update(id: number, data: UpdateIngredientDto, user: IUser): Promise<Ingredient> {
+   
         const ingredient = await this.prismaService.ingredient.findUnique({
             where: { id },
         });
-
+    
         if (!ingredient) {
             throw new NotFoundException(`Ingredient with id ${id} not found`);
         }
-
+    
         return this.prismaService.ingredient.update({
             where: { id },
-            data,
+            data: {
+                ...data,
+                updatedBy: user.sub,  
+                updatedAt: new Date(),
+            },
         });
     }
-
-    async softDelete(id: number): Promise<Ingredient> {
+    
+    async delete(id: number, user:IUser): Promise<Ingredient> {
         const ingredient = await this.prismaService.ingredient.update({
             where: { id },
-            data: { isActive: false },
+            data: { isActive: false, deletedBy:user.sub,  },
         });
         return ingredient;
     }

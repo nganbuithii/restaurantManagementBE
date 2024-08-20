@@ -185,6 +185,9 @@ model Ingredient {
   status      String
   createdAt   DateTime              @default(now())
   updatedAt   DateTime              @updatedAt
+  deletedBy   Int?    
+  updatedBy   Int?      
+  
   menuItems   MenuItemIngredient[]
   slipDetails WarehouseSlipDetail[]
 

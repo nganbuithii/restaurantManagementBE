@@ -1,7 +1,7 @@
 // src/interfaces/user.interface.ts
 
 export interface IUser {
-    _d: string;
+    sub: number;
     fullName: string;
     email: string;
     username:string,

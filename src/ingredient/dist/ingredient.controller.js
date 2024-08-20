@@ -80,13 +80,13 @@ var IngredientController = /** @class */ (function () {
     IngredientController.prototype.getDetail = function (id) {
         return this.ingredientService.getDetail(id);
     };
-    IngredientController.prototype.update = function (id, data) {
-        return this.ingredientService.update(id, data);
+    IngredientController.prototype.update = function (id, data, user) {
+        return this.ingredientService.update(id, data, user);
     };
-    IngredientController.prototype["delete"] = function (id) {
+    IngredientController.prototype["delete"] = function (id, user) {
         return __awaiter(this, void 0, Promise, function () {
             return __generator(this, function (_a) {
-                return [2 /*return*/, this.ingredientService.softDelete(id)];
+                return [2 /*return*/, this.ingredientService["delete"](id, user)];
             });
         });
     };
@@ -113,13 +113,14 @@ var IngredientController = /** @class */ (function () {
         common_1.Patch(':id'),
         common_1.UseGuards(jwt_auth_guard_1.JwtAuthGuard),
         customize_1.ResponseMessage(" update ingredient"),
-        __param(0, common_1.Param('id', common_1.ParseIntPipe)), __param(1, common_1.Body())
+        __param(0, common_1.Param('id', common_1.ParseIntPipe)), __param(1, common_1.Body()),
+        __param(2, customize_1.CurrentUser())
     ], IngredientController.prototype, "update");
     __decorate([
         common_1.Delete(':id'),
         common_1.UseGuards(jwt_auth_guard_1.JwtAuthGuard),
         common_1.HttpCode(common_1.HttpStatus.NO_CONTENT),
-        __param(0, common_1.Param('id', common_1.ParseIntPipe))
+        __param(0, common_1.Param('id', common_1.ParseIntPipe)), __param(1, customize_1.CurrentUser())
     ], IngredientController.prototype, "delete");
     IngredientController = __decorate([
         common_1.Controller('ingredient')

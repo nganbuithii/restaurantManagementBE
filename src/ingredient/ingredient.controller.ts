@@ -3,11 +3,12 @@ import { IngredientService } from './ingredient.service';
 import { CreateIngredientDto, IngredientFilterType, IngredientPaginationResponseType, UpdateIngredientDto } from './dto/ingredient.dto';
 import { JwtAuthGuard } from 'src/auth/jwt-auth.guard';
 import { Ingredient } from '@prisma/client';
-import { ResponseMessage } from 'decorators/customize';
+import { CurrentUser, ResponseMessage } from 'decorators/customize';
+import { IUser } from 'interfaces/user.interface';
 
 @Controller('ingredient')
 export class IngredientController {
-  constructor(private readonly ingredientService: IngredientService) {}
+  constructor(private readonly ingredientService: IngredientService) { }
 
   @Post()
   @HttpCode(HttpStatus.CREATED)
@@ -28,30 +29,31 @@ export class IngredientController {
   // @UseGuards(JwtAuthGuard)
   @ResponseMessage(" get all ingredient ")
   getAll(@Query() params: IngredientFilterType): Promise<IngredientPaginationResponseType> {
-      return this.ingredientService.getAll(params);
+    return this.ingredientService.getAll(params);
   }
 
   @Get(':id')
   @UseGuards(JwtAuthGuard)
   @ResponseMessage(" get detail ingredient by id")
   getDetail(@Param('id', ParseIntPipe) id: number): Promise<Ingredient> {
-      return this.ingredientService.getDetail(id)
+    return this.ingredientService.getDetail(id)
   }
 
   @Patch(':id')
   @UseGuards(JwtAuthGuard)
   @ResponseMessage(" update ingredient")
-  update(@Param('id', ParseIntPipe) id: number, @Body() data: UpdateIngredientDto): Promise<Ingredient> {
-        return this.ingredientService.update(id, data);
-    }
+  update(@Param('id', ParseIntPipe) id: number, @Body() data: UpdateIngredientDto,
+    @CurrentUser() user: IUser): Promise<Ingredient> {
+    return this.ingredientService.update(id, data, user);
+  }
 
-    @Delete(':id')
-    @UseGuards(JwtAuthGuard)
-    @HttpCode(HttpStatus.NO_CONTENT)  
-    async delete(@Param('id', ParseIntPipe) id: number): Promise<Ingredient> {
-      
-      return this.ingredientService.softDelete(id);
-    }
+  @Delete(':id')
+  @UseGuards(JwtAuthGuard)
+  @HttpCode(HttpStatus.NO_CONTENT)
+  async delete(@Param('id', ParseIntPipe) id: number, @CurrentUser() user: IUser): Promise<Ingredient> {
+
+    return this.ingredientService.delete(id, user);
+  }
 
 
 }

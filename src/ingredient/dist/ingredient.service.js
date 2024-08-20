@@ -1,4 +1,15 @@
 "use strict";
+var __assign = (this && this.__assign) || function () {
+    __assign = Object.assign || function(t) {
+        for (var s, i = 1, n = arguments.length; i < n; i++) {
+            s = arguments[i];
+            for (var p in s) if (Object.prototype.hasOwnProperty.call(s, p))
+                t[p] = s[p];
+        }
+        return t;
+    };
+    return __assign.apply(this, arguments);
+};
 var __decorate = (this && this.__decorate) || function (decorators, target, key, desc) {
     var c = arguments.length, r = c < 3 ? target : desc === null ? desc = Object.getOwnPropertyDescriptor(target, key) : desc, d;
     if (typeof Reflect === "object" && typeof Reflect.decorate === "function") r = Reflect.decorate(decorators, target, key, desc);
@@ -160,7 +171,7 @@ var IngredientService = /** @class */ (function () {
             });
         });
     };
-    IngredientService.prototype.update = function (id, data) {
+    IngredientService.prototype.update = function (id, data, user) {
         return __awaiter(this, void 0, Promise, function () {
             var ingredient;
             return __generator(this, function (_a) {
@@ -175,20 +186,20 @@ var IngredientService = /** @class */ (function () {
                         }
                         return [2 /*return*/, this.prismaService.ingredient.update({
                                 where: { id: id },
-                                data: data
+                                data: __assign(__assign({}, data), { updatedBy: user.sub, updatedAt: new Date() })
                             })];
                 }
             });
         });
     };
-    IngredientService.prototype.softDelete = function (id) {
+    IngredientService.prototype["delete"] = function (id, user) {
         return __awaiter(this, void 0, Promise, function () {
             var ingredient;
             return __generator(this, function (_a) {
                 switch (_a.label) {
                     case 0: return [4 /*yield*/, this.prismaService.ingredient.update({
                             where: { id: id },
-                            data: { isActive: false }
+                            data: { isActive: false, deletedBy: user.sub }
                         })];
                     case 1:
                         ingredient = _a.sent();
