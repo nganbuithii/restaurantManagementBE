@@ -61,17 +61,14 @@ var IngredientService = /** @class */ (function () {
         this.prismaService = prismaService;
         this.userHelper = userHelper;
     }
-    IngredientService.prototype.create = function (body, userId) {
+    IngredientService.prototype.create = function (body, user) {
         return __awaiter(this, void 0, void 0, function () {
-            var name, unit, productDate, price, status, formattedProductDate, employeeId;
+            var name, unit, productDate, price, status, formattedProductDate;
             return __generator(this, function (_a) {
                 switch (_a.label) {
                     case 0:
                         name = body.name, unit = body.unit, productDate = body.productDate, price = body.price, status = body.status;
                         formattedProductDate = new Date(productDate).toISOString();
-                        return [4 /*yield*/, this.userHelper.getEmployeeIdByUserId(userId)];
-                    case 1:
-                        employeeId = _a.sent();
                         return [4 /*yield*/, this.prismaService.ingredient.create({
                                 data: {
                                     name: name,
@@ -79,10 +76,10 @@ var IngredientService = /** @class */ (function () {
                                     productDate: formattedProductDate,
                                     price: price,
                                     status: status,
-                                    employeeId: employeeId
+                                    createdBy: user.sub
                                 }
                             })];
-                    case 2: return [2 /*return*/, _a.sent()];
+                    case 1: return [2 /*return*/, _a.sent()];
                 }
             });
         });

@@ -13,16 +13,12 @@ export class IngredientController {
   @Post()
   @HttpCode(HttpStatus.CREATED)
   @UseGuards(JwtAuthGuard)
-  async createIngredient(@Body() body: CreateIngredientDto, @Req() request: any) {
-    try {
-      const userId = request.user.sub;
+ createIngredient(@Body() body: CreateIngredientDto, @CurrentUser() user:IUser) {
+ 
+     
 
-      const newIngredient = await this.ingredientService.create(body, userId);
-      return newIngredient;
-    } catch (error) {
-      console.error('Error details:', error);
-      throw new BadRequestException('Error creating ingredient');
-    }
+      return  this.ingredientService.create(body, user);
+     
   }
 
   @Get()

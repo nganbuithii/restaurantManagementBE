@@ -69,7 +69,7 @@ model Employee {
   userId    Int             @unique
   slips     WarehouseSlip[]
 
-  ingredients Ingredient[]
+  // ingredients Ingredient[]
 }
 
 model Customer {
@@ -133,10 +133,13 @@ model MenuItem {
   id           Int                  @id @default(autoincrement())
   name         String
   price        Float
-  status       String
+  // status       String
   isActive     Boolean              @default(true)
   createdAt    DateTime             @default(now())
   updatedAt    DateTime             @updatedAt
+  updatedBy Int?
+  deletedBy Int?
+
   userId       Int
   user         User                 @relation(fields: [userId], references: [id])
   images       FoodImage[]
@@ -185,16 +188,17 @@ model Ingredient {
   status      String
   createdAt   DateTime              @default(now())
   updatedAt   DateTime              @updatedAt
+  createdBy Int?
   deletedBy   Int?    
   updatedBy   Int?      
-  
+
   menuItems   MenuItemIngredient[]
   slipDetails WarehouseSlipDetail[]
 
   inventory Inventory?
 
-  employeeId Int
-  employee   Employee @relation(fields: [employeeId], references: [id])
+  // employeeId Int
+  // employee   Employee @relation(fields: [employeeId], references: [id])
 }
 
 model MenuItemIngredient {

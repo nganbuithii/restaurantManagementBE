@@ -12,14 +12,12 @@ export class IngredientService {
     constructor(private prismaService: PrismaService,
         private userHelper: UserHelper
     ) { }
-    async create(body: CreateIngredientDto, userId: number) {
+    async create(body: CreateIngredientDto, user:IUser) {
         const { name, unit, productDate, price, status } = body;
 
         const formattedProductDate = new Date(productDate).toISOString();
 
-        // Lấy employeeId từ userId
-        const employeeId = await this.userHelper.getEmployeeIdByUserId(userId);
-
+        
         return await this.prismaService.ingredient.create({
             data: {
                 name,
@@ -27,7 +25,7 @@ export class IngredientService {
                 productDate: formattedProductDate,
                 price,
                 status,
-                employeeId, // Lưu employeeId vào bảng Ingredient
+                createdBy:user.sub
             },
         });
     }

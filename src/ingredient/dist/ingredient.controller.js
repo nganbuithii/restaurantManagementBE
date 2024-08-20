@@ -53,26 +53,8 @@ var IngredientController = /** @class */ (function () {
     function IngredientController(ingredientService) {
         this.ingredientService = ingredientService;
     }
-    IngredientController.prototype.createIngredient = function (body, request) {
-        return __awaiter(this, void 0, void 0, function () {
-            var userId, newIngredient, error_1;
-            return __generator(this, function (_a) {
-                switch (_a.label) {
-                    case 0:
-                        _a.trys.push([0, 2, , 3]);
-                        userId = request.user.sub;
-                        return [4 /*yield*/, this.ingredientService.create(body, userId)];
-                    case 1:
-                        newIngredient = _a.sent();
-                        return [2 /*return*/, newIngredient];
-                    case 2:
-                        error_1 = _a.sent();
-                        console.error('Error details:', error_1);
-                        throw new common_1.BadRequestException('Error creating ingredient');
-                    case 3: return [2 /*return*/];
-                }
-            });
-        });
+    IngredientController.prototype.createIngredient = function (body, user) {
+        return this.ingredientService.create(body, user);
     };
     IngredientController.prototype.getAll = function (params) {
         return this.ingredientService.getAll(params);
@@ -94,7 +76,7 @@ var IngredientController = /** @class */ (function () {
         common_1.Post(),
         common_1.HttpCode(common_1.HttpStatus.CREATED),
         common_1.UseGuards(jwt_auth_guard_1.JwtAuthGuard),
-        __param(0, common_1.Body()), __param(1, common_1.Req())
+        __param(0, common_1.Body()), __param(1, customize_1.CurrentUser())
     ], IngredientController.prototype, "createIngredient");
     __decorate([
         common_1.Get()
