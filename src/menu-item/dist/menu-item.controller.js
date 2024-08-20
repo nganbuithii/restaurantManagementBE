@@ -19,8 +19,7 @@ var MenuItemController = /** @class */ (function () {
         this.menuItemService = menuItemService;
     }
     MenuItemController.prototype.createIngredient = function (body, user, files) {
-        console.log('Files:', files);
-        console.log('Body:', body);
+        console.log("BODY", body);
         return this.menuItemService.create(body, user, files);
     };
     __decorate([

@@ -51,12 +51,24 @@ var MenuItemService = /** @class */ (function () {
     }
     MenuItemService.prototype.create = function (body, user, files) {
         return __awaiter(this, void 0, void 0, function () {
-            var name, price, numericPrice, uploadedImages, menuItem;
+            var name, price, ingredientQuantities, numericPrice, parsedIngredientQuantities, uploadedImages, menuItem;
             return __generator(this, function (_a) {
                 switch (_a.label) {
                     case 0:
-                        name = body.name, price = body.price;
+                        name = body.name, price = body.price, ingredientQuantities = body.ingredientQuantities;
                         numericPrice = typeof price === 'string' ? parseFloat(price) : price;
+                        // Kiểm tra nếu không có hình ảnh
+                        if (!files || files.length === 0) {
+                            throw new common_1.BadRequestException('At least one image is required.');
+                        }
+                        try {
+                            parsedIngredientQuantities = typeof ingredientQuantities === 'string'
+                                ? JSON.parse(ingredientQuantities)
+                                : ingredientQuantities;
+                        }
+                        catch (e) {
+                            throw new common_1.BadRequestException('Invalid format for ingredientQuantities.');
+                        }
                         return [4 /*yield*/, this.cloudinaryService.uploadImages(files)];
                     case 1:
                         uploadedImages = _a.sent();
@@ -68,6 +80,14 @@ var MenuItemService = /** @class */ (function () {
                                     images: {
                                         create: uploadedImages.map(function (image) { return ({
                                             url: image.secure_url
+                                        }); })
+                                    },
+                                    ingredients: {
+                                        create: parsedIngredientQuantities.map(function (item) { return ({
+                                            ingredient: {
+                                                connect: { id: item.ingredientId }
+                                            },
+                                            quantity: item.quantity
                                         }); })
                                     }
                                 }

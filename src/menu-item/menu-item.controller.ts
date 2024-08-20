@@ -20,8 +20,7 @@ export class MenuItemController {
     @Body() body: CreateMenuItemDto, 
   @CurrentUser() user: IUser,
   @UploadedFiles() files: Array<Express.Multer.File>) {
-    console.log('Files:', files);
-console.log('Body:', body);
+console.log("BODY", body)
 
     return this.menuItemService.create(body, user, files);
   }
