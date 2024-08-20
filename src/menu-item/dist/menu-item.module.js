@@ -6,23 +6,24 @@ var __decorate = (this && this.__decorate) || function (decorators, target, key,
     return c > 3 && r && Object.defineProperty(target, key, r), r;
 };
 exports.__esModule = true;
-exports.IngredientModule = void 0;
+exports.MenuItemModule = void 0;
 var common_1 = require("@nestjs/common");
-var ingredient_service_1 = require("./ingredient.service");
-var ingredient_controller_1 = require("./ingredient.controller");
+var menu_item_service_1 = require("./menu-item.service");
+var menu_item_controller_1 = require("./menu-item.controller");
 var prisma_service_1 = require("src/prisma.service");
-var jwt_1 = require("@nestjs/jwt");
 var config_1 = require("@nestjs/config");
-var IngredientModule = /** @class */ (function () {
-    function IngredientModule() {
+var jwt_1 = require("@nestjs/jwt");
+var cloudinary_module_1 = require("src/cloudinary/cloudinary.module");
+var MenuItemModule = /** @class */ (function () {
+    function MenuItemModule() {
     }
-    IngredientModule = __decorate([
+    MenuItemModule = __decorate([
         common_1.Module({
-            imports: [jwt_1.JwtModule],
-            controllers: [ingredient_controller_1.IngredientController],
-            providers: [ingredient_service_1.IngredientService, prisma_service_1.PrismaService, config_1.ConfigService]
+            imports: [jwt_1.JwtModule, cloudinary_module_1.CloudinaryModule],
+            controllers: [menu_item_controller_1.MenuItemController],
+            providers: [menu_item_service_1.MenuItemService, prisma_service_1.PrismaService, config_1.ConfigService]
         })
-    ], IngredientModule);
-    return IngredientModule;
+    ], MenuItemModule);
+    return MenuItemModule;
 }());
-exports.IngredientModule = IngredientModule;
+exports.MenuItemModule = MenuItemModule;

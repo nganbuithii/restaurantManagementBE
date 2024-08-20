@@ -192,6 +192,7 @@ export class UserService {
         if (!id) {
             throw new BadRequestException('Invalid user ID');
         }
+        
         // Kiểm tra xem người dùng có tồn tại không
         const user = await this.prismaService.user.findUnique({
             where: { id },
@@ -199,13 +200,16 @@ export class UserService {
         if (!user) {
             throw new NotFoundException(`User with ID ${id} not found`);
         }
+        
         // Upload hình ảnh lên Cloudinary
-        const result = await this.cloudinaryService.uploadImage(file.path);
+        const result = await this.cloudinaryService.uploadImage(file);
+
         // Cập nhật đường link avatar trong cơ sở dữ liệu
         const updatedUser = await this.prismaService.user.update({
             where: { id },
             data: { avatar: result.secure_url }, // Lưu đường link avatar
         });
+
         // Loại bỏ thuộc tính password
         const { password, ...userData } = updatedUser;
 

@@ -2,15 +2,13 @@ import { Injectable, NotFoundException } from '@nestjs/common';
 import { isValidStatus } from 'constants/status.constants';
 import { CreateIngredientDto, IngredientFilterType, IngredientPaginationResponseType, UpdateIngredientDto } from './dto/ingredient.dto';
 import { PrismaService } from 'src/prisma.service';
-import { UserHelper } from 'helper/user.helper';
-import { plainToClass } from 'class-transformer';
 import { Ingredient } from '@prisma/client';
 import { IUser } from 'interfaces/user.interface';
 
 @Injectable()
 export class IngredientService {
     constructor(private prismaService: PrismaService,
-        private userHelper: UserHelper
+        
     ) { }
     async create(body: CreateIngredientDto, user:IUser) {
         const { name, unit, productDate, price, status } = body;

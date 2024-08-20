@@ -11,15 +11,27 @@ export class CloudinaryService {
         // });
     }
 
-    async uploadImage(filePath: string): Promise<any> {
+    async uploadImage(file: Express.Multer.File): Promise<any> {
+        return new Promise((resolve, reject) => {
+            cloudinary.uploader.upload_stream(
+                { folder: 'avatars', allowed_formats: ['jpg', 'png', 'jpeg'] },
+                (error, result) => {
+                    if (error) {
+                        reject(new Error(`Failed to upload image: ${error.message}`));
+                    } else {
+                        resolve(result);
+                    }
+                }
+            ).end(file.buffer);
+        });
+    }
+
+    async uploadImages(files: Array<Express.Multer.File>): Promise<any[]> {
         try {
-            const result = await cloudinary.uploader.upload(filePath, {
-                folder: 'avatars',
-                allowed_formats: ['jpg', 'png', 'jpeg'],
-            });
-            return result;
+            const uploadPromises = files.map(file => this.uploadImage(file));
+            return Promise.all(uploadPromises);
         } catch (error) {
-            throw new Error(`Failed to upload image: ${error.message}`);
+            throw new Error(`Failed to upload images: ${error.message}`);
         }
     }
 }

@@ -57,9 +57,8 @@ exports.IngredientService = void 0;
 var common_1 = require("@nestjs/common");
 var status_constants_1 = require("constants/status.constants");
 var IngredientService = /** @class */ (function () {
-    function IngredientService(prismaService, userHelper) {
+    function IngredientService(prismaService) {
         this.prismaService = prismaService;
-        this.userHelper = userHelper;
     }
     IngredientService.prototype.create = function (body, user) {
         return __awaiter(this, void 0, void 0, function () {

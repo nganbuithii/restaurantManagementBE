@@ -42,52 +42,46 @@ var __generator = (this && this.__generator) || function (thisArg, body) {
     }
 };
 exports.__esModule = true;
-exports.CloudinaryService = void 0;
+exports.MenuItemService = void 0;
 var common_1 = require("@nestjs/common");
-var cloudinary_config_1 = require("src/configs/cloudinary.config");
-var CloudinaryService = /** @class */ (function () {
-    function CloudinaryService() {
-        // cloudinary.config({
-        //     cloud_name: process.env.CLOUDINARY_NAME,
-        //     api_key: process.env.CLOUDINARY_API_KEY,
-        //     api_secret: process.env.CLOUDINARY_API_SECRET,
-        // });
+var MenuItemService = /** @class */ (function () {
+    function MenuItemService(prismaService, cloudinaryService) {
+        this.prismaService = prismaService;
+        this.cloudinaryService = cloudinaryService;
     }
-    CloudinaryService.prototype.uploadImage = function (file) {
-        return __awaiter(this, void 0, Promise, function () {
+    MenuItemService.prototype.create = function (body, user, files) {
+        return __awaiter(this, void 0, void 0, function () {
+            var name, price, numericPrice, uploadedImages, menuItem;
             return __generator(this, function (_a) {
-                return [2 /*return*/, new Promise(function (resolve, reject) {
-                        cloudinary_config_1["default"].uploader.upload_stream({ folder: 'avatars', allowed_formats: ['jpg', 'png', 'jpeg'] }, function (error, result) {
-                            if (error) {
-                                reject(new Error("Failed to upload image: " + error.message));
-                            }
-                            else {
-                                resolve(result);
-                            }
-                        }).end(file.buffer);
-                    })];
+                switch (_a.label) {
+                    case 0:
+                        name = body.name, price = body.price;
+                        numericPrice = typeof price === 'string' ? parseFloat(price) : price;
+                        return [4 /*yield*/, this.cloudinaryService.uploadImages(files)];
+                    case 1:
+                        uploadedImages = _a.sent();
+                        return [4 /*yield*/, this.prismaService.menuItem.create({
+                                data: {
+                                    name: name,
+                                    price: numericPrice,
+                                    createdBy: user.sub,
+                                    images: {
+                                        create: uploadedImages.map(function (image) { return ({
+                                            url: image.secure_url
+                                        }); })
+                                    }
+                                }
+                            })];
+                    case 2:
+                        menuItem = _a.sent();
+                        return [2 /*return*/, menuItem];
+                }
             });
         });
     };
-    CloudinaryService.prototype.uploadImages = function (files) {
-        return __awaiter(this, void 0, Promise, function () {
-            var uploadPromises;
-            var _this = this;
-            return __generator(this, function (_a) {
-                try {
-                    uploadPromises = files.map(function (file) { return _this.uploadImage(file); });
-                    return [2 /*return*/, Promise.all(uploadPromises)];
-                }
-                catch (error) {
-                    throw new Error("Failed to upload images: " + error.message);
-                }
-                return [2 /*return*/];
-            });
-        });
-    };
-    CloudinaryService = __decorate([
+    MenuItemService = __decorate([
         common_1.Injectable()
-    ], CloudinaryService);
-    return CloudinaryService;
+    ], MenuItemService);
+    return MenuItemService;
 }());
-exports.CloudinaryService = CloudinaryService;
+exports.MenuItemService = MenuItemService;

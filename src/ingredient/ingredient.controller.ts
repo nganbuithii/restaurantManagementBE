@@ -13,12 +13,10 @@ export class IngredientController {
   @Post()
   @HttpCode(HttpStatus.CREATED)
   @UseGuards(JwtAuthGuard)
- createIngredient(@Body() body: CreateIngredientDto, @CurrentUser() user:IUser) {
- 
-     
+  createIngredient(@Body() body: CreateIngredientDto, @CurrentUser() user: IUser) {
 
-      return  this.ingredientService.create(body, user);
-     
+    return this.ingredientService.create(body, user);
+
   }
 
   @Get()

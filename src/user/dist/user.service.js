@@ -284,7 +284,7 @@ var UserService = /** @class */ (function () {
                         if (!user) {
                             throw new common_1.NotFoundException("User with ID " + id + " not found");
                         }
-                        return [4 /*yield*/, this.cloudinaryService.uploadImage(file.path)];
+                        return [4 /*yield*/, this.cloudinaryService.uploadImage(file)];
                     case 2:
                         result = _a.sent();
                         return [4 /*yield*/, this.prismaService.user.update({
