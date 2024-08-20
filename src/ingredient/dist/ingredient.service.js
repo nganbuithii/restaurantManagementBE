@@ -79,6 +79,108 @@ var IngredientService = /** @class */ (function () {
     IngredientService.prototype.validateStatus = function (status) {
         return status_constants_1.isValidStatus(status);
     };
+    IngredientService.prototype.getAll = function (filters) {
+        return __awaiter(this, void 0, Promise, function () {
+            var items_per_page, page, search, skip, ingredients, total;
+            return __generator(this, function (_a) {
+                switch (_a.label) {
+                    case 0:
+                        items_per_page = Number(filters.items_per_page) || 10;
+                        page = Number(filters.page) || 1;
+                        search = filters.search || "";
+                        skip = page > 1 ? (page - 1) * items_per_page : 0;
+                        return [4 /*yield*/, this.prismaService.ingredient.findMany({
+                                take: items_per_page,
+                                skip: skip,
+                                where: {
+                                    OR: [
+                                        {
+                                            name: {
+                                                contains: search
+                                            }
+                                        },
+                                        {
+                                            unit: {
+                                                contains: search
+                                            }
+                                        },
+                                    ],
+                                    isActive: filters.isActive === undefined ? undefined : filters.isActive === 'true'
+                                },
+                                orderBy: {
+                                    createdAt: "desc"
+                                }
+                            })];
+                    case 1:
+                        ingredients = _a.sent();
+                        return [4 /*yield*/, this.prismaService.ingredient.count({
+                                where: {
+                                    OR: [
+                                        {
+                                            name: {
+                                                contains: search
+                                            }
+                                        },
+                                        {
+                                            unit: {
+                                                contains: search
+                                            }
+                                        },
+                                    ],
+                                    isActive: filters.isActive === undefined ? undefined : filters.isActive === 'true'
+                                }
+                            })];
+                    case 2:
+                        total = _a.sent();
+                        return [2 /*return*/, {
+                                data: ingredients,
+                                total: total,
+                                currentPage: page,
+                                itemsPerPage: items_per_page
+                            }];
+                }
+            });
+        });
+    };
+    IngredientService.prototype.getDetail = function (id) {
+        return __awaiter(this, void 0, void 0, function () {
+            var ingredient;
+            return __generator(this, function (_a) {
+                switch (_a.label) {
+                    case 0: return [4 /*yield*/, this.prismaService.ingredient.findUnique({
+                            where: { id: id }
+                        })];
+                    case 1:
+                        ingredient = _a.sent();
+                        if (!ingredient) {
+                            throw new common_1.NotFoundException("Ingredient with id " + id + " not found");
+                        }
+                        return [2 /*return*/, ingredient];
+                }
+            });
+        });
+    };
+    IngredientService.prototype.update = function (id, data) {
+        return __awaiter(this, void 0, Promise, function () {
+            var ingredient;
+            return __generator(this, function (_a) {
+                switch (_a.label) {
+                    case 0: return [4 /*yield*/, this.prismaService.ingredient.findUnique({
+                            where: { id: id }
+                        })];
+                    case 1:
+                        ingredient = _a.sent();
+                        if (!ingredient) {
+                            throw new common_1.NotFoundException("Ingredient with id " + id + " not found");
+                        }
+                        return [2 /*return*/, this.prismaService.ingredient.update({
+                                where: { id: id },
+                                data: data
+                            })];
+                }
+            });
+        });
+    };
     IngredientService = __decorate([
         common_1.Injectable()
     ], IngredientService);

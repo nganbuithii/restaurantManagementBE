@@ -48,6 +48,7 @@ exports.__esModule = true;
 exports.IngredientController = void 0;
 var common_1 = require("@nestjs/common");
 var jwt_auth_guard_1 = require("src/auth/jwt-auth.guard");
+var customize_1 = require("decorators/customize");
 var IngredientController = /** @class */ (function () {
     function IngredientController(ingredientService) {
         this.ingredientService = ingredientService;
@@ -73,12 +74,38 @@ var IngredientController = /** @class */ (function () {
             });
         });
     };
+    IngredientController.prototype.getAll = function (params) {
+        return this.ingredientService.getAll(params);
+    };
+    IngredientController.prototype.getDetail = function (id) {
+        return this.ingredientService.getDetail(id);
+    };
+    IngredientController.prototype.update = function (id, data) {
+        return this.ingredientService.update(id, data);
+    };
     __decorate([
         common_1.Post(),
         common_1.HttpCode(common_1.HttpStatus.CREATED),
         common_1.UseGuards(jwt_auth_guard_1.JwtAuthGuard),
         __param(0, common_1.Body()), __param(1, common_1.Req())
     ], IngredientController.prototype, "createIngredient");
+    __decorate([
+        common_1.Get(),
+        common_1.UseGuards(jwt_auth_guard_1.JwtAuthGuard),
+        __param(0, common_1.Query())
+    ], IngredientController.prototype, "getAll");
+    __decorate([
+        common_1.Get(':id'),
+        common_1.UseGuards(jwt_auth_guard_1.JwtAuthGuard),
+        __param(0, common_1.Param('id', common_1.ParseIntPipe))
+    ], IngredientController.prototype, "getDetail");
+    __decorate([
+        common_1.Patch(':id')
+        // @UseGuards(JwtAuthGuard)
+        ,
+        customize_1.ResponseMessage(" update ingredient"),
+        __param(0, common_1.Param('id', common_1.ParseIntPipe)), __param(1, common_1.Body())
+    ], IngredientController.prototype, "update");
     IngredientController = __decorate([
         common_1.Controller('ingredient')
     ], IngredientController);

@@ -38,6 +38,8 @@ var __generator = (this && this.__generator) || function (thisArg, body) {
 exports.__esModule = true;
 var core_1 = require("@nestjs/core");
 var app_module_1 = require("./app.module");
+var response_interceptor_1 = require("interceptors/response.interceptor");
+var core_2 = require("@nestjs/core");
 function bootstrap() {
     return __awaiter(this, void 0, void 0, function () {
         var app;
@@ -46,6 +48,7 @@ function bootstrap() {
                 case 0: return [4 /*yield*/, core_1.NestFactory.create(app_module_1.AppModule)];
                 case 1:
                     app = _a.sent();
+                    app.useGlobalInterceptors(new response_interceptor_1.ResponseInterceptor(new core_2.Reflector()));
                     return [4 /*yield*/, app.listen(3005)];
                 case 2:
                     _a.sent();

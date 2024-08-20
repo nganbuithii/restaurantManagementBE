@@ -1,5 +1,6 @@
 import { IsString, IsNotEmpty, IsBoolean, IsDate, IsNumber, IsOptional, IsIn } from 'class-validator';
 import { Type } from 'class-transformer';
+import { Ingredient } from '@prisma/client';
 
 export class CreateIngredientDto {
     @IsString({ message: 'Name must be a string.' })
@@ -25,3 +26,43 @@ export class CreateIngredientDto {
     })
     status?: string;
 }
+
+
+
+export interface IngredientFilterType {
+    items_per_page?:number;
+    page?:number;
+    search?:string
+    isActive?:string
+  }
+  
+  export interface IngredientPaginationResponseType{
+    data:Ingredient[]
+    total:number
+    currentPage:number
+    itemsPerPage:number
+  }
+
+  export class UpdateIngredientDto {
+    @IsString({ message: 'Name must be a string.' })
+    @IsOptional()
+        name: string;
+
+    @IsString({ message: 'Unit must be a string.' })
+    @IsOptional()
+    unit: string;
+
+    
+
+    @IsNumber({}, { message: 'Price must be a number.' })
+    @IsOptional()
+    price: number;
+
+
+    @IsIn(['available', 'out_of_stock', 'pending'], {
+        message: 'Status must be one of the following: available, out_of_stock, pending',
+    })
+    @IsOptional()
+    status?: string;
+
+  }

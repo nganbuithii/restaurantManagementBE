@@ -6,7 +6,7 @@ var __decorate = (this && this.__decorate) || function (decorators, target, key,
     return c > 3 && r && Object.defineProperty(target, key, r), r;
 };
 exports.__esModule = true;
-exports.CreateIngredientDto = void 0;
+exports.UpdateIngredientDto = exports.CreateIngredientDto = void 0;
 var class_validator_1 = require("class-validator");
 var CreateIngredientDto = /** @class */ (function () {
     function CreateIngredientDto() {
@@ -34,3 +34,27 @@ var CreateIngredientDto = /** @class */ (function () {
     return CreateIngredientDto;
 }());
 exports.CreateIngredientDto = CreateIngredientDto;
+var UpdateIngredientDto = /** @class */ (function () {
+    function UpdateIngredientDto() {
+    }
+    __decorate([
+        class_validator_1.IsString({ message: 'Name must be a string.' }),
+        class_validator_1.IsOptional()
+    ], UpdateIngredientDto.prototype, "name");
+    __decorate([
+        class_validator_1.IsString({ message: 'Unit must be a string.' }),
+        class_validator_1.IsOptional()
+    ], UpdateIngredientDto.prototype, "unit");
+    __decorate([
+        class_validator_1.IsNumber({}, { message: 'Price must be a number.' }),
+        class_validator_1.IsOptional()
+    ], UpdateIngredientDto.prototype, "price");
+    __decorate([
+        class_validator_1.IsIn(['available', 'out_of_stock', 'pending'], {
+            message: 'Status must be one of the following: available, out_of_stock, pending'
+        }),
+        class_validator_1.IsOptional()
+    ], UpdateIngredientDto.prototype, "status");
+    return UpdateIngredientDto;
+}());
+exports.UpdateIngredientDto = UpdateIngredientDto;
