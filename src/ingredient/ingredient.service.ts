@@ -117,4 +117,12 @@ export class IngredientService {
             data,
         });
     }
+
+    async softDelete(id: number): Promise<Ingredient> {
+        const ingredient = await this.prismaService.ingredient.update({
+            where: { id },
+            data: { isActive: false },
+        });
+        return ingredient;
+    }
 }

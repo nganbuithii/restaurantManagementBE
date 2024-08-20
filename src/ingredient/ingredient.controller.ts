@@ -1,4 +1,4 @@
-import { BadRequestException, Body, Controller, Get, HttpCode, HttpStatus, Param, ParseIntPipe, Patch, Post, Query, Req, UseGuards } from '@nestjs/common';
+import { BadRequestException, Body, Controller, Delete, Get, HttpCode, HttpStatus, Param, ParseIntPipe, Patch, Post, Query, Req, UseGuards } from '@nestjs/common';
 import { IngredientService } from './ingredient.service';
 import { CreateIngredientDto, IngredientFilterType, IngredientPaginationResponseType, UpdateIngredientDto } from './dto/ingredient.dto';
 import { JwtAuthGuard } from 'src/auth/jwt-auth.guard';
@@ -25,25 +25,33 @@ export class IngredientController {
   }
 
   @Get()
-  @UseGuards(JwtAuthGuard)
+  // @UseGuards(JwtAuthGuard)
+  @ResponseMessage(" get all ingredient ")
   getAll(@Query() params: IngredientFilterType): Promise<IngredientPaginationResponseType> {
       return this.ingredientService.getAll(params);
   }
 
   @Get(':id')
   @UseGuards(JwtAuthGuard)
+  @ResponseMessage(" get detail ingredient by id")
   getDetail(@Param('id', ParseIntPipe) id: number): Promise<Ingredient> {
       return this.ingredientService.getDetail(id)
   }
 
   @Patch(':id')
-  // @UseGuards(JwtAuthGuard)
+  @UseGuards(JwtAuthGuard)
   @ResponseMessage(" update ingredient")
   update(@Param('id', ParseIntPipe) id: number, @Body() data: UpdateIngredientDto): Promise<Ingredient> {
         return this.ingredientService.update(id, data);
     }
 
-
+    @Delete(':id')
+    @UseGuards(JwtAuthGuard)
+    @HttpCode(HttpStatus.NO_CONTENT)  
+    async delete(@Param('id', ParseIntPipe) id: number): Promise<Ingredient> {
+      
+      return this.ingredientService.softDelete(id);
+    }
 
 
 }

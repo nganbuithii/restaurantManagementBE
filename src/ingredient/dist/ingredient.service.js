@@ -181,6 +181,22 @@ var IngredientService = /** @class */ (function () {
             });
         });
     };
+    IngredientService.prototype.softDelete = function (id) {
+        return __awaiter(this, void 0, Promise, function () {
+            var ingredient;
+            return __generator(this, function (_a) {
+                switch (_a.label) {
+                    case 0: return [4 /*yield*/, this.prismaService.ingredient.update({
+                            where: { id: id },
+                            data: { isActive: false }
+                        })];
+                    case 1:
+                        ingredient = _a.sent();
+                        return [2 /*return*/, ingredient];
+                }
+            });
+        });
+    };
     IngredientService = __decorate([
         common_1.Injectable()
     ], IngredientService);

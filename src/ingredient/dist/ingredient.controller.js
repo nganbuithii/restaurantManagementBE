@@ -83,6 +83,13 @@ var IngredientController = /** @class */ (function () {
     IngredientController.prototype.update = function (id, data) {
         return this.ingredientService.update(id, data);
     };
+    IngredientController.prototype["delete"] = function (id) {
+        return __awaiter(this, void 0, Promise, function () {
+            return __generator(this, function (_a) {
+                return [2 /*return*/, this.ingredientService.softDelete(id)];
+            });
+        });
+    };
     __decorate([
         common_1.Post(),
         common_1.HttpCode(common_1.HttpStatus.CREATED),
@@ -90,22 +97,30 @@ var IngredientController = /** @class */ (function () {
         __param(0, common_1.Body()), __param(1, common_1.Req())
     ], IngredientController.prototype, "createIngredient");
     __decorate([
-        common_1.Get(),
-        common_1.UseGuards(jwt_auth_guard_1.JwtAuthGuard),
+        common_1.Get()
+        // @UseGuards(JwtAuthGuard)
+        ,
+        customize_1.ResponseMessage(" get all ingredient "),
         __param(0, common_1.Query())
     ], IngredientController.prototype, "getAll");
     __decorate([
         common_1.Get(':id'),
         common_1.UseGuards(jwt_auth_guard_1.JwtAuthGuard),
+        customize_1.ResponseMessage(" get detail ingredient by id"),
         __param(0, common_1.Param('id', common_1.ParseIntPipe))
     ], IngredientController.prototype, "getDetail");
     __decorate([
-        common_1.Patch(':id')
-        // @UseGuards(JwtAuthGuard)
-        ,
+        common_1.Patch(':id'),
+        common_1.UseGuards(jwt_auth_guard_1.JwtAuthGuard),
         customize_1.ResponseMessage(" update ingredient"),
         __param(0, common_1.Param('id', common_1.ParseIntPipe)), __param(1, common_1.Body())
     ], IngredientController.prototype, "update");
+    __decorate([
+        common_1.Delete(':id'),
+        common_1.UseGuards(jwt_auth_guard_1.JwtAuthGuard),
+        common_1.HttpCode(common_1.HttpStatus.NO_CONTENT),
+        __param(0, common_1.Param('id', common_1.ParseIntPipe))
+    ], IngredientController.prototype, "delete");
     IngredientController = __decorate([
         common_1.Controller('ingredient')
     ], IngredientController);
