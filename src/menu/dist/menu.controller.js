@@ -23,6 +23,15 @@ var MenuController = /** @class */ (function () {
     MenuController.prototype.getAll = function (params) {
         return this.menuService.getAll(params);
     };
+    MenuController.prototype.getDetail = function (id) {
+        return this.menuService.getDetail(id);
+    };
+    MenuController.prototype.update = function (id, data, user) {
+        return this.menuService.update(id, data, user);
+    };
+    MenuController.prototype.deleteMenuItem = function (id, user) {
+        return this.menuService["delete"](id, user);
+    };
     __decorate([
         common_1.Post(),
         common_1.HttpCode(common_1.HttpStatus.CREATED),
@@ -37,6 +46,25 @@ var MenuController = /** @class */ (function () {
         customize_1.ResponseMessage("get all menu item with pagination"),
         __param(0, common_1.Query())
     ], MenuController.prototype, "getAll");
+    __decorate([
+        common_1.Get(':id'),
+        common_1.UseGuards(jwt_auth_guard_1.JwtAuthGuard),
+        customize_1.ResponseMessage("get detail menu by id"),
+        __param(0, common_1.Param('id', common_1.ParseIntPipe))
+    ], MenuController.prototype, "getDetail");
+    __decorate([
+        common_1.Patch(':id'),
+        common_1.UseGuards(jwt_auth_guard_1.JwtAuthGuard),
+        customize_1.ResponseMessage(" update menu by id"),
+        __param(0, common_1.Param('id', common_1.ParseIntPipe)), __param(1, common_1.Body()), __param(2, customize_1.CurrentUser())
+    ], MenuController.prototype, "update");
+    __decorate([
+        common_1.Delete(':id'),
+        common_1.UseGuards(jwt_auth_guard_1.JwtAuthGuard),
+        common_1.HttpCode(common_1.HttpStatus.NO_CONTENT),
+        customize_1.ResponseMessage(" delete menu  by id"),
+        __param(0, common_1.Param('id', common_1.ParseIntPipe)), __param(1, customize_1.CurrentUser())
+    ], MenuController.prototype, "deleteMenuItem");
     MenuController = __decorate([
         common_1.Controller('menu')
     ], MenuController);

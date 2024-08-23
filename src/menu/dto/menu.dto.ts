@@ -1,5 +1,6 @@
 import { Menu } from "@prisma/client";
-import { IsArray, IsBoolean, IsNotEmpty, IsNumber, IsOptional, IsString } from "class-validator";
+import { Type } from "class-transformer";
+import { ArrayNotEmpty, IsArray, IsBoolean, IsNotEmpty, IsNumber, IsOptional, IsString, ValidateNested } from "class-validator";
 
 
 export class CreateMenuDto {
@@ -31,3 +32,16 @@ export interface MenuPaginationResponseType {
     currentPage: number
     itemsPerPage: number
 }
+
+export class UpdateMenuDto {
+    @IsOptional()
+    @IsString({ message: 'Name must be a string' })
+    @IsNotEmpty({ message: "name menu item can not empty" })
+    name: string;
+
+    @IsOptional()
+    @IsArray()
+    @ArrayNotEmpty({ message: 'Menu items array cannot be empty' })
+    menuItems?: number[];
+   
+}  

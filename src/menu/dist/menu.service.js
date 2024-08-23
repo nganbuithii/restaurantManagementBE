@@ -119,6 +119,108 @@ var MenuService = /** @class */ (function () {
             });
         });
     };
+    MenuService.prototype.getDetail = function (id) {
+        return __awaiter(this, void 0, Promise, function () {
+            var menu;
+            return __generator(this, function (_a) {
+                switch (_a.label) {
+                    case 0: return [4 /*yield*/, this.prismaService.menu.findUnique({
+                            where: { id: id },
+                            include: { menuItems: true }
+                        })];
+                    case 1:
+                        menu = _a.sent();
+                        if (!menu) {
+                            throw new common_1.NotFoundException("Kh\u00F4ng t\u00ECm th\u1EA5y menu v\u1EDBi ID " + id);
+                        }
+                        return [2 /*return*/, menu];
+                }
+            });
+        });
+    };
+    MenuService.prototype.update = function (id, data, user) {
+        return __awaiter(this, void 0, Promise, function () {
+            var existingMenu, updateData, updatedMenu;
+            return __generator(this, function (_a) {
+                switch (_a.label) {
+                    case 0: return [4 /*yield*/, this.prismaService.menu.findUnique({
+                            where: { id: id },
+                            include: { menuItems: true }
+                        })];
+                    case 1:
+                        existingMenu = _a.sent();
+                        if (!existingMenu) {
+                            throw new common_1.NotFoundException("Menu with ID " + id + " not found");
+                        }
+                        updateData = {};
+                        if (data.name !== undefined)
+                            updateData.name = data.name;
+                        updateData.updatedBy = user.sub; // Thêm thông tin về người cập nhật
+                        return [4 /*yield*/, this.prismaService.menu.update({
+                                where: { id: id },
+                                data: updateData
+                            })];
+                    case 2:
+                        updatedMenu = _a.sent();
+                        if (!data.menuItems) return [3 /*break*/, 5];
+                        // Xóa các món ăn hiện có liên kết với menu
+                        return [4 /*yield*/, this.prismaService.menuItem.updateMany({
+                                where: { menuId: id },
+                                data: { menuId: null }
+                            })];
+                    case 3:
+                        // Xóa các món ăn hiện có liên kết với menu
+                        _a.sent();
+                        // Cập nhật các món ăn mới liên kết với menu
+                        return [4 /*yield*/, this.prismaService.menuItem.updateMany({
+                                where: {
+                                    id: { "in": data.menuItems }
+                                },
+                                data: { menuId: id }
+                            })];
+                    case 4:
+                        // Cập nhật các món ăn mới liên kết với menu
+                        _a.sent();
+                        _a.label = 5;
+                    case 5: 
+                    // Truy vấn và trả về menu đã cập nhật cùng với các món ăn của nó
+                    return [2 /*return*/, this.prismaService.menu.findUnique({
+                            where: { id: id },
+                            include: { menuItems: true }
+                        })];
+                }
+            });
+        });
+    };
+    MenuService.prototype["delete"] = function (id, user) {
+        return __awaiter(this, void 0, Promise, function () {
+            var existingMenu;
+            return __generator(this, function (_a) {
+                switch (_a.label) {
+                    case 0: return [4 /*yield*/, this.prismaService.menu.findUnique({
+                            where: { id: id }
+                        })];
+                    case 1:
+                        existingMenu = _a.sent();
+                        if (!existingMenu) {
+                            throw new common_1.NotFoundException("Menu with ID " + id + " not found");
+                        }
+                        // Cập nhật menu để xóa (chuyển isActive thành false và cập nhật deletedBy)
+                        return [4 /*yield*/, this.prismaService.menu.update({
+                                where: { id: id },
+                                data: {
+                                    isActive: false,
+                                    deletedBy: user.sub
+                                }
+                            })];
+                    case 2:
+                        // Cập nhật menu để xóa (chuyển isActive thành false và cập nhật deletedBy)
+                        _a.sent();
+                        return [2 /*return*/];
+                }
+            });
+        });
+    };
     MenuService = __decorate([
         common_1.Injectable()
     ], MenuService);

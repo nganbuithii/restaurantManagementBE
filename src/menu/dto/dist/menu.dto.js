@@ -6,7 +6,7 @@ var __decorate = (this && this.__decorate) || function (decorators, target, key,
     return c > 3 && r && Object.defineProperty(target, key, r), r;
 };
 exports.__esModule = true;
-exports.CreateMenuDto = void 0;
+exports.UpdateMenuDto = exports.CreateMenuDto = void 0;
 var class_validator_1 = require("class-validator");
 var CreateMenuDto = /** @class */ (function () {
     function CreateMenuDto() {
@@ -27,3 +27,19 @@ var CreateMenuDto = /** @class */ (function () {
     return CreateMenuDto;
 }());
 exports.CreateMenuDto = CreateMenuDto;
+var UpdateMenuDto = /** @class */ (function () {
+    function UpdateMenuDto() {
+    }
+    __decorate([
+        class_validator_1.IsOptional(),
+        class_validator_1.IsString({ message: 'Name must be a string' }),
+        class_validator_1.IsNotEmpty({ message: "name menu item can not empty" })
+    ], UpdateMenuDto.prototype, "name");
+    __decorate([
+        class_validator_1.IsOptional(),
+        class_validator_1.IsArray(),
+        class_validator_1.ArrayNotEmpty({ message: 'Menu items array cannot be empty' })
+    ], UpdateMenuDto.prototype, "menuItems");
+    return UpdateMenuDto;
+}());
+exports.UpdateMenuDto = UpdateMenuDto;
