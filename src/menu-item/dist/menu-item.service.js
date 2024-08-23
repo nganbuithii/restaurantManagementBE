@@ -155,6 +155,64 @@ var MenuItemService = /** @class */ (function () {
             });
         });
     };
+    MenuItemService.prototype.update = function (id, data, user) {
+        return __awaiter(this, void 0, Promise, function () {
+            var existingMenuItem, updateData, updatedMenuItem;
+            return __generator(this, function (_a) {
+                switch (_a.label) {
+                    case 0: return [4 /*yield*/, this.prismaService.menuItem.findUnique({
+                            where: { id: id },
+                            include: { ingredients: true }
+                        })];
+                    case 1:
+                        existingMenuItem = _a.sent();
+                        if (!existingMenuItem) {
+                            throw new common_1.NotFoundException("Kh\u00F4ng t\u00ECm th\u1EA5y m\u1EE5c menu v\u1EDBi ID " + id);
+                        }
+                        updateData = {
+                            updatedBy: user.sub,
+                            updatedAt: new Date()
+                        };
+                        if (data.name !== undefined)
+                            updateData.name = data.name;
+                        if (data.price !== undefined)
+                            updateData.price = data.price;
+                        return [4 /*yield*/, this.prismaService.menuItem.update({
+                                where: { id: id },
+                                data: updateData
+                            })];
+                    case 2:
+                        updatedMenuItem = _a.sent();
+                        if (!(data.ingredientQuantities && data.ingredientQuantities.length > 0)) return [3 /*break*/, 5];
+                        // Xóa các mối quan hệ hiện có
+                        return [4 /*yield*/, this.prismaService.menuItemIngredient.deleteMany({
+                                where: { menuItemId: id }
+                            })];
+                    case 3:
+                        // Xóa các mối quan hệ hiện có
+                        _a.sent();
+                        // Tạo các mối quan hệ mới
+                        return [4 /*yield*/, this.prismaService.menuItemIngredient.createMany({
+                                data: data.ingredientQuantities.map(function (iq) { return ({
+                                    menuItemId: id,
+                                    ingredientId: iq.ingredientId,
+                                    quantity: iq.quantity
+                                }); })
+                            })];
+                    case 4:
+                        // Tạo các mối quan hệ mới
+                        _a.sent();
+                        _a.label = 5;
+                    case 5: 
+                    // Truy vấn và trả về mục menu đã được cập nhật cùng với các nguyên liệu của nó
+                    return [2 /*return*/, this.prismaService.menuItem.findUnique({
+                            where: { id: id },
+                            include: { ingredients: true }
+                        })];
+                }
+            });
+        });
+    };
     MenuItemService = __decorate([
         common_1.Injectable()
     ], MenuItemService);

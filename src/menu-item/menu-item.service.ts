@@ -1,6 +1,6 @@
 import { BadRequestException, Injectable, NotFoundException } from '@nestjs/common';
 import { PrismaService } from 'src/prisma.service';
-import { CreateMenuItemDto, MenuItemFilterType, MenuItemPaginationResponseType } from './dto/menu-item.dto';
+import { CreateMenuItemDto, MenuItemFilterType, MenuItemPaginationResponseType, UpdateMenuItemDto } from './dto/menu-item.dto';
 import { IUser } from 'interfaces/user.interface';
 import { CloudinaryService } from 'src/cloudinary/cloudinary.service';
 import { MenuItem } from '@prisma/client';
@@ -56,7 +56,7 @@ export class MenuItemService {
 
         return menuItem;
     }
-    
+
 
     async getAll(filter: MenuItemFilterType): Promise<MenuItemPaginationResponseType> {
         const { page = 1, items_per_page = 10, search } = filter;
@@ -65,7 +65,7 @@ export class MenuItemService {
         const skip = (page - 1) * items_per_page;
         const take = items_per_page;
 
-        const where = search ? { name: { contains: search} } : {};
+        const where = search ? { name: { contains: search } } : {};
 
         // Lấy danh sách menu items với phân trang và lọc
         const [menuItems, total] = await this.prismaService.$transaction([
@@ -88,7 +88,7 @@ export class MenuItemService {
             itemsPerPage: items_per_page,
         };
     }
-    
+
     async getDetail(id: number): Promise<MenuItem> {
         const menuItem = await this.prismaService.menuItem.findUnique({
             where: { id },
@@ -105,4 +105,52 @@ export class MenuItemService {
 
         return menuItem;
     }
-}
+    async update(id: number, data: UpdateMenuItemDto, user:IUser): Promise<MenuItem> {
+        // Kiểm tra xem mục menu có tồn tại không
+        const existingMenuItem = await this.prismaService.menuItem.findUnique({
+            where: { id },
+            include: { ingredients: true },
+        });
+
+        if (!existingMenuItem) {
+            throw new NotFoundException(`Không tìm thấy mục menu với ID ${id}`);
+        }
+
+        // Chuẩn bị dữ liệu để cập nhật
+        const updateData: any = {
+            updatedBy: user.sub,
+            updatedAt: new Date(),
+        };
+        if (data.name !== undefined) updateData.name = data.name;
+        if (data.price !== undefined) updateData.price = data.price;
+
+        // Cập nhật mục menu
+        const updatedMenuItem = await this.prismaService.menuItem.update({
+            where: { id },
+            data: updateData,
+        });
+
+        // Chỉ cập nhật nguyên liệu nếu được cung cấp
+        if (data.ingredientQuantities && data.ingredientQuantities.length > 0) {
+            // Xóa các mối quan hệ hiện có
+            await this.prismaService.menuItemIngredient.deleteMany({
+                where: { menuItemId: id },
+            });
+
+            // Tạo các mối quan hệ mới
+            await this.prismaService.menuItemIngredient.createMany({
+                data: data.ingredientQuantities.map(iq => ({
+                    menuItemId: id,
+                    ingredientId: iq.ingredientId,
+                    quantity: iq.quantity,
+                })),
+            });
+        }
+
+        // Truy vấn và trả về mục menu đã được cập nhật cùng với các nguyên liệu của nó
+        return this.prismaService.menuItem.findUnique({
+            where: { id },
+            include: { ingredients: true },
+        });
+    }
+}    

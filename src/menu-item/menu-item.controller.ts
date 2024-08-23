@@ -1,8 +1,8 @@
-import { Body, Controller, Get, HttpCode, HttpStatus, Param, ParseIntPipe, Post, Query, UploadedFiles, UseGuards, UseInterceptors } from '@nestjs/common';
+import { Body, Controller, Get, HttpCode, HttpStatus, Param, ParseIntPipe, Patch, Post, Query, UploadedFiles, UseGuards, UseInterceptors } from '@nestjs/common';
 import { MenuItemService } from './menu-item.service';
 import { FilesInterceptor } from '@nestjs/platform-express';
 import { JwtAuthGuard } from 'src/auth/jwt-auth.guard';
-import { CreateMenuItemDto, MenuItemFilterType, MenuItemPaginationResponseType } from './dto/menu-item.dto';
+import { CreateMenuItemDto, MenuItemFilterType, MenuItemPaginationResponseType, UpdateMenuItemDto } from './dto/menu-item.dto';
 import { CurrentUser, ResponseMessage } from 'decorators/customize';
 import { IUser } from 'interfaces/user.interface';
 import { MenuItem } from '@prisma/client';
@@ -39,5 +39,12 @@ export class MenuItemController {
   getDetail(@Param('id', ParseIntPipe) id: number): Promise<MenuItem> {
     return this.menuItemService.getDetail(id)
   }
+
+  @Patch(':id')
+  @UseGuards(JwtAuthGuard)
+  @ResponseMessage(" update menu item by id")
+    update(@Param('id', ParseIntPipe) id: number, @Body() data: UpdateMenuItemDto, @CurrentUser() user:IUser): Promise<MenuItem> {
+        return this.menuItemService.update(id, data, user);
+    }
 
 }
