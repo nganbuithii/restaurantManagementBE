@@ -162,6 +162,10 @@ model Menu {
   createdAt DateTime   @default(now())
   updatedAt DateTime   @updatedAt
   menuItems MenuItem[]
+
+  updatedBy Int?
+  deletedBy Int?
+  createdBy Int
 }
 
 model Supplier {

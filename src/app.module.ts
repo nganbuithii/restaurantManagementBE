@@ -13,6 +13,7 @@ import { JwtAuthGuard } from './auth/jwt-auth.guard';
 import { CloudinaryService } from './cloudinary/cloudinary.service';
 import { CloudinaryModule } from './cloudinary/cloudinary.module';
 import { IngredientModule } from './ingredient/ingredient.module';
+import { MenuModule } from './menu/menu.module';
 
 
 @Module({
@@ -29,7 +30,7 @@ import { IngredientModule } from './ingredient/ingredient.module';
     
     ConfigModule,
     UserModule,
-    AuthModule, RoleModule, PermissionModule, MenuItemModule, CloudinaryModule, IngredientModule,  
+    AuthModule, RoleModule, PermissionModule, MenuItemModule, CloudinaryModule, IngredientModule, MenuModule,  
   ],
   controllers: [AppController],
   providers: [
