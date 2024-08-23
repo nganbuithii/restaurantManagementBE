@@ -15,6 +15,7 @@ import { CloudinaryModule } from './cloudinary/cloudinary.module';
 import { IngredientModule } from './ingredient/ingredient.module';
 import { MenuModule } from './menu/menu.module';
 import { TableModule } from './table/table.module';
+import { ReversationsModule } from './reversations/reversations.module';
 
 
 @Module({
@@ -31,7 +32,7 @@ import { TableModule } from './table/table.module';
     
     ConfigModule,
     UserModule,
-    AuthModule, RoleModule, PermissionModule, MenuItemModule, CloudinaryModule, IngredientModule, MenuModule, TableModule,  
+    AuthModule, RoleModule, PermissionModule, MenuItemModule, CloudinaryModule, IngredientModule, MenuModule, TableModule, ReversationsModule,  
   ],
   controllers: [AppController],
   providers: [
