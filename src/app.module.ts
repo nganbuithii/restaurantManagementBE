@@ -14,6 +14,7 @@ import { CloudinaryService } from './cloudinary/cloudinary.service';
 import { CloudinaryModule } from './cloudinary/cloudinary.module';
 import { IngredientModule } from './ingredient/ingredient.module';
 import { MenuModule } from './menu/menu.module';
+import { TableModule } from './table/table.module';
 
 
 @Module({
@@ -30,7 +31,7 @@ import { MenuModule } from './menu/menu.module';
     
     ConfigModule,
     UserModule,
-    AuthModule, RoleModule, PermissionModule, MenuItemModule, CloudinaryModule, IngredientModule, MenuModule,  
+    AuthModule, RoleModule, PermissionModule, MenuItemModule, CloudinaryModule, IngredientModule, MenuModule, TableModule,  
   ],
   controllers: [AppController],
   providers: [

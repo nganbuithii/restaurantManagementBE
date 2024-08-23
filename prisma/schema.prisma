@@ -109,9 +109,12 @@ model Table {
   id           Int           @id @default(autoincrement())
   number       Int           @unique
   seats        Int
-  status       String
+  isActive Boolean @default(true)
+  status       Int @default(1)
   createdAt    DateTime      @default(now())
   updatedAt    DateTime      @updatedAt
+  updatedBy Int?
+  deletedBy Int?
   reservations Reservation[]
 }
 

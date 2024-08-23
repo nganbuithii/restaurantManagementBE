@@ -57,6 +57,9 @@ var menu_item_module_1 = require("./menu-item/menu-item.module");
 var jwt_auth_guard_1 = require("./auth/jwt-auth.guard");
 var cloudinary_service_1 = require("./cloudinary/cloudinary.service");
 var cloudinary_module_1 = require("./cloudinary/cloudinary.module");
+var ingredient_module_1 = require("./ingredient/ingredient.module");
+var menu_module_1 = require("./menu/menu.module");
+var table_module_1 = require("./table/table.module");
 var AppModule = /** @class */ (function () {
     function AppModule() {
     }
@@ -78,7 +81,7 @@ var AppModule = /** @class */ (function () {
                 }),
                 config_1.ConfigModule,
                 user_module_1.UserModule,
-                auth_module_1.AuthModule, role_module_1.RoleModule, permission_module_1.PermissionModule, menu_item_module_1.MenuItemModule, cloudinary_module_1.CloudinaryModule,
+                auth_module_1.AuthModule, role_module_1.RoleModule, permission_module_1.PermissionModule, menu_item_module_1.MenuItemModule, cloudinary_module_1.CloudinaryModule, ingredient_module_1.IngredientModule, menu_module_1.MenuModule, table_module_1.TableModule,
             ],
             controllers: [app_controller_1.AppController],
             providers: [
