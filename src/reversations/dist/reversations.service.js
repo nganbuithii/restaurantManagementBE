@@ -145,6 +145,81 @@ var ReversationsService = /** @class */ (function () {
             });
         });
     };
+    ReversationsService.prototype.getDetail = function (id) {
+        return __awaiter(this, void 0, Promise, function () {
+            var reservation, data;
+            return __generator(this, function (_a) {
+                switch (_a.label) {
+                    case 0: return [4 /*yield*/, this.prisma.reservation.findUnique({
+                            where: { id: id },
+                            include: {
+                                table: true,
+                                customer: {
+                                    include: {
+                                        user: true
+                                    }
+                                }
+                            }
+                        })];
+                    case 1:
+                        reservation = _a.sent();
+                        if (!reservation) {
+                            throw new common_1.NotFoundException("Reservation with ID " + id + " not found");
+                        }
+                        data = {
+                            id: reservation.id,
+                            startTime: reservation.startTime,
+                            endTime: reservation.endTime,
+                            status: reservation.status,
+                            createdAt: reservation.createdAt,
+                            updatedAt: reservation.updatedAt,
+                            tableId: reservation.tableId,
+                            customerId: reservation.customerId,
+                            table: {
+                                id: reservation.table.id,
+                                number: reservation.table.number,
+                                seats: reservation.table.seats,
+                                status: reservation.table.status
+                            },
+                            customer: {
+                                id: reservation.customer.id,
+                                user: {
+                                    fullName: reservation.customer.user.fullName,
+                                    phone: reservation.customer.user.phone,
+                                    username: reservation.customer.user.username,
+                                    avatar: reservation.customer.user.avatar
+                                }
+                            }
+                        };
+                        return [2 /*return*/, { data: data }];
+                }
+            });
+        });
+    };
+    ReversationsService.prototype.update = function (id, data, user) {
+        return __awaiter(this, void 0, Promise, function () {
+            var reservation, updatedReservation;
+            return __generator(this, function (_a) {
+                switch (_a.label) {
+                    case 0: return [4 /*yield*/, this.prisma.reservation.findUnique({
+                            where: { id: id }
+                        })];
+                    case 1:
+                        reservation = _a.sent();
+                        if (!reservation) {
+                            throw new common_1.NotFoundException('Reservation not found');
+                        }
+                        return [4 /*yield*/, this.prisma.reservation.update({
+                                where: { id: id },
+                                data: __assign(__assign({}, data), { updatedAt: new Date() })
+                            })];
+                    case 2:
+                        updatedReservation = _a.sent();
+                        return [2 /*return*/, updatedReservation];
+                }
+            });
+        });
+    };
     ReversationsService = __decorate([
         common_1.Injectable()
     ], ReversationsService);
