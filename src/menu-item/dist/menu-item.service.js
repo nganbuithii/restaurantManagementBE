@@ -213,6 +213,35 @@ var MenuItemService = /** @class */ (function () {
             });
         });
     };
+    MenuItemService.prototype["delete"] = function (id, user) {
+        return __awaiter(this, void 0, Promise, function () {
+            var existingMenuItem;
+            return __generator(this, function (_a) {
+                switch (_a.label) {
+                    case 0: return [4 /*yield*/, this.prismaService.menuItem.findUnique({
+                            where: { id: id }
+                        })];
+                    case 1:
+                        existingMenuItem = _a.sent();
+                        if (!existingMenuItem) {
+                            throw new common_1.NotFoundException("Kh\u00F4ng t\u00ECm th\u1EA5y m\u1EE5c menu v\u1EDBi ID " + id);
+                        }
+                        // Cập nhật mục menu: đặt isActive = false và cập nhật deletedBy
+                        return [4 /*yield*/, this.prismaService.menuItem.update({
+                                where: { id: id },
+                                data: {
+                                    isActive: false,
+                                    deletedBy: user.sub
+                                }
+                            })];
+                    case 2:
+                        // Cập nhật mục menu: đặt isActive = false và cập nhật deletedBy
+                        _a.sent();
+                        return [2 /*return*/];
+                }
+            });
+        });
+    };
     MenuItemService = __decorate([
         common_1.Injectable()
     ], MenuItemService);

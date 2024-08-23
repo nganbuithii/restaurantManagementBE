@@ -30,6 +30,9 @@ var MenuItemController = /** @class */ (function () {
     MenuItemController.prototype.update = function (id, data, user) {
         return this.menuItemService.update(id, data, user);
     };
+    MenuItemController.prototype.deleteMenuItem = function (id, user) {
+        return this.menuItemService["delete"](id, user);
+    };
     __decorate([
         common_1.Post(),
         common_1.HttpCode(common_1.HttpStatus.CREATED),
@@ -58,6 +61,13 @@ var MenuItemController = /** @class */ (function () {
         customize_1.ResponseMessage(" update menu item by id"),
         __param(0, common_1.Param('id', common_1.ParseIntPipe)), __param(1, common_1.Body()), __param(2, customize_1.CurrentUser())
     ], MenuItemController.prototype, "update");
+    __decorate([
+        common_1.Delete(':id'),
+        common_1.UseGuards(jwt_auth_guard_1.JwtAuthGuard),
+        common_1.HttpCode(common_1.HttpStatus.NO_CONTENT),
+        customize_1.ResponseMessage(" delete menu item by id"),
+        __param(0, common_1.Param('id', common_1.ParseIntPipe)), __param(1, customize_1.CurrentUser())
+    ], MenuItemController.prototype, "deleteMenuItem");
     MenuItemController = __decorate([
         common_1.Controller('menu-item')
     ], MenuItemController);

@@ -105,7 +105,7 @@ export class MenuItemService {
 
         return menuItem;
     }
-    async update(id: number, data: UpdateMenuItemDto, user:IUser): Promise<MenuItem> {
+    async update(id: number, data: UpdateMenuItemDto, user: IUser): Promise<MenuItem> {
         // Kiểm tra xem mục menu có tồn tại không
         const existingMenuItem = await this.prismaService.menuItem.findUnique({
             where: { id },
@@ -152,5 +152,29 @@ export class MenuItemService {
             where: { id },
             include: { ingredients: true },
         });
+    }
+
+
+    async delete(id: number, user: IUser): Promise<void> {
+        // Kiểm tra xem mục menu có tồn tại không
+        const existingMenuItem = await this.prismaService.menuItem.findUnique({
+            where: { id },
+        });
+
+        if (!existingMenuItem) {
+            throw new NotFoundException(`Không tìm thấy mục menu với ID ${id}`);
+        }
+
+        // Cập nhật mục menu: đặt isActive = false và cập nhật deletedBy
+        await this.prismaService.menuItem.update({
+            where: { id },
+            data: {
+                isActive: false,
+                deletedBy: user.sub,
+
+            },
+        });
+
+        // Không trả về dữ liệu
     }
 }    
