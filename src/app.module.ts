@@ -16,6 +16,7 @@ import { IngredientModule } from './ingredient/ingredient.module';
 import { MenuModule } from './menu/menu.module';
 import { TableModule } from './table/table.module';
 import { ReversationsModule } from './reversations/reversations.module';
+import { OrdersModule } from './orders/orders.module';
 
 
 @Module({
@@ -32,7 +33,7 @@ import { ReversationsModule } from './reversations/reversations.module';
     
     ConfigModule,
     UserModule,
-    AuthModule, RoleModule, PermissionModule, MenuItemModule, CloudinaryModule, IngredientModule, MenuModule, TableModule, ReversationsModule,  
+    AuthModule, RoleModule, PermissionModule, MenuItemModule, CloudinaryModule, IngredientModule, MenuModule, TableModule, ReversationsModule, OrdersModule,  
   ],
   controllers: [AppController],
   providers: [
