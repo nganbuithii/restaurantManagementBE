@@ -18,6 +18,7 @@ import { TableModule } from './table/table.module';
 import { ReversationsModule } from './reversations/reversations.module';
 import { OrdersModule } from './orders/orders.module';
 import { FeeckbacksModule } from './feeckbacks/feedbacks.module';
+import { VouchersModule } from './vouchers/vouchers.module';
 
 
 @Module({
@@ -34,7 +35,7 @@ import { FeeckbacksModule } from './feeckbacks/feedbacks.module';
     
     ConfigModule,
     UserModule,
-    AuthModule, RoleModule, PermissionModule, MenuItemModule, CloudinaryModule, IngredientModule, MenuModule, TableModule, ReversationsModule, OrdersModule, FeeckbacksModule,  
+    AuthModule, RoleModule, PermissionModule, MenuItemModule, CloudinaryModule, IngredientModule, MenuModule, TableModule, ReversationsModule, OrdersModule, FeeckbacksModule, VouchersModule,  
   ],
   controllers: [AppController],
   providers: [

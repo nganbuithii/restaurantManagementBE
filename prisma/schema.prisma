@@ -26,7 +26,6 @@ model User {
   feedbacks Feedback[]
   orders    Order[]
   supplier  Supplier?
-
 }
 
 model Role {
@@ -73,13 +72,18 @@ model Employee {
 
 model Customer {
   id           Int           @id @default(autoincrement())
-  points       Int           @default(0)
+
+  points           Int               @default(0)
+  customerVouchers CustomerVoucher[]
+
   createdAt    DateTime      @default(now())
   updatedAt    DateTime      @updatedAt
   user         User          @relation(fields: [userId], references: [id])
   userId       Int           @unique
   reservations Reservation[]
   vouchers     Voucher[]
+
+  @@index([userId]) // Tạo chỉ mục cho trường userId để tăng tốc độ tìm kiếm
 }
 
 model Order {
@@ -89,9 +93,13 @@ model Order {
   discountPrice Float         @default(0)
   userId        Int
   user          User          @relation(fields: [userId], references: [id])
+
   createdAt     DateTime      @default(now())
   updatedAt     DateTime      @updatedAt
   details       OrderDetail[]
+
+  usedVoucherId Int?
+  usedVoucher   Voucher? @relation(fields: [usedVoucherId], references: [id])
 }
 
 model OrderDetail {
@@ -109,12 +117,12 @@ model Table {
   id           Int           @id @default(autoincrement())
   number       Int           @unique
   seats        Int
-  isActive Boolean @default(true)
-  status       Int @default(1)
+  isActive     Boolean       @default(true)
+  status       Int           @default(1)
   createdAt    DateTime      @default(now())
   updatedAt    DateTime      @updatedAt
-  updatedBy Int?
-  deletedBy Int?
+  updatedBy    Int?
+  deletedBy    Int?
   reservations Reservation[]
 }
 
@@ -132,21 +140,20 @@ model Reservation {
 }
 
 model MenuItem {
-  id           Int                  @id @default(autoincrement())
-  name         String
-  price        Float
+  id        Int      @id @default(autoincrement())
+  name      String
+  price     Float
   // status       String
-  isActive     Boolean              @default(true)
-  createdAt    DateTime             @default(now())
-  updatedAt    DateTime             @updatedAt
+  isActive  Boolean  @default(true)
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
   updatedBy Int?
   deletedBy Int?
   createdBy Int
 
-
   images       FoodImage[]
   menuId       Int?
-  menu         Menu?                 @relation(fields: [menuId], references: [id])
+  menu         Menu?                @relation(fields: [menuId], references: [id])
   orderDetails OrderDetail[]
   ingredients  MenuItemIngredient[]
 }
@@ -185,24 +192,23 @@ model Supplier {
 }
 
 model Ingredient {
-  id          Int                   @id @default(autoincrement())
+  id          Int      @id @default(autoincrement())
   name        String
   unit        String
   productDate DateTime
   price       Float
-  isActive    Boolean               @default(true)
+  isActive    Boolean  @default(true)
   status      String
-  createdAt   DateTime              @default(now())
-  updatedAt   DateTime              @updatedAt
-  createdBy Int?
-  deletedBy   Int?    
-  updatedBy   Int?      
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+  createdBy   Int?
+  deletedBy   Int?
+  updatedBy   Int?
 
   menuItems   MenuItemIngredient[]
   slipDetails WarehouseSlipDetail[]
 
   inventory Inventory?
-
 }
 
 model MenuItemIngredient {
@@ -214,7 +220,6 @@ model MenuItemIngredient {
 
   @@id([menuItemId, ingredientId])
 }
-
 model Voucher {
   id          Int      @id @default(autoincrement())
   code        String   @unique
@@ -223,10 +228,33 @@ model Voucher {
   startDate   DateTime @default(now())
   endDate     DateTime
   isActive    Boolean  @default(true)
-  createdAt   DateTime @default(now())
-  updatedAt   DateTime @updatedAt
-  customerId  Int
-  customer    Customer @relation(fields: [customerId], references: [id])
+  status      String // "ACTIVE", "PAUSED", "EXPIRED", "USED_UP"
+  quantity    Int
+  usedCount   Int      @default(0)
+  pointCost   Int
+  customerId  Int?
+  customer    Customer? @relation(fields: [customerId], references: [id])
+
+  customerVouchers CustomerVoucher[]
+  usedInOrders     Order[]
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+  createdBy Int?
+  updatedBy Int?
+  deletedBy Int?
+}
+model CustomerVoucher {
+  id         Int      @id @default(autoincrement())
+  customerId Int
+  voucherId  Int
+  obtainedAt DateTime @default(now())
+  usedAt     DateTime?
+
+  customer   Customer @relation(fields: [customerId], references: [id])
+  voucher    Voucher  @relation(fields: [voucherId], references: [id])
+
+  @@unique([customerId, voucherId])
 }
 
 model Feedback {

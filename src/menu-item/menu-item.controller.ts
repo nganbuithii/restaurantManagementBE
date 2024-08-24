@@ -19,7 +19,7 @@ export class MenuItemController {
   @UseInterceptors(FilesInterceptor('files'))
   createIngredient(
     @Body() body: CreateMenuItemDto, 
-  @CurrentUser() user: IUser,
+    @CurrentUser() user: IUser,
   @UploadedFiles() files: Array<Express.Multer.File>) {
     return this.menuItemService.create(body, user, files);
   }

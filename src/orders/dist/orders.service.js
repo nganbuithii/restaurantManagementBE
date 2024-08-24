@@ -147,6 +147,7 @@ var OrdersService = /** @class */ (function () {
                             userId: order.userId,
                             createdAt: order.createdAt,
                             updatedAt: order.updatedAt,
+                            usedVoucherId: order.usedVoucherId,
                             details: order.details.map(function (detail) { return ({
                                 id: detail.id,
                                 quantity: detail.quantity,
