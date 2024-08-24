@@ -6,7 +6,7 @@ var __decorate = (this && this.__decorate) || function (decorators, target, key,
     return c > 3 && r && Object.defineProperty(target, key, r), r;
 };
 exports.__esModule = true;
-exports.CreateOrderDto = void 0;
+exports.UpdateOrderDto = exports.CreateOrderDto = void 0;
 var class_transformer_1 = require("class-transformer");
 var class_validator_1 = require("class-validator");
 var OrderStatus;
@@ -37,10 +37,6 @@ var CreateOrderDto = /** @class */ (function () {
         class_validator_1.IsNotEmpty()
     ], CreateOrderDto.prototype, "status");
     __decorate([
-        class_validator_1.IsNumber(),
-        class_validator_1.IsNotEmpty()
-    ], CreateOrderDto.prototype, "totalPrice");
-    __decorate([
         class_validator_1.IsNumber()
     ], CreateOrderDto.prototype, "discountPrice");
     __decorate([
@@ -51,3 +47,21 @@ var CreateOrderDto = /** @class */ (function () {
     return CreateOrderDto;
 }());
 exports.CreateOrderDto = CreateOrderDto;
+var UpdateOrderDto = /** @class */ (function () {
+    function UpdateOrderDto() {
+    }
+    __decorate([
+        class_validator_1.IsOptional(),
+        class_validator_1.IsString()
+    ], UpdateOrderDto.prototype, "status");
+    __decorate([
+        class_validator_1.IsOptional(),
+        class_validator_1.IsNumber()
+    ], UpdateOrderDto.prototype, "totalPrice");
+    __decorate([
+        class_validator_1.IsOptional(),
+        class_validator_1.IsNumber()
+    ], UpdateOrderDto.prototype, "discountPrice");
+    return UpdateOrderDto;
+}());
+exports.UpdateOrderDto = UpdateOrderDto;

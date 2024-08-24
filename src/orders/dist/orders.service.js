@@ -1,4 +1,15 @@
 "use strict";
+var __assign = (this && this.__assign) || function () {
+    __assign = Object.assign || function(t) {
+        for (var s, i = 1, n = arguments.length; i < n; i++) {
+            s = arguments[i];
+            for (var p in s) if (Object.prototype.hasOwnProperty.call(s, p))
+                t[p] = s[p];
+        }
+        return t;
+    };
+    return __assign.apply(this, arguments);
+};
 var __decorate = (this && this.__decorate) || function (decorators, target, key, desc) {
     var c = arguments.length, r = c < 3 ? target : desc === null ? desc = Object.getOwnPropertyDescriptor(target, key) : desc, d;
     if (typeof Reflect === "object" && typeof Reflect.decorate === "function") r = Reflect.decorate(decorators, target, key, desc);
@@ -50,31 +61,161 @@ var OrdersService = /** @class */ (function () {
     }
     OrdersService.prototype.create = function (createOrderDto, user) {
         return __awaiter(this, void 0, Promise, function () {
-            var status, totalPrice, discountPrice, details, order;
+            var status, discountPrice, details, totalPrice, _i, details_1, detail, menuItem, order;
             return __generator(this, function (_a) {
                 switch (_a.label) {
                     case 0:
-                        status = createOrderDto.status, totalPrice = createOrderDto.totalPrice, discountPrice = createOrderDto.discountPrice, details = createOrderDto.details;
-                        return [4 /*yield*/, this.prisma.order.create({
-                                data: {
-                                    status: status,
-                                    totalPrice: totalPrice,
-                                    discountPrice: discountPrice,
-                                    userId: user.sub,
-                                    details: {
-                                        create: details.map(function (detail) { return ({
-                                            quantity: detail.quantity,
-                                            menuItem: { connect: { id: detail.menuItemId } }
-                                        }); })
-                                    }
-                                },
-                                include: {
-                                    details: true
-                                }
-                            })];
+                        status = createOrderDto.status, discountPrice = createOrderDto.discountPrice, details = createOrderDto.details;
+                        totalPrice = 0;
+                        _i = 0, details_1 = details;
+                        _a.label = 1;
                     case 1:
+                        if (!(_i < details_1.length)) return [3 /*break*/, 4];
+                        detail = details_1[_i];
+                        return [4 /*yield*/, this.prisma.menuItem.findUnique({
+                                where: { id: detail.menuItemId }
+                            })];
+                    case 2:
+                        menuItem = _a.sent();
+                        if (!menuItem) {
+                            throw new common_1.NotFoundException("MenuItem with id " + detail.menuItemId + " not found");
+                        }
+                        // Cộng thêm vào totalPrice
+                        totalPrice += menuItem.price * detail.quantity;
+                        _a.label = 3;
+                    case 3:
+                        _i++;
+                        return [3 /*break*/, 1];
+                    case 4: return [4 /*yield*/, this.prisma.order.create({
+                            data: {
+                                status: status,
+                                totalPrice: totalPrice,
+                                discountPrice: discountPrice,
+                                userId: user.sub,
+                                details: {
+                                    create: details.map(function (detail) { return ({
+                                        quantity: detail.quantity,
+                                        menuItem: { connect: { id: detail.menuItemId } }
+                                    }); })
+                                }
+                            },
+                            include: {
+                                details: true
+                            }
+                        })];
+                    case 5:
                         order = _a.sent();
                         return [2 /*return*/, order];
+                }
+            });
+        });
+    };
+    OrdersService.prototype.getAll = function (params) {
+        return __awaiter(this, void 0, Promise, function () {
+            var _a, page, _b, items_per_page, search, skip, where, _c, orders, total, customOrders;
+            return __generator(this, function (_d) {
+                switch (_d.label) {
+                    case 0:
+                        _a = params.page, page = _a === void 0 ? 1 : _a, _b = params.items_per_page, items_per_page = _b === void 0 ? 10 : _b, search = params.search;
+                        skip = (page - 1) * items_per_page;
+                        where = search
+                            ? {
+                                OR: [
+                                    { status: { contains: search, mode: 'insensitive' } },
+                                    { totalPrice: { equals: parseFloat(search) } },
+                                ]
+                            }
+                            : {};
+                        return [4 /*yield*/, Promise.all([
+                                this.prisma.order.findMany({
+                                    where: where,
+                                    skip: skip,
+                                    take: items_per_page,
+                                    include: {
+                                        details: true
+                                    }
+                                }),
+                                this.prisma.order.count({ where: where }),
+                            ])];
+                    case 1:
+                        _c = _d.sent(), orders = _c[0], total = _c[1];
+                        customOrders = orders.map(function (order) { return ({
+                            id: order.id,
+                            status: order.status,
+                            totalPrice: order.totalPrice,
+                            discountPrice: order.discountPrice,
+                            userId: order.userId,
+                            createdAt: order.createdAt,
+                            updatedAt: order.updatedAt,
+                            details: order.details.map(function (detail) { return ({
+                                id: detail.id,
+                                quantity: detail.quantity,
+                                menuItemId: detail.menuItemId
+                            }); })
+                        }); });
+                        return [2 /*return*/, {
+                                data: customOrders,
+                                total: total,
+                                currentPage: page,
+                                itemsPerPage: items_per_page
+                            }];
+                }
+            });
+        });
+    };
+    OrdersService.prototype.getDetail = function (id) {
+        return __awaiter(this, void 0, Promise, function () {
+            var order;
+            return __generator(this, function (_a) {
+                switch (_a.label) {
+                    case 0: return [4 /*yield*/, this.prisma.order.findUnique({
+                            where: { id: id },
+                            include: {
+                                details: true
+                            }
+                        })];
+                    case 1:
+                        order = _a.sent();
+                        if (!order) {
+                            throw new common_1.NotFoundException("Order with id " + id + " not found");
+                        }
+                        return [2 /*return*/, {
+                                id: order.id,
+                                status: order.status,
+                                totalPrice: order.totalPrice,
+                                discountPrice: order.discountPrice,
+                                userId: order.userId,
+                                createdAt: order.createdAt,
+                                details: order.details.map(function (detail) { return ({
+                                    id: detail.id,
+                                    quantity: detail.quantity,
+                                    menuItemId: detail.menuItemId
+                                }); })
+                            }];
+                }
+            });
+        });
+    };
+    OrdersService.prototype.update = function (id, updateOrderDto, user) {
+        return __awaiter(this, void 0, Promise, function () {
+            var order;
+            return __generator(this, function (_a) {
+                switch (_a.label) {
+                    case 0: return [4 /*yield*/, this.prisma.order.findUnique({
+                            where: { id: id }
+                        })];
+                    case 1:
+                        order = _a.sent();
+                        if (!order) {
+                            throw new common_1.NotFoundException("Order with id " + id + " not found");
+                        }
+                        if (order.userId !== user.sub) {
+                            throw new common_1.ForbiddenException('You are not allowed to update this order');
+                        }
+                        return [2 /*return*/, this.prisma.order.update({
+                                where: { id: id },
+                                data: __assign({}, updateOrderDto)
+                            })];
                 }
             });
         });
