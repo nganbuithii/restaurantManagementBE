@@ -42,62 +42,37 @@ var __generator = (this && this.__generator) || function (thisArg, body) {
     }
 };
 exports.__esModule = true;
-exports.AppModule = void 0;
+exports.FeeckbacksService = void 0;
 var common_1 = require("@nestjs/common");
-var app_controller_1 = require("./app.controller");
-var app_service_1 = require("./app.service");
-var auth_module_1 = require("./auth/auth.module");
-var role_module_1 = require("./role/role.module");
-var core_1 = require("@nestjs/core");
-var user_module_1 = require("./user/user.module");
-var config_1 = require("@nestjs/config");
-var jwt_1 = require("@nestjs/jwt");
-var permission_module_1 = require("./permission/permission.module");
-var menu_item_module_1 = require("./menu-item/menu-item.module");
-var jwt_auth_guard_1 = require("./auth/jwt-auth.guard");
-var cloudinary_service_1 = require("./cloudinary/cloudinary.service");
-var cloudinary_module_1 = require("./cloudinary/cloudinary.module");
-var ingredient_module_1 = require("./ingredient/ingredient.module");
-var menu_module_1 = require("./menu/menu.module");
-var table_module_1 = require("./table/table.module");
-var reversations_module_1 = require("./reversations/reversations.module");
-var orders_module_1 = require("./orders/orders.module");
-var feedbacks_module_1 = require("./feeckbacks/feedbacks.module");
-var AppModule = /** @class */ (function () {
-    function AppModule() {
+var FeeckbacksService = /** @class */ (function () {
+    function FeeckbacksService(prisma) {
+        this.prisma = prisma;
     }
-    AppModule = __decorate([
-        common_1.Module({
-            imports: [
-                config_1.ConfigModule.forRoot(),
-                jwt_1.JwtModule.registerAsync({
-                    imports: [config_1.ConfigModule],
-                    useFactory: function (configService) { return __awaiter(void 0, void 0, void 0, function () {
-                        return __generator(this, function (_a) {
-                            return [2 /*return*/, ({
-                                    secret: configService.get('JWT_SECRET'),
-                                    signOptions: { expiresIn: '60m' }
-                                })];
-                        });
-                    }); },
-                    inject: [config_1.ConfigService]
-                }),
-                config_1.ConfigModule,
-                user_module_1.UserModule,
-                auth_module_1.AuthModule, role_module_1.RoleModule, permission_module_1.PermissionModule, menu_item_module_1.MenuItemModule, cloudinary_module_1.CloudinaryModule, ingredient_module_1.IngredientModule, menu_module_1.MenuModule, table_module_1.TableModule, reversations_module_1.ReversationsModule, orders_module_1.OrdersModule, feedbacks_module_1.FeeckbacksModule,
-            ],
-            controllers: [app_controller_1.AppController],
-            providers: [
-                jwt_auth_guard_1.JwtAuthGuard,
-                app_service_1.AppService,
-                {
-                    provide: core_1.APP_PIPE,
-                    useClass: common_1.ValidationPipe
-                },
-                cloudinary_service_1.CloudinaryService,
-            ]
-        })
-    ], AppModule);
-    return AppModule;
+    FeeckbacksService.prototype.create = function (createFeedbackDto, user) {
+        return __awaiter(this, void 0, Promise, function () {
+            var content, rating, isActive, feedback;
+            return __generator(this, function (_a) {
+                switch (_a.label) {
+                    case 0:
+                        content = createFeedbackDto.content, rating = createFeedbackDto.rating, isActive = createFeedbackDto.isActive;
+                        return [4 /*yield*/, this.prisma.feedback.create({
+                                data: {
+                                    content: content,
+                                    rating: rating !== null && rating !== void 0 ? rating : 5,
+                                    isActive: isActive !== null && isActive !== void 0 ? isActive : true,
+                                    userId: user.sub
+                                }
+                            })];
+                    case 1:
+                        feedback = _a.sent();
+                        return [2 /*return*/, feedback];
+                }
+            });
+        });
+    };
+    FeeckbacksService = __decorate([
+        common_1.Injectable()
+    ], FeeckbacksService);
+    return FeeckbacksService;
 }());
-exports.AppModule = AppModule;
+exports.FeeckbacksService = FeeckbacksService;
