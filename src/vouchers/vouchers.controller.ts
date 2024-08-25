@@ -1,7 +1,8 @@
-import { Body, Controller, Get, HttpCode, HttpStatus, Post, Query, UseGuards } from '@nestjs/common';
+import { Voucher } from '@prisma/client';
+import { Body, Controller, Get, HttpCode, HttpStatus, Post, Query,Param, UseGuards, ParseIntPipe, Patch, Delete } from '@nestjs/common';
 import { VouchersService } from './vouchers.service';
 import { JwtAuthGuard } from 'src/auth/jwt-auth.guard';
-import { CreateVoucherDto, VoucherFilterType, VoucherPaginationResponseType } from './dto/voucher.dto';
+import { CreateVoucherDto, UpdateVoucherDto, VoucherFilterType, VoucherPaginationResponseType } from './dto/voucher.dto';
 import { CurrentUser, ResponseMessage } from 'decorators/customize';
 import { IUser } from 'interfaces/user.interface';
 
@@ -23,28 +24,28 @@ export class VouchersController {
   @ResponseMessage("Get vouchers list")
   getAll(@Query() params: VoucherFilterType): Promise<VoucherPaginationResponseType> {
     return this.vouchersService.getAll(params);
+  }
 
-    // @Get(':id')
-    // @UseGuards(JwtAuthGuard)
-    // @ResponseMessage("Get voucher details")
-    // getById(@Param('id', ParseIntPipe) id: number): Promise<Voucher> {
-    //   return this.vouchersService.getById(id);
-    // }
+  @Get(':id')
+  @ResponseMessage(" get detail menu item by id")
+  getDetail(@Param('id', ParseIntPipe) id: number): Promise<Voucher> {
+    return this.vouchersService.getById(id)
+  }
 
-    // @Patch(':id')
-    // @UseGuards(JwtAuthGuard)
-    // @ResponseMessage("Update voucher by id")
-    // update(@Param('id', ParseIntPipe) id: number, @Body() data: UpdateVoucherDto): Promise<Voucher> {
-    //   return this.vouchersService.update(id, data);
-    // }
+    @Patch(':id')
+    @UseGuards(JwtAuthGuard)
+    @ResponseMessage("Update voucher by id")
+    update(@Param('id', ParseIntPipe) id: number, @Body() data: UpdateVoucherDto, @CurrentUser() user:IUser): Promise<Voucher> {
+      return this.vouchersService.update(id, data, user);
+    }
 
-    // @Delete(':id')
-    // @UseGuards(JwtAuthGuard)
-    // @HttpCode(HttpStatus.NO_CONTENT)
-    // @ResponseMessage("Delete voucher by id")
-    // delete(@Param('id', ParseIntPipe) id: number): Promise<void> {
-    //   return this.vouchersService.delete(id);
-    // }
+    @Delete(':id')
+    @UseGuards(JwtAuthGuard)
+    @HttpCode(HttpStatus.NO_CONTENT)
+    @ResponseMessage("Delete voucher by id")
+    delete(@Param('id', ParseIntPipe) id: number, @CurrentUser() user:IUser): Promise<void> {
+      return this.vouchersService.delete(id, user);
+    }
     // @Get('customers/:customerId/vouchers')
     // @UseGuards(JwtAuthGuard)
     // @ResponseMessage("Get customer's vouchers")
@@ -60,8 +61,7 @@ export class VouchersController {
     // }
 
 
-  }
-
-
-
 }
+
+
+

@@ -22,37 +22,15 @@ var VouchersController = /** @class */ (function () {
     };
     VouchersController.prototype.getAll = function (params) {
         return this.vouchersService.getAll(params);
-        // @Get(':id')
-        // @UseGuards(JwtAuthGuard)
-        // @ResponseMessage("Get voucher details")
-        // getById(@Param('id', ParseIntPipe) id: number): Promise<Voucher> {
-        //   return this.vouchersService.getById(id);
-        // }
-        // @Patch(':id')
-        // @UseGuards(JwtAuthGuard)
-        // @ResponseMessage("Update voucher by id")
-        // update(@Param('id', ParseIntPipe) id: number, @Body() data: UpdateVoucherDto): Promise<Voucher> {
-        //   return this.vouchersService.update(id, data);
-        // }
-        // @Delete(':id')
-        // @UseGuards(JwtAuthGuard)
-        // @HttpCode(HttpStatus.NO_CONTENT)
-        // @ResponseMessage("Delete voucher by id")
-        // delete(@Param('id', ParseIntPipe) id: number): Promise<void> {
-        //   return this.vouchersService.delete(id);
-        // }
-        // @Get('customers/:customerId/vouchers')
-        // @UseGuards(JwtAuthGuard)
-        // @ResponseMessage("Get customer's vouchers")
-        // getCustomerVouchers(@Param('customerId', ParseIntPipe) customerId: number): Promise<Voucher[]> {
-        //   return this.vouchersService.getCustomerVouchers(customerId);
-        // }
-        // @Post('orders/:orderId/apply-voucher')
-        // @UseGuards(JwtAuthGuard)
-        // @ResponseMessage("Apply voucher to order")
-        // applyVoucher(@Param('orderId', ParseIntPipe) orderId: number, @Body() voucherCode: string): Promise<Order> {
-        //   return this.vouchersService.applyVoucher(orderId, voucherCode);
-        // }
+    };
+    VouchersController.prototype.getDetail = function (id) {
+        return this.vouchersService.getById(id);
+    };
+    VouchersController.prototype.update = function (id, data, user) {
+        return this.vouchersService.update(id, data, user);
+    };
+    VouchersController.prototype["delete"] = function (id, user) {
+        return this.vouchersService["delete"](id, user);
     };
     __decorate([
         common_1.Post(),
@@ -67,6 +45,24 @@ var VouchersController = /** @class */ (function () {
         customize_1.ResponseMessage("Get vouchers list"),
         __param(0, common_1.Query())
     ], VouchersController.prototype, "getAll");
+    __decorate([
+        common_1.Get(':id'),
+        customize_1.ResponseMessage(" get detail menu item by id"),
+        __param(0, common_1.Param('id', common_1.ParseIntPipe))
+    ], VouchersController.prototype, "getDetail");
+    __decorate([
+        common_1.Patch(':id'),
+        common_1.UseGuards(jwt_auth_guard_1.JwtAuthGuard),
+        customize_1.ResponseMessage("Update voucher by id"),
+        __param(0, common_1.Param('id', common_1.ParseIntPipe)), __param(1, common_1.Body()), __param(2, customize_1.CurrentUser())
+    ], VouchersController.prototype, "update");
+    __decorate([
+        common_1.Delete(':id'),
+        common_1.UseGuards(jwt_auth_guard_1.JwtAuthGuard),
+        common_1.HttpCode(common_1.HttpStatus.NO_CONTENT),
+        customize_1.ResponseMessage("Delete voucher by id"),
+        __param(0, common_1.Param('id', common_1.ParseIntPipe)), __param(1, customize_1.CurrentUser())
+    ], VouchersController.prototype, "delete");
     VouchersController = __decorate([
         common_1.Controller('vouchers')
     ], VouchersController);
