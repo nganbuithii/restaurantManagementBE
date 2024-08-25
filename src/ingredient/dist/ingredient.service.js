@@ -62,22 +62,42 @@ var IngredientService = /** @class */ (function () {
     }
     IngredientService.prototype.create = function (body, user) {
         return __awaiter(this, void 0, void 0, function () {
-            var name, unit, productDate, price, status, formattedProductDate;
+            var name, unit, productDate, price, status, quantity, formattedProductDate;
+            var _this = this;
             return __generator(this, function (_a) {
                 switch (_a.label) {
                     case 0:
-                        name = body.name, unit = body.unit, productDate = body.productDate, price = body.price, status = body.status;
+                        name = body.name, unit = body.unit, productDate = body.productDate, price = body.price, status = body.status, quantity = body.quantity;
                         formattedProductDate = new Date(productDate).toISOString();
-                        return [4 /*yield*/, this.prismaService.ingredient.create({
-                                data: {
-                                    name: name,
-                                    unit: unit,
-                                    productDate: formattedProductDate,
-                                    price: price,
-                                    status: status,
-                                    createdBy: user.sub
-                                }
-                            })];
+                        return [4 /*yield*/, this.prismaService.$transaction(function (prisma) { return __awaiter(_this, void 0, void 0, function () {
+                                var ingredient;
+                                return __generator(this, function (_a) {
+                                    switch (_a.label) {
+                                        case 0: return [4 /*yield*/, prisma.ingredient.create({
+                                                data: {
+                                                    name: name,
+                                                    unit: unit,
+                                                    productDate: formattedProductDate,
+                                                    price: price,
+                                                    status: status,
+                                                    createdBy: user.sub
+                                                }
+                                            })];
+                                        case 1:
+                                            ingredient = _a.sent();
+                                            return [4 /*yield*/, prisma.inventory.create({
+                                                    data: {
+                                                        ingredientId: ingredient.id,
+                                                        quantity: quantity,
+                                                        lastChecked: new Date()
+                                                    }
+                                                })];
+                                        case 2:
+                                            _a.sent();
+                                            return [2 /*return*/, ingredient];
+                                    }
+                                });
+                            }); })];
                     case 1: return [2 /*return*/, _a.sent()];
                 }
             });

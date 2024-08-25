@@ -20,6 +20,9 @@ export class CreateIngredientDto {
     @IsNotEmpty({ message: 'Price is required.' })
     price: number;
 
+    @IsNumber({}, { message: 'quantity ingredient in inventory must be a number.' })
+    quantity: number;
+
 
     @IsIn(['available', 'out_of_stock', 'pending'], {
         message: 'Status must be one of the following: available, out_of_stock, pending',
@@ -65,4 +68,6 @@ export interface IngredientFilterType {
     @IsOptional()
     status?: string;
 
+
+    
   }

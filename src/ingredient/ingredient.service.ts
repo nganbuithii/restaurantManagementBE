@@ -8,23 +8,34 @@ import { IUser } from 'interfaces/user.interface';
 @Injectable()
 export class IngredientService {
     constructor(private prismaService: PrismaService,
-        
+
     ) { }
-    async create(body: CreateIngredientDto, user:IUser) {
-        const { name, unit, productDate, price, status } = body;
+    async create(body: CreateIngredientDto, user: IUser) {
+        const { name, unit, productDate, price, status, quantity } = body;
 
         const formattedProductDate = new Date(productDate).toISOString();
 
-        
-        return await this.prismaService.ingredient.create({
-            data: {
-                name,
-                unit,
-                productDate: formattedProductDate,
-                price,
-                status,
-                createdBy:user.sub
-            },
+        return await this.prismaService.$transaction(async (prisma) => {
+            const ingredient = await prisma.ingredient.create({
+                data: {
+                    name,
+                    unit,
+                    productDate: formattedProductDate,
+                    price,
+                    status,
+                    createdBy: user.sub
+                },
+            });
+
+            await prisma.inventory.create({
+                data: {
+                    ingredientId: ingredient.id,
+                    quantity,
+                    lastChecked: new Date()
+                }
+            });
+
+            return ingredient;
         });
     }
 
@@ -101,29 +112,29 @@ export class IngredientService {
 
 
     async update(id: number, data: UpdateIngredientDto, user: IUser): Promise<Ingredient> {
-   
+
         const ingredient = await this.prismaService.ingredient.findUnique({
             where: { id },
         });
-    
+
         if (!ingredient) {
             throw new NotFoundException(`Ingredient with id ${id} not found`);
         }
-    
+
         return this.prismaService.ingredient.update({
             where: { id },
             data: {
                 ...data,
-                updatedBy: user.sub,  
+                updatedBy: user.sub,
                 updatedAt: new Date(),
             },
         });
     }
-    
-    async delete(id: number, user:IUser): Promise<Ingredient> {
+
+    async delete(id: number, user: IUser): Promise<Ingredient> {
         const ingredient = await this.prismaService.ingredient.update({
             where: { id },
-            data: { isActive: false, deletedBy:user.sub,  },
+            data: { isActive: false, deletedBy: user.sub, },
         });
         return ingredient;
     }

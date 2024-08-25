@@ -27,6 +27,9 @@ var CreateIngredientDto = /** @class */ (function () {
         class_validator_1.IsNotEmpty({ message: 'Price is required.' })
     ], CreateIngredientDto.prototype, "price");
     __decorate([
+        class_validator_1.IsNumber({}, { message: 'quantity ingredient in inventory must be a number.' })
+    ], CreateIngredientDto.prototype, "quantity");
+    __decorate([
         class_validator_1.IsIn(['available', 'out_of_stock', 'pending'], {
             message: 'Status must be one of the following: available, out_of_stock, pending'
         })
