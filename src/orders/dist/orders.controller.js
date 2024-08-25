@@ -50,8 +50,9 @@ var common_1 = require("@nestjs/common");
 var jwt_auth_guard_1 = require("src/auth/jwt-auth.guard");
 var customize_1 = require("decorators/customize");
 var OrdersController = /** @class */ (function () {
-    function OrdersController(ordersService) {
+    function OrdersController(ordersService, vouchersService) {
         this.ordersService = ordersService;
+        this.vouchersService = vouchersService;
     }
     OrdersController.prototype.createOrder = function (body, user) {
         return this.ordersService.create(body, user);
@@ -68,6 +69,9 @@ var OrdersController = /** @class */ (function () {
                 return [2 /*return*/, this.ordersService.update(id, updateOrderDto, user)];
             });
         });
+    };
+    OrdersController.prototype.applyVoucher = function (orderId, body) {
+        return this.vouchersService.applyVoucher(orderId, body.voucherCode);
     };
     __decorate([
         common_1.Post(),
@@ -98,6 +102,13 @@ var OrdersController = /** @class */ (function () {
         __param(1, common_1.Body()),
         __param(2, customize_1.CurrentUser())
     ], OrdersController.prototype, "updateOrder");
+    __decorate([
+        common_1.Post('/:orderId/apply-voucher'),
+        common_1.UseGuards(jwt_auth_guard_1.JwtAuthGuard),
+        customize_1.ResponseMessage("Apply voucher to order"),
+        __param(0, common_1.Param('orderId', common_1.ParseIntPipe)),
+        __param(1, common_1.Body())
+    ], OrdersController.prototype, "applyVoucher");
     OrdersController = __decorate([
         common_1.Controller('orders')
     ], OrdersController);

@@ -20,6 +20,7 @@ var VouchersModule = /** @class */ (function () {
         common_1.Module({
             imports: [jwt_1.JwtModule],
             controllers: [vouchers_controller_1.VouchersController],
+            exports: [vouchers_service_1.VouchersService],
             providers: [vouchers_service_1.VouchersService, prisma_service_1.PrismaService, config_1.ConfigService]
         })
     ], VouchersModule);

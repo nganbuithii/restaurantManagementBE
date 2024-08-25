@@ -7,6 +7,7 @@ import { JwtModule } from '@nestjs/jwt';
 @Module({
   imports:[JwtModule],
   controllers: [VouchersController],
+  exports: [VouchersService],
   providers: [VouchersService, PrismaService, ConfigService],
 })
 export class VouchersModule {}

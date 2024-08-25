@@ -53,12 +53,7 @@ export class VouchersController {
     //   return this.vouchersService.getCustomerVouchers(customerId);
     // }
 
-    // @Post('orders/:orderId/apply-voucher')
-    // @UseGuards(JwtAuthGuard)
-    // @ResponseMessage("Apply voucher to order")
-    // applyVoucher(@Param('orderId', ParseIntPipe) orderId: number, @Body() voucherCode: string): Promise<Order> {
-    //   return this.vouchersService.applyVoucher(orderId, voucherCode);
-    // }
+
 
 
 }

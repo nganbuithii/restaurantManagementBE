@@ -13,12 +13,13 @@ var orders_controller_1 = require("./orders.controller");
 var prisma_service_1 = require("src/prisma.service");
 var config_1 = require("@nestjs/config");
 var jwt_1 = require("@nestjs/jwt");
+var vouchers_module_1 = require("src/vouchers/vouchers.module");
 var OrdersModule = /** @class */ (function () {
     function OrdersModule() {
     }
     OrdersModule = __decorate([
         common_1.Module({
-            imports: [jwt_1.JwtModule],
+            imports: [jwt_1.JwtModule, vouchers_module_1.VouchersModule],
             controllers: [orders_controller_1.OrdersController],
             providers: [orders_service_1.OrdersService, prisma_service_1.PrismaService, config_1.ConfigService]
         })

@@ -2,7 +2,7 @@ import { BadRequestException, Injectable, NotFoundException } from '@nestjs/comm
 import { PrismaService } from 'src/prisma.service';
 import { CreateVoucherDto, UpdateVoucherDto, VoucherFilterType, VoucherPaginationResponseType } from './dto/voucher.dto';
 import { IUser } from 'interfaces/user.interface';
-import { Voucher } from '@prisma/client';
+import { Order, Voucher } from '@prisma/client';
 import { generateVoucherCode } from 'helper/voucher.helper';
 @Injectable()
 export class VouchersService {
@@ -123,15 +123,53 @@ export class VouchersService {
       throw new NotFoundException('Voucher not found');
     }
 
-await this.prisma.voucher.update({
+    await this.prisma.voucher.update({
       where: { id },
       data: {
         status: 'PAUSED',
         isActive: false,
-        createdBy: user.sub,
+        deletedBy: user.sub,
       },
     });
-
-  
   }
+
+
+  async applyVoucher(orderId: number, voucherCode: string): Promise<Order> {
+    // Tìm đơn hàng
+    const order = await this.prisma.order.findUnique({
+      where: { id: orderId },
+    });
+    if (!order) {
+      throw new Error('Order not found');
+    }
+  
+    // Tìm voucher
+    const voucher = await this.prisma.voucher.findFirst({
+      where: {
+        code: voucherCode,
+        isActive: true,
+      },
+    });
+  
+    if (!voucher) {
+      throw new Error('Voucher not found or is not active');
+    }
+  
+    // Tính toán số tiền giảm giá
+    const discountAmount = (order.totalPrice * voucher.percent) / 100;
+  
+    // Cập nhật lại đơn hàng với số tiền sau khi áp dụng voucher
+    const updatedOrder = await this.prisma.order.update({
+      where: { id: orderId },
+      data: {
+        discountPrice: discountAmount, // Lưu số tiền giảm vào discountPrice
+        // totalPrice: order.totalPrice - discountAmount, // Cập nhật tổng tiền sau khi giảm
+        usedVoucherId: voucher.id,
+      },
+    });
+  
+    return updatedOrder;
+  }
+  
+
 }

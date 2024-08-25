@@ -5,10 +5,13 @@ import { CurrentUser, ResponseMessage } from 'decorators/customize';
 import { IUser } from 'interfaces/user.interface';
 import { Order } from '@prisma/client';
 import { CreateOrderDto, OrderFilterType, OrderPaginationResponseType, UpdateOrderDto } from './dto/orders.dto';
+import { VouchersService } from 'src/vouchers/vouchers.service';
 
 @Controller('orders')
 export class OrdersController {
-  constructor(private readonly ordersService: OrdersService) {}
+  constructor(private readonly ordersService: OrdersService,
+    private readonly vouchersService: VouchersService
+  ) {}
 
   @Post()
   @HttpCode(HttpStatus.CREATED)
@@ -48,4 +51,14 @@ export class OrdersController {
     return this.ordersService.update(id, updateOrderDto, user);
   }
 
+  @Post('/:orderId/apply-voucher')
+  @UseGuards(JwtAuthGuard)
+  @ResponseMessage("Apply voucher to order")
+  applyVoucher(
+      @Param('orderId', ParseIntPipe) orderId: number,
+      @Body() body: { voucherCode: string } 
+  ): Promise<Order> {
+      return this.vouchersService.applyVoucher(orderId, body.voucherCode);
+  }
+  
 }

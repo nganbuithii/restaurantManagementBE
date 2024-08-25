@@ -4,8 +4,9 @@ import { OrdersController } from './orders.controller';
 import { PrismaService } from 'src/prisma.service';
 import { ConfigService } from '@nestjs/config';
 import { JwtModule } from '@nestjs/jwt';
+import { VouchersModule } from 'src/vouchers/vouchers.module';
 @Module({
-  imports:[JwtModule],
+  imports:[JwtModule,VouchersModule],
   controllers: [OrdersController],
   providers: [OrdersService,PrismaService,ConfigService]
 })

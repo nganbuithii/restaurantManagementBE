@@ -189,12 +189,52 @@ var VouchersService = /** @class */ (function () {
                                 data: {
                                     status: 'PAUSED',
                                     isActive: false,
-                                    createdBy: user.sub
+                                    deletedBy: user.sub
                                 }
                             })];
                     case 2:
                         _a.sent();
                         return [2 /*return*/];
+                }
+            });
+        });
+    };
+    VouchersService.prototype.applyVoucher = function (orderId, voucherCode) {
+        return __awaiter(this, void 0, Promise, function () {
+            var order, voucher, discountAmount, updatedOrder;
+            return __generator(this, function (_a) {
+                switch (_a.label) {
+                    case 0: return [4 /*yield*/, this.prisma.order.findUnique({
+                            where: { id: orderId }
+                        })];
+                    case 1:
+                        order = _a.sent();
+                        if (!order) {
+                            throw new Error('Order not found');
+                        }
+                        return [4 /*yield*/, this.prisma.voucher.findFirst({
+                                where: {
+                                    code: voucherCode,
+                                    isActive: true
+                                }
+                            })];
+                    case 2:
+                        voucher = _a.sent();
+                        if (!voucher) {
+                            throw new Error('Voucher not found or is not active');
+                        }
+                        discountAmount = (order.totalPrice * voucher.percent) / 100;
+                        return [4 /*yield*/, this.prisma.order.update({
+                                where: { id: orderId },
+                                data: {
+                                    discountPrice: discountAmount,
+                                    // totalPrice: order.totalPrice - discountAmount, // Cập nhật tổng tiền sau khi giảm
+                                    usedVoucherId: voucher.id
+                                }
+                            })];
+                    case 3:
+                        updatedOrder = _a.sent();
+                        return [2 /*return*/, updatedOrder];
                 }
             });
         });
