@@ -20,6 +20,7 @@ import { OrdersModule } from './orders/orders.module';
 import { FeeckbacksModule } from './feeckbacks/feedbacks.module';
 import { VouchersModule } from './vouchers/vouchers.module';
 import { SuppliersModule } from './suppliers/suppliers.module';
+import { WarehouseSlipsModule } from './warehouse-slips/warehouse-slips.module';
 
 
 @Module({
@@ -36,7 +37,7 @@ import { SuppliersModule } from './suppliers/suppliers.module';
     
     ConfigModule,
     UserModule,
-    AuthModule, RoleModule, PermissionModule, MenuItemModule, CloudinaryModule, IngredientModule, MenuModule, TableModule, ReversationsModule, OrdersModule, FeeckbacksModule, VouchersModule, SuppliersModule,  
+    AuthModule, RoleModule, PermissionModule, MenuItemModule, CloudinaryModule, IngredientModule, MenuModule, TableModule, ReversationsModule, OrdersModule, FeeckbacksModule, VouchersModule, SuppliersModule, WarehouseSlipsModule,  
   ],
   controllers: [AppController],
   providers: [

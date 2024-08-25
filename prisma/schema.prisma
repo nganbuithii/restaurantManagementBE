@@ -209,7 +209,7 @@ model Ingredient {
   menuItems   MenuItemIngredient[]
   slipDetails WarehouseSlipDetail[]
 
-  inventory Inventory?
+  inventory Inventory? @relation
 }
 
 model MenuItemIngredient {
