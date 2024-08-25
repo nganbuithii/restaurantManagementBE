@@ -1,8 +1,8 @@
-import { Body, Controller, Get, HttpCode, HttpStatus, Param, ParseIntPipe, Post,Delete, Query, UseGuards } from '@nestjs/common';
+import { Body, Controller, Get, HttpCode, HttpStatus, Param, ParseIntPipe, Post,Delete, Query, UseGuards, Patch } from '@nestjs/common';
 import { WarehouseSlipsService } from './warehouse-slips.service';
 import { JwtAuthGuard } from 'src/auth/jwt-auth.guard';
 import { CurrentUser, ResponseMessage } from 'decorators/customize';
-import { CreateWarehouseSlipDto, WarehouserSlipFilterType, WarehouseSlipPaginationResponseType } from './dto/warehouse-slip.dto';
+import { CreateWarehouseSlipDto, UpdateWarehouseSlipDto, WarehouserSlipFilterType, WarehouseSlipPaginationResponseType } from './dto/warehouse-slip.dto';
 import { IUser } from 'interfaces/user.interface';
 import { WarehouseSlip } from '@prisma/client';
 
@@ -41,4 +41,13 @@ export class WarehouseSlipsController {
   delete(@Param('id', ParseIntPipe) id: number, @CurrentUser() user:IUser): Promise<void> {
     return this.warehouseSlipsService.delete(id, user);
   }
+
+  @Patch(':id')
+    @UseGuards(JwtAuthGuard)
+    @ResponseMessage("Update warehouse slip by id")
+    update(@Param('id', ParseIntPipe) id: number, @Body() data: UpdateWarehouseSlipDto, @CurrentUser() user:IUser): Promise<WarehouseSlip> {
+      return this.warehouseSlipsService.update(id, data, user);
+    }
 }
+
+

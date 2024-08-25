@@ -6,7 +6,7 @@ var __decorate = (this && this.__decorate) || function (decorators, target, key,
     return c > 3 && r && Object.defineProperty(target, key, r), r;
 };
 exports.__esModule = true;
-exports.CreateWarehouseSlipDto = exports.WarehouseSlipType = void 0;
+exports.UpdateWarehouseSlipDto = exports.CreateWarehouseSlipDto = exports.WarehouseSlipType = void 0;
 var class_validator_1 = require("class-validator");
 var class_transformer_1 = require("class-transformer");
 var WarehouseSlipDetailDto = /** @class */ (function () {
@@ -49,3 +49,20 @@ var CreateWarehouseSlipDto = /** @class */ (function () {
     return CreateWarehouseSlipDto;
 }());
 exports.CreateWarehouseSlipDto = CreateWarehouseSlipDto;
+var UpdateWarehouseSlipDto = /** @class */ (function () {
+    function UpdateWarehouseSlipDto() {
+    }
+    __decorate([
+        class_validator_1.IsOptional(),
+        class_validator_1.IsInt()
+    ], UpdateWarehouseSlipDto.prototype, "supplierId");
+    __decorate([
+        class_validator_1.IsOptional(),
+        class_validator_1.IsArray(),
+        class_validator_1.ValidateNested({ each: true }),
+        class_validator_1.ArrayMinSize(1),
+        class_transformer_1.Type(function () { return WarehouseSlipDetailDto; })
+    ], UpdateWarehouseSlipDto.prototype, "details");
+    return UpdateWarehouseSlipDto;
+}());
+exports.UpdateWarehouseSlipDto = UpdateWarehouseSlipDto;

@@ -1,6 +1,6 @@
 import { WarehouseSlip } from '@prisma/client';
 
-import { IsNotEmpty, IsString, IsInt, IsArray, ValidateNested, ArrayMinSize } from 'class-validator';
+import { IsNotEmpty, IsString, IsInt, IsArray, ValidateNested, ArrayMinSize, IsOptional } from 'class-validator';
 import { Type } from 'class-transformer';
 
 class WarehouseSlipDetailDto {
@@ -48,4 +48,21 @@ export interface WarehouseSlipPaginationResponseType {
     total: number
     currentPage: number
     itemsPerPage: number
+}
+
+export class UpdateWarehouseSlipDto {
+
+
+
+
+    @IsOptional()
+    @IsInt()
+    supplierId?: number;
+
+    @IsOptional()
+    @IsArray()
+    @ValidateNested({ each: true })
+    @ArrayMinSize(1)
+    @Type(() => WarehouseSlipDetailDto)
+    details?: WarehouseSlipDetailDto[];
 }

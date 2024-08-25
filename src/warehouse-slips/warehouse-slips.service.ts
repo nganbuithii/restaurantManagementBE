@@ -1,6 +1,6 @@
 import { BadRequestException, Injectable, NotFoundException } from '@nestjs/common';
 import { PrismaService } from 'src/prisma.service';
-import { CreateWarehouseSlipDto, WarehouserSlipFilterType, WarehouseSlipPaginationResponseType } from './dto/warehouse-slip.dto';
+import { CreateWarehouseSlipDto, UpdateWarehouseSlipDto, WarehouserSlipFilterType, WarehouseSlipPaginationResponseType } from './dto/warehouse-slip.dto';
 import { IUser } from 'interfaces/user.interface';
 import { WarehouseSlip } from '@prisma/client';
 
@@ -77,7 +77,7 @@ export class WarehouseSlipsService {
     async getAll(filter: WarehouserSlipFilterType): Promise<WarehouseSlipPaginationResponseType> {
         const itemsPerPage = parseInt(process.env.ITEMS_PER_PAGE, 10) || 10;
         const currentPage = parseInt(process.env.DEFAULT_PAGE, 10) || 1;
-        
+
         const search = filter.search || '';
         const page = filter.page || currentPage;
         const perPage = filter.items_per_page || itemsPerPage;
@@ -115,7 +115,7 @@ export class WarehouseSlipsService {
         const warehouseSlip = await this.prisma.warehouseSlip.findUnique({
             where: { id },
             include: {
-                details: true, 
+                details: true,
             },
         });
 
@@ -142,5 +142,37 @@ export class WarehouseSlipsService {
 
             },
         });
+    }
+
+    async update(id: number, data: UpdateWarehouseSlipDto, user: IUser): Promise<WarehouseSlip> {
+        const existingWarehouseSlip = await this.prisma.warehouseSlip.findUnique({
+            where: { id },
+            include: { details: true },
+        });
+
+        if (!existingWarehouseSlip) {
+            throw new BadRequestException('Warehouse slip not found');
+        }
+
+        // Cập nhật thông tin phiếu kho
+        const updatedWarehouseSlip = await this.prisma.warehouseSlip.update({
+            where: { id },
+            data: {
+                supplierId: data.supplierId ?? existingWarehouseSlip.supplierId,
+                updatedAt: new Date(),
+                details: data.details
+                    ? {
+                        deleteMany: {},
+                        create: data.details.map(detail => ({
+                            ingredientId: detail.ingredientId,
+                            quantity: detail.quantity,
+                        })),
+                    }
+                    : undefined,
+            },
+            include: { details: true },
+        });
+
+        return updatedWarehouseSlip;
     }
 }

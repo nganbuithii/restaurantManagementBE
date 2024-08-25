@@ -216,6 +216,45 @@ var WarehouseSlipsService = /** @class */ (function () {
             });
         });
     };
+    WarehouseSlipsService.prototype.update = function (id, data, user) {
+        var _a;
+        return __awaiter(this, void 0, Promise, function () {
+            var existingWarehouseSlip, updatedWarehouseSlip;
+            return __generator(this, function (_b) {
+                switch (_b.label) {
+                    case 0: return [4 /*yield*/, this.prisma.warehouseSlip.findUnique({
+                            where: { id: id },
+                            include: { details: true }
+                        })];
+                    case 1:
+                        existingWarehouseSlip = _b.sent();
+                        if (!existingWarehouseSlip) {
+                            throw new common_1.BadRequestException('Warehouse slip not found');
+                        }
+                        return [4 /*yield*/, this.prisma.warehouseSlip.update({
+                                where: { id: id },
+                                data: {
+                                    supplierId: (_a = data.supplierId) !== null && _a !== void 0 ? _a : existingWarehouseSlip.supplierId,
+                                    updatedAt: new Date(),
+                                    details: data.details
+                                        ? {
+                                            deleteMany: {},
+                                            create: data.details.map(function (detail) { return ({
+                                                ingredientId: detail.ingredientId,
+                                                quantity: detail.quantity
+                                            }); })
+                                        }
+                                        : undefined
+                                },
+                                include: { details: true }
+                            })];
+                    case 2:
+                        updatedWarehouseSlip = _b.sent();
+                        return [2 /*return*/, updatedWarehouseSlip];
+                }
+            });
+        });
+    };
     WarehouseSlipsService = __decorate([
         common_1.Injectable()
     ], WarehouseSlipsService);

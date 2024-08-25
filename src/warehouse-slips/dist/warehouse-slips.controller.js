@@ -29,6 +29,9 @@ var WarehouseSlipsController = /** @class */ (function () {
     WarehouseSlipsController.prototype["delete"] = function (id, user) {
         return this.warehouseSlipsService["delete"](id, user);
     };
+    WarehouseSlipsController.prototype.update = function (id, data, user) {
+        return this.warehouseSlipsService.update(id, data, user);
+    };
     __decorate([
         common_1.Post(),
         common_1.HttpCode(common_1.HttpStatus.CREATED),
@@ -56,6 +59,12 @@ var WarehouseSlipsController = /** @class */ (function () {
         customize_1.ResponseMessage("Delete warehouse slip by id is success"),
         __param(0, common_1.Param('id', common_1.ParseIntPipe)), __param(1, customize_1.CurrentUser())
     ], WarehouseSlipsController.prototype, "delete");
+    __decorate([
+        common_1.Patch(':id'),
+        common_1.UseGuards(jwt_auth_guard_1.JwtAuthGuard),
+        customize_1.ResponseMessage("Update warehouse slip by id"),
+        __param(0, common_1.Param('id', common_1.ParseIntPipe)), __param(1, common_1.Body()), __param(2, customize_1.CurrentUser())
+    ], WarehouseSlipsController.prototype, "update");
     WarehouseSlipsController = __decorate([
         common_1.Controller('warehouse-slips')
     ], WarehouseSlipsController);
