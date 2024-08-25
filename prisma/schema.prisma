@@ -25,7 +25,6 @@ model User {
   customer  Customer?
   feedbacks Feedback[]
   orders    Order[]
-  supplier  Supplier?
 }
 
 model Role {
@@ -182,12 +181,14 @@ model Supplier {
   id        Int             @id @default(autoincrement())
   name      String
   address   String
-  email     String
+  email     String @unique
   isActive  Boolean         @default(true)
   createdAt DateTime        @default(now())
   updatedAt DateTime        @updatedAt
-  userId    Int             @unique
-  user      User            @relation(fields: [userId], references: [id])
+  createdBy Int?
+  updatedBy Int?
+  deletedBy Int?
+
   slips     WarehouseSlip[]
 }
 

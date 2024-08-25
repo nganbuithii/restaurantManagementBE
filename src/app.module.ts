@@ -19,6 +19,7 @@ import { ReversationsModule } from './reversations/reversations.module';
 import { OrdersModule } from './orders/orders.module';
 import { FeeckbacksModule } from './feeckbacks/feedbacks.module';
 import { VouchersModule } from './vouchers/vouchers.module';
+import { SuppliersModule } from './suppliers/suppliers.module';
 
 
 @Module({
@@ -35,7 +36,7 @@ import { VouchersModule } from './vouchers/vouchers.module';
     
     ConfigModule,
     UserModule,
-    AuthModule, RoleModule, PermissionModule, MenuItemModule, CloudinaryModule, IngredientModule, MenuModule, TableModule, ReversationsModule, OrdersModule, FeeckbacksModule, VouchersModule,  
+    AuthModule, RoleModule, PermissionModule, MenuItemModule, CloudinaryModule, IngredientModule, MenuModule, TableModule, ReversationsModule, OrdersModule, FeeckbacksModule, VouchersModule, SuppliersModule,  
   ],
   controllers: [AppController],
   providers: [
