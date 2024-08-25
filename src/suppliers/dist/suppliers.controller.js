@@ -23,6 +23,15 @@ var SuppliersController = /** @class */ (function () {
     SuppliersController.prototype.getAll = function (params) {
         return this.suppliersService.getAll(params);
     };
+    SuppliersController.prototype.getDetail = function (id) {
+        return this.suppliersService.getById(id);
+    };
+    SuppliersController.prototype.update = function (id, data, user) {
+        return this.suppliersService.update(id, data, user);
+    };
+    SuppliersController.prototype["delete"] = function (id, user) {
+        return this.suppliersService["delete"](id, user);
+    };
     __decorate([
         common_1.Post(),
         common_1.HttpCode(common_1.HttpStatus.CREATED),
@@ -37,6 +46,24 @@ var SuppliersController = /** @class */ (function () {
         customize_1.ResponseMessage("Get all supplier list"),
         __param(0, common_1.Query())
     ], SuppliersController.prototype, "getAll");
+    __decorate([
+        common_1.Get(':id'),
+        customize_1.ResponseMessage(" get detail supplier by id"),
+        __param(0, common_1.Param('id', common_1.ParseIntPipe))
+    ], SuppliersController.prototype, "getDetail");
+    __decorate([
+        common_1.Patch(':id'),
+        common_1.UseGuards(jwt_auth_guard_1.JwtAuthGuard),
+        customize_1.ResponseMessage("Update supplier by id"),
+        __param(0, common_1.Param('id', common_1.ParseIntPipe)), __param(1, common_1.Body()), __param(2, customize_1.CurrentUser())
+    ], SuppliersController.prototype, "update");
+    __decorate([
+        common_1.Delete(':id'),
+        common_1.UseGuards(jwt_auth_guard_1.JwtAuthGuard),
+        common_1.HttpCode(common_1.HttpStatus.NO_CONTENT),
+        customize_1.ResponseMessage("Delete voucher by id"),
+        __param(0, common_1.Param('id', common_1.ParseIntPipe)), __param(1, customize_1.CurrentUser())
+    ], SuppliersController.prototype, "delete");
     SuppliersController = __decorate([
         common_1.Controller('suppliers')
     ], SuppliersController);

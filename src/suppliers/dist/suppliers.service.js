@@ -123,6 +123,87 @@ var SuppliersService = /** @class */ (function () {
             });
         });
     };
+    SuppliersService.prototype.getById = function (id) {
+        return __awaiter(this, void 0, Promise, function () {
+            var supplier;
+            return __generator(this, function (_a) {
+                switch (_a.label) {
+                    case 0: return [4 /*yield*/, this.prisma.supplier.findUnique({
+                            where: {
+                                id: id
+                            }
+                        })];
+                    case 1:
+                        supplier = _a.sent();
+                        if (!supplier) {
+                            throw new common_1.NotFoundException("Supplier with ID " + id + " not found");
+                        }
+                        return [2 /*return*/, supplier];
+                }
+            });
+        });
+    };
+    SuppliersService.prototype.update = function (id, data, user) {
+        return __awaiter(this, void 0, Promise, function () {
+            var existingSupplier, emailInUse, updatedSupplier;
+            return __generator(this, function (_a) {
+                switch (_a.label) {
+                    case 0: return [4 /*yield*/, this.prisma.supplier.findUnique({
+                            where: { id: id }
+                        })];
+                    case 1:
+                        existingSupplier = _a.sent();
+                        if (!existingSupplier) {
+                            throw new common_1.NotFoundException("Supplier with ID " + id + " not found");
+                        }
+                        if (!(data.email && data.email !== existingSupplier.email)) return [3 /*break*/, 3];
+                        return [4 /*yield*/, this.prisma.supplier.findUnique({
+                                where: { email: data.email }
+                            })];
+                    case 2:
+                        emailInUse = _a.sent();
+                        if (emailInUse) {
+                            throw new common_1.BadRequestException('Email is already in use by another supplier');
+                        }
+                        _a.label = 3;
+                    case 3: return [4 /*yield*/, this.prisma.supplier.update({
+                            where: { id: id },
+                            data: __assign(__assign({}, data), { updatedBy: user.sub })
+                        })];
+                    case 4:
+                        updatedSupplier = _a.sent();
+                        return [2 /*return*/, updatedSupplier];
+                }
+            });
+        });
+    };
+    SuppliersService.prototype["delete"] = function (id, user) {
+        return __awaiter(this, void 0, Promise, function () {
+            var existingSupplier;
+            return __generator(this, function (_a) {
+                switch (_a.label) {
+                    case 0: return [4 /*yield*/, this.prisma.supplier.findUnique({
+                            where: { id: id }
+                        })];
+                    case 1:
+                        existingSupplier = _a.sent();
+                        if (!existingSupplier) {
+                            throw new common_1.NotFoundException("Supplier with ID " + id + " not found");
+                        }
+                        return [4 /*yield*/, this.prisma.supplier.update({
+                                where: { id: id },
+                                data: {
+                                    isActive: false,
+                                    deletedBy: user.sub
+                                }
+                            })];
+                    case 2:
+                        _a.sent();
+                        return [2 /*return*/];
+                }
+            });
+        });
+    };
     SuppliersService = __decorate([
         common_1.Injectable()
     ], SuppliersService);

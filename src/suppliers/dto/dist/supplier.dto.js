@@ -6,7 +6,7 @@ var __decorate = (this && this.__decorate) || function (decorators, target, key,
     return c > 3 && r && Object.defineProperty(target, key, r), r;
 };
 exports.__esModule = true;
-exports.CreateSupplierDto = void 0;
+exports.UpdateSupplierDto = exports.CreateSupplierDto = void 0;
 var class_validator_1 = require("class-validator");
 var CreateSupplierDto = /** @class */ (function () {
     function CreateSupplierDto() {
@@ -30,3 +30,21 @@ var CreateSupplierDto = /** @class */ (function () {
     return CreateSupplierDto;
 }());
 exports.CreateSupplierDto = CreateSupplierDto;
+var UpdateSupplierDto = /** @class */ (function () {
+    function UpdateSupplierDto() {
+    }
+    __decorate([
+        class_validator_1.IsOptional(),
+        class_validator_1.IsString()
+    ], UpdateSupplierDto.prototype, "name");
+    __decorate([
+        class_validator_1.IsOptional(),
+        class_validator_1.IsString()
+    ], UpdateSupplierDto.prototype, "address");
+    __decorate([
+        class_validator_1.IsOptional(),
+        class_validator_1.IsEmail()
+    ], UpdateSupplierDto.prototype, "email");
+    return UpdateSupplierDto;
+}());
+exports.UpdateSupplierDto = UpdateSupplierDto;

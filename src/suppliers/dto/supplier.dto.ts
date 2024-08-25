@@ -34,3 +34,17 @@ export interface SupplierPaginationResponseType {
     currentPage: number
     itemsPerPage: number
 }
+
+export class UpdateSupplierDto {
+    @IsOptional()
+    @IsString()
+    name: string;
+
+    @IsOptional()
+    @IsString()
+    address: string;
+
+    @IsOptional()
+    @IsEmail()
+    email: string;
+}
