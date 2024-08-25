@@ -3,20 +3,20 @@ import { FeeckbacksService } from './feedbacks.service';
 import { JwtAuthGuard } from 'src/auth/jwt-auth.guard';
 import { CurrentUser, ResponseMessage } from 'decorators/customize';
 import { IUser } from 'interfaces/user.interface';
-import { CreateFeedbackDto, FeedbackFilterType, FeedbackPaginationResponseType, UpdateFeedbackDto } from './dto/feecback.dto';
+import { CreateFeedbackDto, CreateFeedbackReplyDto, FeedbackFilterType, FeedbackPaginationResponseType, UpdateFeedbackDto } from './dto/feecback.dto';
 import { Feedback } from '@prisma/client';
 
 @Controller('feedbacks')
 export class FeeckbacksController {
-  constructor(private readonly s: FeeckbacksService) {}
+  constructor(private readonly s: FeeckbacksService) { }
 
   @Post()
   @HttpCode(HttpStatus.CREATED)
   @UseGuards(JwtAuthGuard)
   @ResponseMessage("create feedback successfully")
   createFeedback(
-    @Body() body: CreateFeedbackDto, 
-  @CurrentUser() user: IUser) {
+    @Body() body: CreateFeedbackDto,
+    @CurrentUser() user: IUser) {
     return this.s.create(body, user);
   }
 
@@ -29,23 +29,35 @@ export class FeeckbacksController {
   @Get(':id')
   @UseGuards(JwtAuthGuard)
   @ResponseMessage(" get feedbacks by id")
-  getDetail(@Param ('id', ParseIntPipe) id: number): Promise<Feedback> {
+  getDetail(@Param('id', ParseIntPipe) id: number): Promise<Feedback> {
     return this.s.getDetail(id)
   }
 
   @Patch(':id')
   @UseGuards(JwtAuthGuard)
   @ResponseMessage(" update feedback by id")
-    update(@Param('id', ParseIntPipe) id: number, @Body() data: UpdateFeedbackDto): Promise<Feedback> {
-        return this.s.update(id, data);
-    }
+  update(@Param('id', ParseIntPipe) id: number, @Body() data: UpdateFeedbackDto): Promise<Feedback> {
+    return this.s.update(id, data);
+  }
 
 
-    @Delete(':id')
+  @Delete(':id')
   @UseGuards(JwtAuthGuard)
   @HttpCode(HttpStatus.NO_CONTENT)
   @ResponseMessage(" delete feedback by id")
-    deleteMenuItem(@Param('id', ParseIntPipe) id: number, @CurrentUser() user:IUser): Promise<void> {
-        return this.s.delete(id, user);
-    }
+  deleteMenuItem(@Param('id', ParseIntPipe) id: number, @CurrentUser() user: IUser): Promise<void> {
+    return this.s.delete(id, user);
+  }
+
+
+  @Post(':id/reply')
+  @UseGuards(JwtAuthGuard)
+  @ResponseMessage("Reply to feedback successfully")
+  async replyToFeedback(
+    @Param('id', ParseIntPipe) id: number,
+    @Body() replyDto: CreateFeedbackReplyDto,
+    @CurrentUser() user: IUser
+  ): Promise<Feedback> {
+    return this.s.replyToFeedback(id, replyDto, user);
+  }
 }

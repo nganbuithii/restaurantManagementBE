@@ -1,6 +1,6 @@
 import { ForbiddenException, Injectable, NotFoundException } from '@nestjs/common';
 import { PrismaService } from 'src/prisma.service';
-import { CreateFeedbackDto, FeedbackFilterType, FeedbackPaginationResponseType, UpdateFeedbackDto } from './dto/feecback.dto';
+import { CreateFeedbackDto, CreateFeedbackReplyDto, FeedbackFilterType, FeedbackPaginationResponseType, UpdateFeedbackDto } from './dto/feecback.dto';
 import { IUser } from 'interfaces/user.interface';
 import { Feedback } from '@prisma/client';
 
@@ -57,15 +57,35 @@ export class FeeckbacksService {
       async getDetail(id: number): Promise<Feedback> {
         const feedback = await this.prisma.feedback.findUnique({
           where: { id },
+          include: {
+            user: {
+              select: {
+                id: true,
+                fullName: true,
+                avatar: true,
+              },
+            },
+            replies: {
+              include: {
+                user: {
+                  select: {
+                    id: true,
+                    fullName: true,
+                    avatar: true,
+                  },
+                },
+                replies: true, 
+              },
+            },
+          },
         });
-    
+      
         if (!feedback) {
-          throw new NotFoundException(`Feedback with id ${id} not found`);
+          throw new NotFoundException(`Feedback with ID ${id} not found`);
         }
-    
+      
         return feedback;
       }
-
 
       async update(id: number, updateFeedbackDto: UpdateFeedbackDto): Promise<Feedback> {
         const feedback = await this.prisma.feedback.findUnique({
@@ -104,6 +124,28 @@ export class FeeckbacksService {
           data: {
             isActive: false,
             updatedAt: new Date(), 
+          },
+        });
+      }
+
+      async replyToFeedback(
+        id: number,
+        replyDto: CreateFeedbackReplyDto,
+        user: IUser
+      ): Promise<Feedback> {
+        const parentFeedback = await this.prisma.feedback.findUnique({
+          where: { id },
+        });
+    
+        if (!parentFeedback) {
+          throw new NotFoundException(`Feedback with ID ${id} not found`);
+        }
+    
+        return this.prisma.feedback.create({
+          data: {
+            content: replyDto.content,
+            userId: user.sub,
+            parentId: id,
           },
         });
       }

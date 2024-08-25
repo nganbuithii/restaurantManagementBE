@@ -1,5 +1,5 @@
 import { Feedback } from '@prisma/client';
-import { IsInt, IsNotEmpty, IsOptional, IsString, Min, Max, IsBoolean } from 'class-validator';
+import { IsInt, IsNotEmpty, IsOptional, IsString, Min, Max, IsBoolean, IsNumber } from 'class-validator';
 
 export class CreateFeedbackDto {
     @IsNotEmpty({ message: " content  can not empty" })
@@ -44,4 +44,15 @@ export class UpdateFeedbackDto {
     @Max(5)
     rating: number;
 
-}  
+}
+
+
+export class CreateFeedbackReplyDto {
+    @IsNotEmpty()
+    @IsString()
+    content: string;
+
+    // @IsNotEmpty()
+    // @IsNumber()
+    // parentId: number;
+}

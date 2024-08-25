@@ -6,7 +6,7 @@ var __decorate = (this && this.__decorate) || function (decorators, target, key,
     return c > 3 && r && Object.defineProperty(target, key, r), r;
 };
 exports.__esModule = true;
-exports.UpdateFeedbackDto = exports.CreateFeedbackDto = void 0;
+exports.CreateFeedbackReplyDto = exports.UpdateFeedbackDto = exports.CreateFeedbackDto = void 0;
 var class_validator_1 = require("class-validator");
 var CreateFeedbackDto = /** @class */ (function () {
     function CreateFeedbackDto() {
@@ -44,3 +44,13 @@ var UpdateFeedbackDto = /** @class */ (function () {
     return UpdateFeedbackDto;
 }());
 exports.UpdateFeedbackDto = UpdateFeedbackDto;
+var CreateFeedbackReplyDto = /** @class */ (function () {
+    function CreateFeedbackReplyDto() {
+    }
+    __decorate([
+        class_validator_1.IsNotEmpty(),
+        class_validator_1.IsString()
+    ], CreateFeedbackReplyDto.prototype, "content");
+    return CreateFeedbackReplyDto;
+}());
+exports.CreateFeedbackReplyDto = CreateFeedbackReplyDto;

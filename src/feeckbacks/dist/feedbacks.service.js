@@ -122,12 +122,33 @@ var FeeckbacksService = /** @class */ (function () {
             return __generator(this, function (_a) {
                 switch (_a.label) {
                     case 0: return [4 /*yield*/, this.prisma.feedback.findUnique({
-                            where: { id: id }
+                            where: { id: id },
+                            include: {
+                                user: {
+                                    select: {
+                                        id: true,
+                                        fullName: true,
+                                        avatar: true
+                                    }
+                                },
+                                replies: {
+                                    include: {
+                                        user: {
+                                            select: {
+                                                id: true,
+                                                fullName: true,
+                                                avatar: true
+                                            }
+                                        },
+                                        replies: true
+                                    }
+                                }
+                            }
                         })];
                     case 1:
                         feedback = _a.sent();
                         if (!feedback) {
-                            throw new common_1.NotFoundException("Feedback with id " + id + " not found");
+                            throw new common_1.NotFoundException("Feedback with ID " + id + " not found");
                         }
                         return [2 /*return*/, feedback];
                 }
@@ -184,6 +205,30 @@ var FeeckbacksService = /** @class */ (function () {
                     case 2:
                         _a.sent();
                         return [2 /*return*/];
+                }
+            });
+        });
+    };
+    FeeckbacksService.prototype.replyToFeedback = function (id, replyDto, user) {
+        return __awaiter(this, void 0, Promise, function () {
+            var parentFeedback;
+            return __generator(this, function (_a) {
+                switch (_a.label) {
+                    case 0: return [4 /*yield*/, this.prisma.feedback.findUnique({
+                            where: { id: id }
+                        })];
+                    case 1:
+                        parentFeedback = _a.sent();
+                        if (!parentFeedback) {
+                            throw new common_1.NotFoundException("Feedback with ID " + id + " not found");
+                        }
+                        return [2 /*return*/, this.prisma.feedback.create({
+                                data: {
+                                    content: replyDto.content,
+                                    userId: user.sub,
+                                    parentId: id
+                                }
+                            })];
                 }
             });
         });

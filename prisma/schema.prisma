@@ -71,7 +71,7 @@ model Employee {
 }
 
 model Customer {
-  id           Int           @id @default(autoincrement())
+  id Int @id @default(autoincrement())
 
   points           Int               @default(0)
   customerVouchers CustomerVoucher[]
@@ -87,16 +87,16 @@ model Customer {
 }
 
 model Order {
-  id            Int           @id @default(autoincrement())
+  id            Int    @id @default(autoincrement())
   status        String
   totalPrice    Float
-  discountPrice Float         @default(0)
+  discountPrice Float  @default(0)
   userId        Int
-  user          User          @relation(fields: [userId], references: [id])
+  user          User   @relation(fields: [userId], references: [id])
 
-  createdAt     DateTime      @default(now())
-  updatedAt     DateTime      @updatedAt
-  details       OrderDetail[]
+  createdAt DateTime      @default(now())
+  updatedAt DateTime      @updatedAt
+  details   OrderDetail[]
 
   usedVoucherId Int?
   usedVoucher   Voucher? @relation(fields: [usedVoucherId], references: [id])
@@ -220,17 +220,18 @@ model MenuItemIngredient {
 
   @@id([menuItemId, ingredientId])
 }
+
 model Voucher {
-  id          Int      @id @default(autoincrement())
-  code        String   @unique
+  id          Int       @id @default(autoincrement())
+  code        String    @unique
   percent     Int
   description String
-  startDate   DateTime @default(now())
+  startDate   DateTime  @default(now())
   endDate     DateTime
-  isActive    Boolean  @default(true)
+  isActive    Boolean   @default(true)
   status      String // "ACTIVE", "PAUSED", "EXPIRED", "USED_UP"
   quantity    Int
-  usedCount   Int      @default(0)
+  usedCount   Int       @default(0)
   pointCost   Int
   customerId  Int?
   customer    Customer? @relation(fields: [customerId], references: [id])
@@ -244,15 +245,16 @@ model Voucher {
   updatedBy Int?
   deletedBy Int?
 }
+
 model CustomerVoucher {
-  id         Int      @id @default(autoincrement())
+  id         Int       @id @default(autoincrement())
   customerId Int
   voucherId  Int
-  obtainedAt DateTime @default(now())
+  obtainedAt DateTime  @default(now())
   usedAt     DateTime?
 
-  customer   Customer @relation(fields: [customerId], references: [id])
-  voucher    Voucher  @relation(fields: [voucherId], references: [id])
+  customer Customer @relation(fields: [customerId], references: [id])
+  voucher  Voucher  @relation(fields: [voucherId], references: [id])
 
   @@unique([customerId, voucherId])
 }
@@ -266,6 +268,10 @@ model Feedback {
   updatedAt DateTime @updatedAt
   userId    Int
   user      User     @relation(fields: [userId], references: [id])
+
+  parentId Int?
+  parent   Feedback?  @relation("FeedbackReplies", fields: [parentId], references: [id])
+  replies  Feedback[] @relation("FeedbackReplies")
 }
 
 model WarehouseSlip {
