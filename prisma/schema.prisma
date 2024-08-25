@@ -278,6 +278,7 @@ model Feedback {
 model WarehouseSlip {
   id         Int                   @id @default(autoincrement())
   type       String // "IN" or "OUT"
+  isActive Boolean @default(true)
   createdAt  DateTime              @default(now())
   updatedAt  DateTime              @updatedAt
   employeeId Int

@@ -20,6 +20,15 @@ var WarehouseSlipsController = /** @class */ (function () {
     WarehouseSlipsController.prototype.createVoucher = function (body, user) {
         return this.warehouseSlipsService.create(body, user);
     };
+    WarehouseSlipsController.prototype.getAll = function (params) {
+        return this.warehouseSlipsService.getAll(params);
+    };
+    WarehouseSlipsController.prototype.getDetail = function (id) {
+        return this.warehouseSlipsService.getById(id);
+    };
+    WarehouseSlipsController.prototype["delete"] = function (id, user) {
+        return this.warehouseSlipsService["delete"](id, user);
+    };
     __decorate([
         common_1.Post(),
         common_1.HttpCode(common_1.HttpStatus.CREATED),
@@ -28,6 +37,25 @@ var WarehouseSlipsController = /** @class */ (function () {
         __param(0, common_1.Body()),
         __param(1, customize_1.CurrentUser())
     ], WarehouseSlipsController.prototype, "createVoucher");
+    __decorate([
+        common_1.Get(),
+        common_1.UseGuards(jwt_auth_guard_1.JwtAuthGuard),
+        customize_1.ResponseMessage("Get all warehouse list"),
+        __param(0, common_1.Query())
+    ], WarehouseSlipsController.prototype, "getAll");
+    __decorate([
+        common_1.Get(':id'),
+        common_1.UseGuards(jwt_auth_guard_1.JwtAuthGuard),
+        customize_1.ResponseMessage(" get detail warehouse slip by id"),
+        __param(0, common_1.Param('id', common_1.ParseIntPipe))
+    ], WarehouseSlipsController.prototype, "getDetail");
+    __decorate([
+        common_1.Delete(':id'),
+        common_1.UseGuards(jwt_auth_guard_1.JwtAuthGuard),
+        common_1.HttpCode(common_1.HttpStatus.NO_CONTENT),
+        customize_1.ResponseMessage("Delete warehouse slip by id is success"),
+        __param(0, common_1.Param('id', common_1.ParseIntPipe)), __param(1, customize_1.CurrentUser())
+    ], WarehouseSlipsController.prototype, "delete");
     WarehouseSlipsController = __decorate([
         common_1.Controller('warehouse-slips')
     ], WarehouseSlipsController);

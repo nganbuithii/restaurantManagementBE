@@ -127,6 +127,95 @@ var WarehouseSlipsService = /** @class */ (function () {
             });
         });
     };
+    WarehouseSlipsService.prototype.getAll = function (filter) {
+        return __awaiter(this, void 0, Promise, function () {
+            var itemsPerPage, currentPage, search, page, perPage, warehouseSlips, total;
+            return __generator(this, function (_a) {
+                switch (_a.label) {
+                    case 0:
+                        itemsPerPage = parseInt(process.env.ITEMS_PER_PAGE, 10) || 10;
+                        currentPage = parseInt(process.env.DEFAULT_PAGE, 10) || 1;
+                        search = filter.search || '';
+                        page = filter.page || currentPage;
+                        perPage = filter.items_per_page || itemsPerPage;
+                        return [4 /*yield*/, this.prisma.warehouseSlip.findMany({
+                                where: {
+                                    type: {
+                                        contains: search
+                                    }
+                                },
+                                skip: (page - 1) * perPage,
+                                take: perPage,
+                                include: {
+                                    details: true
+                                }
+                            })];
+                    case 1:
+                        warehouseSlips = _a.sent();
+                        return [4 /*yield*/, this.prisma.warehouseSlip.count({
+                                where: {
+                                    type: {
+                                        contains: search
+                                    }
+                                }
+                            })];
+                    case 2:
+                        total = _a.sent();
+                        return [2 /*return*/, {
+                                data: warehouseSlips,
+                                total: total,
+                                currentPage: page,
+                                itemsPerPage: perPage
+                            }];
+                }
+            });
+        });
+    };
+    WarehouseSlipsService.prototype.getById = function (id) {
+        return __awaiter(this, void 0, Promise, function () {
+            var warehouseSlip;
+            return __generator(this, function (_a) {
+                switch (_a.label) {
+                    case 0: return [4 /*yield*/, this.prisma.warehouseSlip.findUnique({
+                            where: { id: id },
+                            include: {
+                                details: true
+                            }
+                        })];
+                    case 1:
+                        warehouseSlip = _a.sent();
+                        if (!warehouseSlip) {
+                            throw new common_1.NotFoundException("WarehouseSlip with ID " + id + " not found");
+                        }
+                        return [2 /*return*/, warehouseSlip];
+                }
+            });
+        });
+    };
+    WarehouseSlipsService.prototype["delete"] = function (id, user) {
+        return __awaiter(this, void 0, Promise, function () {
+            var warehouseSlip;
+            return __generator(this, function (_a) {
+                switch (_a.label) {
+                    case 0: return [4 /*yield*/, this.prisma.warehouseSlip.findUnique({
+                            where: { id: id }
+                        })];
+                    case 1:
+                        warehouseSlip = _a.sent();
+                        if (!warehouseSlip) {
+                            throw new common_1.NotFoundException("WarehouseSlip with ID " + id + " not found");
+                        }
+                        return [4 /*yield*/, this.prisma.warehouseSlip.update({
+                                where: { id: id },
+                                data: {}
+                            })];
+                    case 2:
+                        _a.sent();
+                        return [2 /*return*/];
+                }
+            });
+        });
+    };
     WarehouseSlipsService = __decorate([
         common_1.Injectable()
     ], WarehouseSlipsService);

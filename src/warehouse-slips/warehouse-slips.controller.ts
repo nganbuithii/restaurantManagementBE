@@ -1,9 +1,10 @@
-import { Body, Controller, HttpCode, HttpStatus, Post, UseGuards } from '@nestjs/common';
+import { Body, Controller, Get, HttpCode, HttpStatus, Param, ParseIntPipe, Post,Delete, Query, UseGuards } from '@nestjs/common';
 import { WarehouseSlipsService } from './warehouse-slips.service';
 import { JwtAuthGuard } from 'src/auth/jwt-auth.guard';
 import { CurrentUser, ResponseMessage } from 'decorators/customize';
-import { CreateWarehouseSlipDto } from './dto/warehouse-slip.dto';
+import { CreateWarehouseSlipDto, WarehouserSlipFilterType, WarehouseSlipPaginationResponseType } from './dto/warehouse-slip.dto';
 import { IUser } from 'interfaces/user.interface';
+import { WarehouseSlip } from '@prisma/client';
 
 @Controller('warehouse-slips')
 export class WarehouseSlipsController {
@@ -17,5 +18,27 @@ export class WarehouseSlipsController {
     @Body() body: CreateWarehouseSlipDto,
     @CurrentUser() user: IUser) {
     return this.warehouseSlipsService.create(body, user);
+  }
+
+  @Get()
+  @UseGuards(JwtAuthGuard)
+  @ResponseMessage("Get all warehouse list")
+  getAll(@Query() params: WarehouserSlipFilterType): Promise<WarehouseSlipPaginationResponseType> {
+    return this.warehouseSlipsService.getAll(params);
+  }
+
+  @Get(':id')
+  @UseGuards(JwtAuthGuard)
+  @ResponseMessage(" get detail warehouse slip by id")
+  getDetail(@Param('id', ParseIntPipe) id: number): Promise<WarehouseSlip> {
+    return this.warehouseSlipsService.getById(id)
+  }
+
+  @Delete(':id')
+  @UseGuards(JwtAuthGuard)
+  @HttpCode(HttpStatus.NO_CONTENT)
+  @ResponseMessage("Delete warehouse slip by id is success")
+  delete(@Param('id', ParseIntPipe) id: number, @CurrentUser() user:IUser): Promise<void> {
+    return this.warehouseSlipsService.delete(id, user);
   }
 }

@@ -1,6 +1,6 @@
-import { BadRequestException, Injectable } from '@nestjs/common';
+import { BadRequestException, Injectable, NotFoundException } from '@nestjs/common';
 import { PrismaService } from 'src/prisma.service';
-import { CreateWarehouseSlipDto } from './dto/warehouse-slip.dto';
+import { CreateWarehouseSlipDto, WarehouserSlipFilterType, WarehouseSlipPaginationResponseType } from './dto/warehouse-slip.dto';
 import { IUser } from 'interfaces/user.interface';
 import { WarehouseSlip } from '@prisma/client';
 
@@ -72,5 +72,75 @@ export class WarehouseSlipsService {
         }
 
         return warehouseSlip;
+    }
+
+    async getAll(filter: WarehouserSlipFilterType): Promise<WarehouseSlipPaginationResponseType> {
+        const itemsPerPage = parseInt(process.env.ITEMS_PER_PAGE, 10) || 10;
+        const currentPage = parseInt(process.env.DEFAULT_PAGE, 10) || 1;
+        
+        const search = filter.search || '';
+        const page = filter.page || currentPage;
+        const perPage = filter.items_per_page || itemsPerPage;
+
+        const warehouseSlips = await this.prisma.warehouseSlip.findMany({
+            where: {
+                type: {
+                    contains: search,
+                },
+            },
+            skip: (page - 1) * perPage,
+            take: perPage,
+            include: {
+                details: true,
+            },
+        });
+
+        const total = await this.prisma.warehouseSlip.count({
+            where: {
+                type: {
+                    contains: search,
+                },
+            },
+        });
+
+        return {
+            data: warehouseSlips,
+            total,
+            currentPage: page,
+            itemsPerPage: perPage,
+        };
+    }
+
+    async getById(id: number): Promise<WarehouseSlip> {
+        const warehouseSlip = await this.prisma.warehouseSlip.findUnique({
+            where: { id },
+            include: {
+                details: true, 
+            },
+        });
+
+        if (!warehouseSlip) {
+            throw new NotFoundException(`WarehouseSlip with ID ${id} not found`);
+        }
+
+        return warehouseSlip;
+    }
+
+
+    async delete(id: number, user: IUser): Promise<void> {
+        const warehouseSlip = await this.prisma.warehouseSlip.findUnique({
+            where: { id },
+        });
+
+        if (!warehouseSlip) {
+            throw new NotFoundException(`WarehouseSlip with ID ${id} not found`);
+        }
+
+        await this.prisma.warehouseSlip.update({
+            where: { id },
+            data: {
+
+            },
+        });
     }
 }

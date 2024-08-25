@@ -1,3 +1,4 @@
+import { WarehouseSlip } from '@prisma/client';
 
 import { IsNotEmpty, IsString, IsInt, IsArray, ValidateNested, ArrayMinSize } from 'class-validator';
 import { Type } from 'class-transformer';
@@ -32,4 +33,19 @@ export class CreateWarehouseSlipDto {
     @ArrayMinSize(1)
     @Type(() => WarehouseSlipDetailDto)
     details: WarehouseSlipDetailDto[];
+}
+
+
+
+export interface WarehouserSlipFilterType {
+    items_per_page?: number;
+    page?: number;
+    search?: string
+}
+
+export interface WarehouseSlipPaginationResponseType {
+    data: WarehouseSlip[]
+    total: number
+    currentPage: number
+    itemsPerPage: number
 }
