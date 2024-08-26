@@ -41,6 +41,7 @@ var app_module_1 = require("./app.module");
 var response_interceptor_1 = require("interceptors/response.interceptor");
 var core_2 = require("@nestjs/core");
 var swagger_1 = require("@nestjs/swagger");
+var user_interceptor_1 = require("interceptors/user.interceptor");
 function bootstrap() {
     return __awaiter(this, void 0, void 0, function () {
         var app, config, document;
@@ -72,6 +73,7 @@ function bootstrap() {
                     document = swagger_1.SwaggerModule.createDocument(app, config);
                     swagger_1.SwaggerModule.setup('api', app, document);
                     app.useGlobalInterceptors(new response_interceptor_1.ResponseInterceptor(new core_2.Reflector()));
+                    app.useGlobalInterceptors(new user_interceptor_1.UserInterceptor());
                     return [4 /*yield*/, app.listen(3005)];
                 case 2:
                     _a.sent();

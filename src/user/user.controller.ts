@@ -8,6 +8,7 @@ import { FileInterceptor } from '@nestjs/platform-express';
 import { storageConfig } from 'helper/config';
 import { extname } from 'path';
 import { ApiTags } from '@nestjs/swagger';
+import { RequirePermissions } from 'decorators/permission';
 
 
 
@@ -17,29 +18,32 @@ export class UserController {
     constructor(private readonly userService: UserService) { }
 
     @Post()
-    // @Permissions('create:user')  // Quyền yêu cầu để tạo người dùng
-    // @UseGuards(PermissionsGuard)
+    @RequirePermissions('CREATE_USER')
     create(@Body() body: CreateUserDto): Promise<Omit<User, 'password'>> {
         return this.userService.create(body);
     }
 
     @Get()
+    @RequirePermissions('GET_USER')
     getAll(@Query() params: UserFilterType): Promise<UserpaginationResponseType> {
         return this.userService.getAll(params);
     }
 
     @Get(':id')
+    @RequirePermissions('GET_USER')
     getDetail(@Param('id', ParseIntPipe) id: number): Promise<Omit<User, 'password'>> {
         return this.userService.getDetail(id);
     }
 
     @Patch(':id')
+    @RequirePermissions('UPDATE_USER')
     update(@Param('id', ParseIntPipe) id: number, @Body() data: UpdateUserDto): Promise<User> {
         return this.userService.update(id, data);
     }
 
     @Post('upload-avt')
     @UseGuards(JwtAuthGuard)
+    @RequirePermissions('UPDATE_AVATAR_USER')
     @UseInterceptors(FileInterceptor('avatar', {
         storage: storageConfig('avatar'),
         fileFilter: (req, file, cb) => {

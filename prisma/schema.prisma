@@ -39,12 +39,15 @@ model Role {
 
 model Permission {
   id          Int              @id @default(autoincrement())
-  action      String
+  action      String //ví dụ: CREATE, READ, UPDATE, DELETE)
+  resource    String // (ví dụ: USER, VOUCHER, FEEDBACK)
   description String?
   createdAt   DateTime         @default(now())
   updatedAt   DateTime         @updatedAt
   deletedAt   DateTime?
   roles       RolePermission[]
+
+  @@unique([action, resource])
 }
 
 model RolePermission {
@@ -178,18 +181,18 @@ model Menu {
 }
 
 model Supplier {
-  id        Int             @id @default(autoincrement())
+  id        Int      @id @default(autoincrement())
   name      String
   address   String
-  email     String @unique
-  isActive  Boolean         @default(true)
-  createdAt DateTime        @default(now())
-  updatedAt DateTime        @updatedAt
+  email     String   @unique
+  isActive  Boolean  @default(true)
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
   createdBy Int?
   updatedBy Int?
   deletedBy Int?
 
-  slips     WarehouseSlip[]
+  slips WarehouseSlip[]
 }
 
 model Ingredient {
@@ -278,7 +281,7 @@ model Feedback {
 model WarehouseSlip {
   id         Int                   @id @default(autoincrement())
   type       String // "IN" or "OUT"
-  isActive Boolean @default(true)
+  isActive   Boolean               @default(true)
   createdAt  DateTime              @default(now())
   updatedAt  DateTime              @updatedAt
   employeeId Int

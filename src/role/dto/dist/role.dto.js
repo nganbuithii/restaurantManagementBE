@@ -6,8 +6,9 @@ var __decorate = (this && this.__decorate) || function (decorators, target, key,
     return c > 3 && r && Object.defineProperty(target, key, r), r;
 };
 exports.__esModule = true;
-exports.CreateRoleDto = void 0;
+exports.UpdateRolePermissionsDto = exports.CreateRoleDto = void 0;
 var class_validator_1 = require("class-validator");
+var class_validator_2 = require("class-validator");
 var CreateRoleDto = /** @class */ (function () {
     function CreateRoleDto() {
     }
@@ -17,3 +18,14 @@ var CreateRoleDto = /** @class */ (function () {
     return CreateRoleDto;
 }());
 exports.CreateRoleDto = CreateRoleDto;
+var UpdateRolePermissionsDto = /** @class */ (function () {
+    function UpdateRolePermissionsDto() {
+    }
+    __decorate([
+        class_validator_2.IsArray(),
+        class_validator_2.ArrayNotEmpty(),
+        class_validator_2.IsNumber({}, { each: true })
+    ], UpdateRolePermissionsDto.prototype, "permissionIds");
+    return UpdateRolePermissionsDto;
+}());
+exports.UpdateRolePermissionsDto = UpdateRolePermissionsDto;

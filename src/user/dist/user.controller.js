@@ -52,12 +52,11 @@ var platform_express_1 = require("@nestjs/platform-express");
 var config_1 = require("helper/config");
 var path_1 = require("path");
 var swagger_1 = require("@nestjs/swagger");
+var permission_1 = require("decorators/permission");
 var UserController = /** @class */ (function () {
     function UserController(userService) {
         this.userService = userService;
     }
-    // @Permissions('create:user')  // Quyền yêu cầu để tạo người dùng
-    // @UseGuards(PermissionsGuard)
     UserController.prototype.create = function (body) {
         return this.userService.create(body);
     };
@@ -103,23 +102,28 @@ var UserController = /** @class */ (function () {
     };
     __decorate([
         common_1.Post(),
+        permission_1.RequirePermissions('CREATE_USER'),
         __param(0, common_1.Body())
     ], UserController.prototype, "create");
     __decorate([
         common_1.Get(),
+        permission_1.RequirePermissions('GET_USER'),
         __param(0, common_1.Query())
     ], UserController.prototype, "getAll");
     __decorate([
         common_1.Get(':id'),
+        permission_1.RequirePermissions('GET_USER'),
         __param(0, common_1.Param('id', common_1.ParseIntPipe))
     ], UserController.prototype, "getDetail");
     __decorate([
         common_1.Patch(':id'),
+        permission_1.RequirePermissions('UPDATE_USER'),
         __param(0, common_1.Param('id', common_1.ParseIntPipe)), __param(1, common_1.Body())
     ], UserController.prototype, "update");
     __decorate([
         common_1.Post('upload-avt'),
         common_1.UseGuards(jwt_auth_guard_1.JwtAuthGuard),
+        permission_1.RequirePermissions('UPDATE_AVATAR_USER'),
         common_1.UseInterceptors(platform_express_1.FileInterceptor('avatar', {
             storage: config_1.storageConfig('avatar'),
             fileFilter: function (req, file, cb) {

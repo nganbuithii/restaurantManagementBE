@@ -9,6 +9,11 @@ export class CreatePermissionDto {
     action: string
 
     @ApiProperty()
+    @IsNotEmpty({ message: "resource can not empty " })
+    @IsString()
+    resource    :string 
+
+    @ApiProperty()
     @IsNotEmpty({ message: "description can not empty" })
     @IsString()
     description: string

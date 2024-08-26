@@ -19,6 +19,11 @@ var CreatePermissionDto = /** @class */ (function () {
     ], CreatePermissionDto.prototype, "action");
     __decorate([
         swagger_1.ApiProperty(),
+        class_validator_1.IsNotEmpty({ message: "resource can not empty " }),
+        class_validator_1.IsString()
+    ], CreatePermissionDto.prototype, "resource");
+    __decorate([
+        swagger_1.ApiProperty(),
         class_validator_1.IsNotEmpty({ message: "description can not empty" }),
         class_validator_1.IsString()
     ], CreatePermissionDto.prototype, "description");

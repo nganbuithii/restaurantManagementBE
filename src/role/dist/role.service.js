@@ -1,4 +1,15 @@
 "use strict";
+var __assign = (this && this.__assign) || function () {
+    __assign = Object.assign || function(t) {
+        for (var s, i = 1, n = arguments.length; i < n; i++) {
+            s = arguments[i];
+            for (var p in s) if (Object.prototype.hasOwnProperty.call(s, p))
+                t[p] = s[p];
+        }
+        return t;
+    };
+    return __assign.apply(this, arguments);
+};
 var __decorate = (this && this.__decorate) || function (decorators, target, key, desc) {
     var c = arguments.length, r = c < 3 ? target : desc === null ? desc = Object.getOwnPropertyDescriptor(target, key) : desc, d;
     if (typeof Reflect === "object" && typeof Reflect.decorate === "function") r = Reflect.decorate(decorators, target, key, desc);
@@ -52,26 +63,30 @@ var RoleService = /** @class */ (function () {
         return __awaiter(this, void 0, void 0, function () {
             return __generator(this, function (_a) {
                 return [2 /*return*/, this.prismaService.role.upsert({
-                        where: { name: 'NORMAL_USER' },
+                        where: { name: 'CUSTOMER' },
                         update: {},
-                        create: { name: 'NORMAL_USER' }
+                        create: { name: 'CUSTOMER' }
                     })];
             });
         });
     };
     RoleService.prototype.create = function (body) {
         return __awaiter(this, void 0, Promise, function () {
-            var role;
+            var existingRole;
             return __generator(this, function (_a) {
                 switch (_a.label) {
-                    case 0: return [4 /*yield*/, this.prismaService.role.create({
-                            data: {
-                                name: body.name
-                            }
+                    case 0: return [4 /*yield*/, this.prismaService.role.findUnique({
+                            where: { name: body.name }
                         })];
                     case 1:
-                        role = _a.sent();
-                        return [2 /*return*/, role];
+                        existingRole = _a.sent();
+                        if (existingRole) {
+                            throw new common_1.BadRequestException('Role with this name already exists');
+                        }
+                        // Tạo role mới nếu không bị trùng
+                        return [2 /*return*/, this.prismaService.role.create({
+                                data: body
+                            })];
                 }
             });
         });
@@ -85,18 +100,26 @@ var RoleService = /** @class */ (function () {
     };
     RoleService.prototype.getById = function (id) {
         return __awaiter(this, void 0, Promise, function () {
-            var role;
+            var role, detailedRole;
             return __generator(this, function (_a) {
                 switch (_a.label) {
                     case 0: return [4 /*yield*/, this.prismaService.role.findUnique({
-                            where: { id: id }
+                            where: { id: id },
+                            include: {
+                                permissions: {
+                                    include: {
+                                        permission: true
+                                    }
+                                }
+                            }
                         })];
                     case 1:
                         role = _a.sent();
                         if (!role) {
                             throw new common_1.NotFoundException("Role with ID " + id + " not found");
                         }
-                        return [2 /*return*/, role];
+                        detailedRole = __assign(__assign({}, role), { permissions: role.permissions.map(function (rp) { return rp.permission; }) });
+                        return [2 /*return*/, detailedRole];
                 }
             });
         });
@@ -119,6 +142,80 @@ var RoleService = /** @class */ (function () {
                                 data: {
                                     name: name,
                                     updatedAt: new Date()
+                                }
+                            })];
+                }
+            });
+        });
+    };
+    RoleService.prototype.assignPermissionsToRole = function (roleId, permissionIds) {
+        return __awaiter(this, void 0, void 0, function () {
+            var rolePermissions;
+            return __generator(this, function (_a) {
+                switch (_a.label) {
+                    case 0: 
+                    // Xóa tất cả các quyền hiện tại của role
+                    return [4 /*yield*/, this.prismaService.rolePermission.deleteMany({
+                            where: { roleId: roleId }
+                        })];
+                    case 1:
+                        // Xóa tất cả các quyền hiện tại của role
+                        _a.sent();
+                        rolePermissions = permissionIds.map(function (permissionId) { return ({
+                            roleId: roleId,
+                            permissionId: permissionId
+                        }); });
+                        return [4 /*yield*/, this.prismaService.rolePermission.createMany({
+                                data: rolePermissions
+                            })];
+                    case 2:
+                        _a.sent();
+                        return [2 /*return*/, this.prismaService.role.findUnique({
+                                where: { id: roleId },
+                                include: { permissions: true }
+                            })];
+                }
+            });
+        });
+    };
+    RoleService.prototype.updateRolePermissions = function (roleId, newPermissionIds) {
+        return __awaiter(this, void 0, void 0, function () {
+            var createPromises;
+            var _this = this;
+            return __generator(this, function (_a) {
+                switch (_a.label) {
+                    case 0:
+                        // Kiểm tra xem newPermissionIds có phải là một mảng không
+                        if (!Array.isArray(newPermissionIds)) {
+                            throw new common_1.BadRequestException('Permissions should be an array of numbers');
+                        }
+                        // Xóa tất cả quyền hiện tại của role
+                        return [4 /*yield*/, this.prismaService.rolePermission.deleteMany({
+                                where: { roleId: roleId }
+                            })];
+                    case 1:
+                        // Xóa tất cả quyền hiện tại của role
+                        _a.sent();
+                        createPromises = newPermissionIds.map(function (permissionId) {
+                            return _this.prismaService.rolePermission.create({
+                                data: {
+                                    roleId: roleId,
+                                    permissionId: permissionId
+                                }
+                            });
+                        });
+                        return [4 /*yield*/, Promise.all(createPromises)];
+                    case 2:
+                        _a.sent();
+                        // Trả về role với danh sách quyền mới
+                        return [2 /*return*/, this.prismaService.role.findUnique({
+                                where: { id: roleId },
+                                include: {
+                                    permissions: {
+                                        include: {
+                                            permission: true
+                                        }
+                                    }
                                 }
                             })];
                 }

@@ -50,13 +50,13 @@ var PermissionService = /** @class */ (function () {
     }
     PermissionService.prototype.create = function (createPermissionDto) {
         return __awaiter(this, void 0, void 0, function () {
-            var action, description, existingPermission, permission;
+            var action, description, resource, existingPermission, permission;
             return __generator(this, function (_a) {
                 switch (_a.label) {
                     case 0:
-                        action = createPermissionDto.action, description = createPermissionDto.description;
+                        action = createPermissionDto.action, description = createPermissionDto.description, resource = createPermissionDto.resource;
                         return [4 /*yield*/, this.prismaService.permission.findFirst({
-                                where: { action: action }
+                                where: { action: action, resource: resource }
                             })];
                     case 1:
                         existingPermission = _a.sent();
@@ -66,6 +66,7 @@ var PermissionService = /** @class */ (function () {
                         return [4 /*yield*/, this.prismaService.permission.create({
                                 data: {
                                     action: action,
+                                    resource: resource,
                                     description: description
                                 }
                             })];
@@ -204,6 +205,41 @@ var PermissionService = /** @class */ (function () {
                     case 2:
                         _a.sent();
                         return [2 /*return*/];
+                }
+            });
+        });
+    };
+    PermissionService.prototype.getRolePermissions = function (roleId) {
+        return __awaiter(this, void 0, Promise, function () {
+            var roleWithPermissions;
+            return __generator(this, function (_a) {
+                switch (_a.label) {
+                    case 0: return [4 /*yield*/, this.prismaService.role.findUnique({
+                            where: { id: roleId },
+                            include: {
+                                permissions: {
+                                    include: {
+                                        permission: true
+                                    }
+                                }
+                            }
+                        })];
+                    case 1:
+                        roleWithPermissions = _a.sent();
+                        return [2 /*return*/, roleWithPermissions.permissions.map(function (rp) { return rp.permission.action; })];
+                }
+            });
+        });
+    };
+    PermissionService.prototype.hasPermission = function (roleId, requiredPermission) {
+        return __awaiter(this, void 0, Promise, function () {
+            var permissions;
+            return __generator(this, function (_a) {
+                switch (_a.label) {
+                    case 0: return [4 /*yield*/, this.getRolePermissions(roleId)];
+                    case 1:
+                        permissions = _a.sent();
+                        return [2 /*return*/, permissions.includes(requiredPermission)];
                 }
             });
         });

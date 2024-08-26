@@ -3,6 +3,7 @@ import { AppModule } from './app.module';
 import { ResponseInterceptor } from 'interceptors/response.interceptor';
 import { Reflector } from '@nestjs/core';
 import { DocumentBuilder, SwaggerModule } from '@nestjs/swagger';
+import { UserInterceptor } from 'interceptors/user.interceptor';
 
 async function bootstrap() {
   const app = await NestFactory.create(AppModule);
@@ -30,6 +31,8 @@ async function bootstrap() {
   const document = SwaggerModule.createDocument(app, config);
   SwaggerModule.setup('api', app, document);
   app.useGlobalInterceptors(new ResponseInterceptor(new Reflector()));
+  app.useGlobalInterceptors(new UserInterceptor());
+
   await app.listen(3005);
 }
 bootstrap();

@@ -6,6 +6,8 @@ import { CreateVoucherDto, UpdateVoucherDto, VoucherFilterType, VoucherPaginatio
 import { CurrentUser, ResponseMessage } from 'decorators/customize';
 import { IUser } from 'interfaces/user.interface';
 import { ApiTags } from '@nestjs/swagger';
+import { RequirePermissions } from 'decorators/permission';
+import { PermissionGuard } from 'src/auth/permissions.guard';
 
 
 @ApiTags("Vouchers")
@@ -15,7 +17,8 @@ export class VouchersController {
 
   @Post()
   @HttpCode(HttpStatus.CREATED)
-  @UseGuards(JwtAuthGuard)
+  @RequirePermissions('CREATE_VOUCHER')
+  @UseGuards(JwtAuthGuard, PermissionGuard)
   @ResponseMessage("create new voucher successfully")
   createVoucher(
     @Body() body: CreateVoucherDto,

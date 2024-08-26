@@ -4,7 +4,8 @@ import { RegisterDto } from './dtos/auth.dto';
 import { createHash } from 'crypto';
 import { User } from '@prisma/client';
 import { PrismaService } from 'src/prisma.service';
-import { compare } from 'bcrypt';
+import * as bcrypt from 'bcrypt';
+
 import { JwtService } from '@nestjs/jwt';
 import { UserService } from 'src/user/user.service';
 
@@ -97,7 +98,9 @@ export class AuthService {
         const payload = { 
            
             username: account.username ,
-            sub:account.id
+            sub:account.id,
+            role:account.roleId
+
         }
         const accessToken = await this.jwtService.signAsync(payload, {
             secret: process.env.JWT_SECRET,  
@@ -117,17 +120,42 @@ export class AuthService {
         };
     };
 
-    async validateUser(username: string, pass: string): Promise<any> {
-        // check xem người dùng đăng nhập có hợp lệ không
-        const user = await this.userService.findOne(username);
-        
-        
-        if(user){
-            const isValid = this.userService.isValidPassword(pass, user.password)
-            if(isValid){
-                return user;
+
+    private async getPermissionsForUser(userId: number): Promise<{ action: string; resource: string }[]> {
+        // Implement logic to get permissions from database
+        const userWithPermissions = await this.prismaService.user.findUnique({
+            where: { id: userId },
+            include: {
+                role: {
+                    include: {
+                        permissions: {
+                            include: {
+                                permission: true
+                            }
+                        }
+                    }
+                }
             }
+        });
+    
+        // Trả về danh sách các quyền, mỗi quyền chứa action và resource
+        return userWithPermissions.role.permissions.map(rp => ({
+            action: rp.permission.action,
+            resource: rp.permission.resource
+        }));
+    }
+    
+    async validateUser(username: string, password: string): Promise<any> {
+        const user = await this.userService.findOne(username);
+        if (user && await bcrypt.compare(password, user.password)) {
+            const { password, ...result } = user;
+    
+            // Lấy permissions từ database
+            const permissions = await this.getPermissionsForUser(user.id);
+    
+            // Trả về đối tượng kết quả với các permissions
+            return { ...result, permissions };
         }
         return null;
     }
-}
+}    

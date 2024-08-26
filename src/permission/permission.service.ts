@@ -8,11 +8,11 @@ import { Permission } from '@prisma/client';
 export class PermissionService {
   constructor(private prismaService: PrismaService) { }
   async create(createPermissionDto: CreatePermissionDto) {
-    const { action, description } = createPermissionDto;
+    const { action, description, resource } = createPermissionDto;
 
     // Kiểm tra xem quyền đã tồn tại hay chưa
     const existingPermission = await this.prismaService.permission.findFirst({
-      where: { action },
+      where: { action, resource },
     });
 
     if (existingPermission) {
@@ -26,6 +26,7 @@ export class PermissionService {
     const permission = await this.prismaService.permission.create({
       data: {
         action,
+        resource,
         description,
       },
     });
@@ -43,7 +44,7 @@ export class PermissionService {
       take: items_per_page,
       skip,
       where: {
-       
+
         deletedAt: null,  // Chỉ lấy các bản ghi chưa bị xóa
         OR: [
           {
@@ -94,7 +95,7 @@ export class PermissionService {
     return permission;
   }
 
- 
+
   async update(id: number, data: { action?: string; description?: string }): Promise<Permission> {
     const permission = await this.prismaService.permission.findUnique({
       where: { id },
@@ -135,5 +136,26 @@ export class PermissionService {
       where: { id },
       data: { deletedAt: new Date() },
     });
+  }
+
+
+  async getRolePermissions(roleId: number): Promise<string[]> {
+    const roleWithPermissions = await this.prismaService.role.findUnique({
+      where: { id: roleId },
+      include: {
+        permissions: {
+          include: {
+            permission: true
+          }
+        }
+      }
+    });
+
+    return roleWithPermissions.permissions.map(rp => rp.permission.action);
+  }
+
+  async hasPermission(roleId: number, requiredPermission: string): Promise<boolean> {
+    const permissions = await this.getRolePermissions(roleId);
+    return permissions.includes(requiredPermission);
   }
 }

@@ -1,4 +1,15 @@
 "use strict";
+var __assign = (this && this.__assign) || function () {
+    __assign = Object.assign || function(t) {
+        for (var s, i = 1, n = arguments.length; i < n; i++) {
+            s = arguments[i];
+            for (var p in s) if (Object.prototype.hasOwnProperty.call(s, p))
+                t[p] = s[p];
+        }
+        return t;
+    };
+    return __assign.apply(this, arguments);
+};
 var __decorate = (this && this.__decorate) || function (decorators, target, key, desc) {
     var c = arguments.length, r = c < 3 ? target : desc === null ? desc = Object.getOwnPropertyDescriptor(target, key) : desc, d;
     if (typeof Reflect === "object" && typeof Reflect.decorate === "function") r = Reflect.decorate(decorators, target, key, desc);
@@ -41,10 +52,22 @@ var __generator = (this && this.__generator) || function (thisArg, body) {
         if (op[0] & 5) throw op[1]; return { value: op[0] ? op[1] : void 0, done: true };
     }
 };
+var __rest = (this && this.__rest) || function (s, e) {
+    var t = {};
+    for (var p in s) if (Object.prototype.hasOwnProperty.call(s, p) && e.indexOf(p) < 0)
+        t[p] = s[p];
+    if (s != null && typeof Object.getOwnPropertySymbols === "function")
+        for (var i = 0, p = Object.getOwnPropertySymbols(s); i < p.length; i++) {
+            if (e.indexOf(p[i]) < 0 && Object.prototype.propertyIsEnumerable.call(s, p[i]))
+                t[p[i]] = s[p[i]];
+        }
+    return t;
+};
 exports.__esModule = true;
 exports.AuthService = void 0;
 var common_1 = require("@nestjs/common");
 var crypto_1 = require("crypto");
+var bcrypt = require("bcrypt");
 var AuthService = /** @class */ (function () {
     function AuthService(prismaService, jwtService, userService) {
         var _this = this;
@@ -121,7 +144,8 @@ var AuthService = /** @class */ (function () {
                         }
                         payload = {
                             username: account.username,
-                            sub: account.id
+                            sub: account.id,
+                            role: account.roleId
                         };
                         return [4 /*yield*/, this.jwtService.signAsync(payload, {
                                 secret: process.env.JWT_SECRET,
@@ -143,21 +167,59 @@ var AuthService = /** @class */ (function () {
             });
         }); };
     }
-    AuthService.prototype.validateUser = function (username, pass) {
+    AuthService.prototype.getPermissionsForUser = function (userId) {
         return __awaiter(this, void 0, Promise, function () {
-            var user, isValid;
+            var userWithPermissions;
             return __generator(this, function (_a) {
                 switch (_a.label) {
+                    case 0: return [4 /*yield*/, this.prismaService.user.findUnique({
+                            where: { id: userId },
+                            include: {
+                                role: {
+                                    include: {
+                                        permissions: {
+                                            include: {
+                                                permission: true
+                                            }
+                                        }
+                                    }
+                                }
+                            }
+                        })];
+                    case 1:
+                        userWithPermissions = _a.sent();
+                        // Trả về danh sách các quyền, mỗi quyền chứa action và resource
+                        return [2 /*return*/, userWithPermissions.role.permissions.map(function (rp) { return ({
+                                action: rp.permission.action,
+                                resource: rp.permission.resource
+                            }); })];
+                }
+            });
+        });
+    };
+    AuthService.prototype.validateUser = function (username, password) {
+        return __awaiter(this, void 0, Promise, function () {
+            var user, _a, password_1, result, permissions;
+            return __generator(this, function (_b) {
+                switch (_b.label) {
                     case 0: return [4 /*yield*/, this.userService.findOne(username)];
                     case 1:
-                        user = _a.sent();
-                        if (user) {
-                            isValid = this.userService.isValidPassword(pass, user.password);
-                            if (isValid) {
-                                return [2 /*return*/, user];
-                            }
-                        }
-                        return [2 /*return*/, null];
+                        user = _b.sent();
+                        _a = user;
+                        if (!_a) return [3 /*break*/, 3];
+                        return [4 /*yield*/, bcrypt.compare(password, user.password)];
+                    case 2:
+                        _a = (_b.sent());
+                        _b.label = 3;
+                    case 3:
+                        if (!_a) return [3 /*break*/, 5];
+                        password_1 = user.password, result = __rest(user, ["password"]);
+                        return [4 /*yield*/, this.getPermissionsForUser(user.id)];
+                    case 4:
+                        permissions = _b.sent();
+                        // Trả về đối tượng kết quả với các permissions
+                        return [2 /*return*/, __assign(__assign({}, result), { permissions: permissions })];
+                    case 5: return [2 /*return*/, null];
                 }
             });
         });
