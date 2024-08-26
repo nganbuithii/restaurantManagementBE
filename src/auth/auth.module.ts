@@ -10,6 +10,8 @@ import { LocalStrategy } from './passport/local.strategy';
 import { UserModule } from 'src/user/user.module';
 import { JwtStrategy } from './jwt.strategy';
 import { CloudinaryModule } from 'src/cloudinary/cloudinary.module';
+import { OtpService } from 'src/otp/otp.service';
+import { EmailService } from 'src/email/email.service';
 
 @Module({
   imports: [UserModule, PassportModule,CloudinaryModule,
@@ -26,6 +28,6 @@ import { CloudinaryModule } from 'src/cloudinary/cloudinary.module';
     }),
   ],
   controllers: [AuthController],
-  providers: [AuthService, PrismaService, JwtService  , JwtStrategy, ConfigService, UserService, LocalStrategy]
+  providers: [AuthService, PrismaService, JwtService  , JwtStrategy, ConfigService, UserService,  OtpService, EmailService,LocalStrategy]
 })
 export class AuthModule {}

@@ -69,11 +69,13 @@ var common_1 = require("@nestjs/common");
 var crypto_1 = require("crypto");
 var bcrypt = require("bcrypt");
 var AuthService = /** @class */ (function () {
-    function AuthService(prismaService, jwtService, userService) {
+    function AuthService(prismaService, jwtService, userService, otpService, emailService) {
         var _this = this;
         this.prismaService = prismaService;
         this.jwtService = jwtService;
         this.userService = userService;
+        this.otpService = otpService;
+        this.emailService = emailService;
         this.register = function (userData) { return __awaiter(_this, void 0, Promise, function () {
             var _this = this;
             return __generator(this, function (_a) {
@@ -232,6 +234,56 @@ var AuthService = /** @class */ (function () {
                         // Trả về đối tượng kết quả với các permissions
                         return [2 /*return*/, __assign(__assign({}, result), { permissions: permissions })];
                     case 5: return [2 /*return*/, null];
+                }
+            });
+        });
+    };
+    AuthService.prototype.sendPasswordResetOTP = function (email) {
+        return __awaiter(this, void 0, void 0, function () {
+            var user, otp;
+            return __generator(this, function (_a) {
+                switch (_a.label) {
+                    case 0: return [4 /*yield*/, this.userService.findByEmail(email)];
+                    case 1:
+                        user = _a.sent();
+                        if (!user) {
+                            throw new common_1.NotFoundException('User not found');
+                        }
+                        otp = this.otpService.generateOTP();
+                        this.otpService.storeOTP(email, otp);
+                        return [4 /*yield*/, this.emailService.sendOTP(email, otp)];
+                    case 2:
+                        _a.sent();
+                        return [2 /*return*/, { message: 'OTP sent to your email' }];
+                }
+            });
+        });
+    };
+    AuthService.prototype.resetPassword = function (email, otp, newPassword) {
+        return __awaiter(this, void 0, void 0, function () {
+            var isValidOTP, user, hashedPassword;
+            return __generator(this, function (_a) {
+                switch (_a.label) {
+                    case 0:
+                        isValidOTP = this.otpService.verifyOTP(email, otp);
+                        if (!isValidOTP) {
+                            throw new common_1.BadRequestException('Invalid or expired OTP');
+                        }
+                        return [4 /*yield*/, this.userService.findByEmail(email)];
+                    case 1:
+                        user = _a.sent();
+                        if (!user) {
+                            throw new common_1.NotFoundException('User not found');
+                        }
+                        return [4 /*yield*/, bcrypt.hash(newPassword, 10)];
+                    case 2:
+                        hashedPassword = _a.sent();
+                        return [4 /*yield*/, this.userService.updatePassword(user.id, hashedPassword)];
+                    case 3:
+                        _a.sent();
+                        // Xóa OTP sau khi sử dụng
+                        this.otpService.clearOTP(email);
+                        return [2 /*return*/, { message: 'Password reset successfully' }];
                 }
             });
         });

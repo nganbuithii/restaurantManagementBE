@@ -312,6 +312,40 @@ var UserService = /** @class */ (function () {
             });
         });
     };
+    UserService.prototype.findByEmail = function (email) {
+        return __awaiter(this, void 0, Promise, function () {
+            var user;
+            return __generator(this, function (_a) {
+                switch (_a.label) {
+                    case 0: return [4 /*yield*/, this.prismaService.user.findUnique({
+                            where: { email: email }
+                        })];
+                    case 1:
+                        user = _a.sent();
+                        if (!user) {
+                            throw new common_1.NotFoundException("User with email " + email + " not found");
+                        }
+                        return [2 /*return*/, user];
+                }
+            });
+        });
+    };
+    UserService.prototype.updatePassword = function (userId, newPassword) {
+        return __awaiter(this, void 0, Promise, function () {
+            var updatedUser;
+            return __generator(this, function (_a) {
+                switch (_a.label) {
+                    case 0: return [4 /*yield*/, this.prismaService.user.update({
+                            where: { id: userId },
+                            data: { password: newPassword }
+                        })];
+                    case 1:
+                        updatedUser = _a.sent();
+                        return [2 /*return*/, updatedUser];
+                }
+            });
+        });
+    };
     UserService = __decorate([
         common_1.Injectable()
     ], UserService);

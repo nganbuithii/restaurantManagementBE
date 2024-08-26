@@ -1,4 +1,4 @@
-import { HttpException, HttpStatus, Injectable, NotFoundException } from '@nestjs/common';
+import { BadRequestException, HttpException, HttpStatus, Injectable, NotFoundException } from '@nestjs/common';
 
 import { RegisterDto } from './dtos/auth.dto';
 import { createHash } from 'crypto';
@@ -8,13 +8,17 @@ import * as bcrypt from 'bcrypt';
 
 import { JwtService } from '@nestjs/jwt';
 import { UserService } from 'src/user/user.service';
+import { OtpService } from 'src/otp/otp.service';
+import { EmailService } from 'src/email/email.service';
 
 @Injectable()
 export class AuthService {
     constructor(
         private prismaService: PrismaService,
         private jwtService: JwtService,
-        private userService: UserService
+        private userService: UserService,
+        private otpService: OtpService,
+        private emailService: EmailService,
     ) { }
 
     register = async (userData: RegisterDto): Promise<User> => {
@@ -46,40 +50,40 @@ export class AuthService {
             // Bước 3: Băm mật khẩu
             const hashedPassword = createHash('sha256').update(userData.password).digest('hex');
 
-             // Lấy role 'CUSTOMER'
-        const customerRole = await prisma.role.upsert({
-            where: { name: 'CUSTOMER' },
-            update: {},
-            create: { name: 'CUSTOMER' },
-        });
+            // Lấy role 'CUSTOMER'
+            const customerRole = await prisma.role.upsert({
+                where: { name: 'CUSTOMER' },
+                update: {},
+                create: { name: 'CUSTOMER' },
+            });
 
-        // Tạo người dùng mới và liên kết với role 'CUSTOMER'
-        const newUser = await prisma.user.create({
-            data: {
-                fullName: userData.fullName,
-                email: userData.email,
-                phone: userData.phone || null,
-                username: userData.username,
-                password: hashedPassword,
-                role: {
-                    connect: { id: customerRole.id },
-                },
-                avatar: userData.avatar || '',
-            },
-        });
-        // Bước 5: Nếu role là CUSTOMER, thêm thông tin vào bảng CUSTOMER
-        if (customerRole.name === 'CUSTOMER') {
-            await prisma.customer.create({
+            // Tạo người dùng mới và liên kết với role 'CUSTOMER'
+            const newUser = await prisma.user.create({
                 data: {
-                    userId: newUser.id,
-                
+                    fullName: userData.fullName,
+                    email: userData.email,
+                    phone: userData.phone || null,
+                    username: userData.username,
+                    password: hashedPassword,
+                    role: {
+                        connect: { id: customerRole.id },
+                    },
+                    avatar: userData.avatar || '',
                 },
             });
-        }
-        
+            // Bước 5: Nếu role là CUSTOMER, thêm thông tin vào bảng CUSTOMER
+            if (customerRole.name === 'CUSTOMER') {
+                await prisma.customer.create({
+                    data: {
+                        userId: newUser.id,
 
-        return newUser;
-    });
+                    },
+                });
+            }
+
+
+            return newUser;
+        });
     };
 
 
@@ -168,5 +172,43 @@ export class AuthService {
             return { ...result, permissions };
         }
         return null;
+    }
+
+
+    async sendPasswordResetOTP(email: string) {
+        const user = await this.userService.findByEmail(email);
+        if (!user) {
+            throw new NotFoundException('User not found');
+        }
+
+        const otp = this.otpService.generateOTP();
+        this.otpService.storeOTP(email, otp);
+        await this.emailService.sendOTP(email, otp);
+
+        return { message: 'OTP sent to your email' };
+    }
+
+
+
+    async resetPassword(email: string, otp: string, newPassword: string) {
+        // Kiểm tra OTP
+        const isValidOTP = this.otpService.verifyOTP(email, otp);
+        if (!isValidOTP) {
+            throw new BadRequestException('Invalid or expired OTP');
+        }
+
+        const user = await this.userService.findByEmail(email);
+        if (!user) {
+            throw new NotFoundException('User not found');
+        }
+
+        // Hash và cập nhật mật khẩu mới
+        const hashedPassword = await bcrypt.hash(newPassword, 10);
+        await this.userService.updatePassword(user.id, hashedPassword);
+
+        // Xóa OTP sau khi sử dụng
+        this.otpService.clearOTP(email);
+
+        return { message: 'Password reset successfully' };
     }
 }    

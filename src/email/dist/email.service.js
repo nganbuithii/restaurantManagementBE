@@ -42,47 +42,43 @@ var __generator = (this && this.__generator) || function (thisArg, body) {
     }
 };
 exports.__esModule = true;
-exports.AuthModule = void 0;
+exports.EmailService = void 0;
+// email.service.ts
 var common_1 = require("@nestjs/common");
-var auth_controller_1 = require("./auth.controller");
-var auth_service_1 = require("./auth.service");
-var prisma_service_1 = require("src/prisma.service");
-var jwt_1 = require("@nestjs/jwt");
-var config_1 = require("@nestjs/config");
-var user_service_1 = require("src/user/user.service");
-var passport_1 = require("@nestjs/passport");
-var local_strategy_1 = require("./passport/local.strategy");
-var user_module_1 = require("src/user/user.module");
-var jwt_strategy_1 = require("./jwt.strategy");
-var cloudinary_module_1 = require("src/cloudinary/cloudinary.module");
-var otp_service_1 = require("src/otp/otp.service");
-var email_service_1 = require("src/email/email.service");
-var AuthModule = /** @class */ (function () {
-    function AuthModule() {
+var nodemailer = require("nodemailer");
+var EmailService = /** @class */ (function () {
+    function EmailService() {
+        this.transporter = nodemailer.createTransport({
+            host: process.env.EMAIL_HOST,
+            port: Number(process.env.EMAIL_PORT) || 587,
+            secure: false,
+            auth: {
+                user: process.env.EMAIL_AUTH_USER,
+                pass: process.env.EMAIL_AUTH_PASS
+            }
+        });
     }
-    AuthModule = __decorate([
-        common_1.Module({
-            imports: [user_module_1.UserModule, passport_1.PassportModule, cloudinary_module_1.CloudinaryModule, 
-                // khai báo jwwt và sự dụng biến trong .env
-                jwt_1.JwtModule.registerAsync({
-                    imports: [config_1.ConfigModule],
-                    useFactory: function (configService) { return __awaiter(void 0, void 0, void 0, function () {
-                        return __generator(this, function (_a) {
-                            return [2 /*return*/, ({
-                                    secret: configService.get('JWT_SECRET'),
-                                    signOptions: {
-                                        expiresIn: configService.get('JWT_EXPIRE')
-                                    }
-                                })];
-                        });
-                    }); },
-                    inject: [config_1.ConfigService]
-                }),
-            ],
-            controllers: [auth_controller_1.AuthController],
-            providers: [auth_service_1.AuthService, prisma_service_1.PrismaService, jwt_1.JwtService, jwt_strategy_1.JwtStrategy, config_1.ConfigService, user_service_1.UserService, otp_service_1.OtpService, email_service_1.EmailService, local_strategy_1.LocalStrategy]
-        })
-    ], AuthModule);
-    return AuthModule;
+    EmailService.prototype.sendOTP = function (to, otp) {
+        return __awaiter(this, void 0, Promise, function () {
+            return __generator(this, function (_a) {
+                switch (_a.label) {
+                    case 0: return [4 /*yield*/, this.transporter.sendMail({
+                            from: '"Nabity Restaurant" <noreply@nabity.com>',
+                            to: to,
+                            subject: 'Password Reset OTP - Nabity Restaurant ',
+                            // text: `Your OTP for password reset is: ${otp}. It will expire in 3 minutes.`,
+                            html: "<html><p>Your OTP for password reset is : <strong>" + otp + "</strong>. It will expire in 3 minutes.</p></html>"
+                        })];
+                    case 1:
+                        _a.sent();
+                        return [2 /*return*/];
+                }
+            });
+        });
+    };
+    EmailService = __decorate([
+        common_1.Injectable()
+    ], EmailService);
+    return EmailService;
 }());
-exports.AuthModule = AuthModule;
+exports.EmailService = EmailService;

@@ -75,9 +75,9 @@ export class UserService {
             await this.prismaService.employee.create({
                 data: {
                     userId: result.id,
-                    hireDate: new Date(), 
-                    salary: 0, 
-                    position: role.name, 
+                    hireDate: new Date(),
+                    salary: 0,
+                    position: role.name,
                 },
             });
         }
@@ -201,7 +201,7 @@ export class UserService {
         if (!id) {
             throw new BadRequestException('Invalid user ID');
         }
-        
+
         // Kiểm tra xem người dùng có tồn tại không
         const user = await this.prismaService.user.findUnique({
             where: { id },
@@ -209,7 +209,7 @@ export class UserService {
         if (!user) {
             throw new NotFoundException(`User with ID ${id} not found`);
         }
-        
+
         // Upload hình ảnh lên Cloudinary
         const result = await this.cloudinaryService.uploadImage(file);
 
@@ -225,4 +225,26 @@ export class UserService {
         return userData;
     }
 
+
+    async findByEmail(email: string): Promise<User | null> {
+        const user = await this.prismaService.user.findUnique({
+            where: { email },
+        });
+
+        if (!user) {
+            throw new NotFoundException(`User with email ${email} not found`);
+        }
+
+        return user;
+    }
+
+    async updatePassword(userId: number, newPassword: string): Promise<User> {
+            const updatedUser = await this.prismaService.user.update({
+                where: { id: userId },
+                data: { password: newPassword },
+            });
+
+            return updatedUser;
+        
+    }
 }

@@ -21,6 +21,8 @@ import { FeeckbacksModule } from './feeckbacks/feedbacks.module';
 import { VouchersModule } from './vouchers/vouchers.module';
 import { SuppliersModule } from './suppliers/suppliers.module';
 import { WarehouseSlipsModule } from './warehouse-slips/warehouse-slips.module';
+import { EmailModule } from './email/email.module';
+import { OtpService } from './otp/otp.service';
 
 
 @Module({
@@ -37,7 +39,7 @@ import { WarehouseSlipsModule } from './warehouse-slips/warehouse-slips.module';
     
     ConfigModule,
     UserModule,
-    AuthModule, RoleModule, PermissionModule, MenuItemModule, CloudinaryModule, IngredientModule, MenuModule, TableModule, ReversationsModule, OrdersModule, FeeckbacksModule, VouchersModule, SuppliersModule, WarehouseSlipsModule,  
+    AuthModule, RoleModule, PermissionModule, MenuItemModule, CloudinaryModule, IngredientModule, MenuModule, TableModule, ReversationsModule, OrdersModule, FeeckbacksModule, VouchersModule, SuppliersModule, WarehouseSlipsModule, EmailModule,  
   ],
   controllers: [AppController],
   providers: [
@@ -48,6 +50,7 @@ import { WarehouseSlipsModule } from './warehouse-slips/warehouse-slips.module';
       useClass:ValidationPipe
     },
     CloudinaryService,
+    OtpService,
   ],
 })
 export class AppModule {}

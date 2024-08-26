@@ -70,6 +70,20 @@ var AuthController = /** @class */ (function () {
             });
         });
     };
+    AuthController.prototype.forgotPassword = function (email) {
+        return __awaiter(this, void 0, void 0, function () {
+            return __generator(this, function (_a) {
+                return [2 /*return*/, this.authService.sendPasswordResetOTP(email)];
+            });
+        });
+    };
+    AuthController.prototype.resetPassword = function (body) {
+        return __awaiter(this, void 0, void 0, function () {
+            return __generator(this, function (_a) {
+                return [2 /*return*/, this.authService.resetPassword(body.email, body.otp, body.newPassword)];
+            });
+        });
+    };
     __decorate([
         common_1.Post('register'),
         __param(0, common_1.Body())
@@ -79,6 +93,14 @@ var AuthController = /** @class */ (function () {
         common_1.UseGuards(local_auth_guard_1.LocalAuthGuard),
         __param(0, common_1.Body()), __param(1, common_1.Request())
     ], AuthController.prototype, "login");
+    __decorate([
+        common_1.Post('forgot-password'),
+        __param(0, common_1.Body('email'))
+    ], AuthController.prototype, "forgotPassword");
+    __decorate([
+        common_1.Post('reset-password'),
+        __param(0, common_1.Body())
+    ], AuthController.prototype, "resetPassword");
     AuthController = __decorate([
         swagger_1.ApiTags("Auth"),
         common_1.Controller('auth')
