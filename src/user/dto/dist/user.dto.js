@@ -7,6 +7,7 @@ var __decorate = (this && this.__decorate) || function (decorators, target, key,
 };
 exports.__esModule = true;
 exports.UserDto = exports.UpdateUserDto = exports.CreateUserDto = void 0;
+var swagger_1 = require("@nestjs/swagger");
 var class_transformer_1 = require("class-transformer");
 var class_validator_1 = require("class-validator");
 // export class CreateUserDto{
@@ -26,26 +27,33 @@ var CreateUserDto = /** @class */ (function () {
     function CreateUserDto() {
     }
     __decorate([
-        class_validator_1.IsEmail({}, { message: 'Email is not correct format' })
+        class_validator_1.IsEmail({}, { message: 'Email is not correct format' }),
+        swagger_1.ApiProperty()
     ], CreateUserDto.prototype, "email");
     __decorate([
         class_validator_1.Matches(/^(?:\+84|0)[3|5|7|8|9]\d{8}$/, {
             message: 'phone number is not correct'
-        })
+        }),
+        swagger_1.ApiProperty()
     ], CreateUserDto.prototype, "phone");
     __decorate([
+        swagger_1.ApiProperty(),
         class_validator_1.IsNotEmpty({ message: 'Username can not empty' })
     ], CreateUserDto.prototype, "username");
     __decorate([
+        swagger_1.ApiProperty(),
         class_validator_1.MinLength(8)
     ], CreateUserDto.prototype, "password");
     __decorate([
+        swagger_1.ApiProperty(),
         class_validator_1.IsNotEmpty({ message: 'Role can not empty' })
     ], CreateUserDto.prototype, "roleId");
     __decorate([
+        swagger_1.ApiProperty(),
         class_validator_1.IsNotEmpty({ message: 'Fullname can not empty' })
     ], CreateUserDto.prototype, "fullName");
     __decorate([
+        swagger_1.ApiProperty(),
         class_validator_1.IsOptional()
     ], CreateUserDto.prototype, "avatar");
     return CreateUserDto;
@@ -56,22 +64,27 @@ var UpdateUserDto = /** @class */ (function () {
     }
     __decorate([
         class_validator_1.IsOptional(),
+        swagger_1.ApiProperty(),
         class_validator_1.IsEmail({}, { message: 'Email is not correct format' })
     ], UpdateUserDto.prototype, "email");
     __decorate([
+        swagger_1.ApiProperty(),
         class_validator_1.IsOptional(),
         class_validator_1.Matches(/^(?:\+84|0)[3|5|7|8|9]\d{8}$/, {
             message: 'phone number is not correct'
         })
     ], UpdateUserDto.prototype, "phone");
     __decorate([
+        swagger_1.ApiProperty(),
         class_validator_1.IsOptional(),
         class_validator_1.IsNotEmpty({ message: 'Username can not empty' })
     ], UpdateUserDto.prototype, "username");
     __decorate([
+        swagger_1.ApiProperty(),
         class_validator_1.IsOptional()
     ], UpdateUserDto.prototype, "fullName");
     __decorate([
+        swagger_1.ApiProperty(),
         class_validator_1.IsOptional()
     ], UpdateUserDto.prototype, "avatar");
     return UpdateUserDto;

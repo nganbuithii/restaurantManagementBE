@@ -5,7 +5,8 @@ import { UpdatePermissionDto } from './dto/update-permission.dto';
 import { CurrentUser, ResponseMessage } from 'decorators/customize';
 import { IUser } from 'interfaces/user.interface';
 import { Permission } from '@prisma/client';
-
+import { ApiTags } from '@nestjs/swagger';
+@ApiTags("Permissions")
 @Controller('permission')
 export class PermissionController {
   constructor(private readonly permissionService: PermissionService) {}

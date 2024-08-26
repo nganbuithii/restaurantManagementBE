@@ -9,15 +9,18 @@ exports.__esModule = true;
 exports.UpdateWarehouseSlipDto = exports.CreateWarehouseSlipDto = exports.WarehouseSlipType = void 0;
 var class_validator_1 = require("class-validator");
 var class_transformer_1 = require("class-transformer");
+var swagger_1 = require("@nestjs/swagger");
 var WarehouseSlipDetailDto = /** @class */ (function () {
     function WarehouseSlipDetailDto() {
     }
     __decorate([
         class_validator_1.IsInt(),
-        class_validator_1.IsNotEmpty()
+        class_validator_1.IsNotEmpty(),
+        swagger_1.ApiProperty()
     ], WarehouseSlipDetailDto.prototype, "ingredientId");
     __decorate([
-        class_validator_1.IsNotEmpty()
+        class_validator_1.IsNotEmpty(),
+        swagger_1.ApiProperty()
     ], WarehouseSlipDetailDto.prototype, "quantity");
     return WarehouseSlipDetailDto;
 }());
@@ -30,19 +33,23 @@ var CreateWarehouseSlipDto = /** @class */ (function () {
     function CreateWarehouseSlipDto() {
     }
     __decorate([
-        class_validator_1.IsNotEmpty({ message: "type can not empty" })
+        class_validator_1.IsNotEmpty({ message: "type can not empty" }),
+        swagger_1.ApiProperty()
     ], CreateWarehouseSlipDto.prototype, "type");
     __decorate([
         class_validator_1.IsInt(),
-        class_validator_1.IsNotEmpty({ message: "employee ID can not empty" })
+        class_validator_1.IsNotEmpty({ message: "employee ID can not empty" }),
+        swagger_1.ApiProperty()
     ], CreateWarehouseSlipDto.prototype, "employeeId");
     __decorate([
         class_validator_1.IsInt(),
+        swagger_1.ApiProperty(),
         class_validator_1.IsNotEmpty()
     ], CreateWarehouseSlipDto.prototype, "supplierId");
     __decorate([
         class_validator_1.IsArray(),
         class_validator_1.ValidateNested({ each: true }),
+        swagger_1.ApiProperty(),
         class_validator_1.ArrayMinSize(1),
         class_transformer_1.Type(function () { return WarehouseSlipDetailDto; })
     ], CreateWarehouseSlipDto.prototype, "details");
@@ -54,13 +61,15 @@ var UpdateWarehouseSlipDto = /** @class */ (function () {
     }
     __decorate([
         class_validator_1.IsOptional(),
-        class_validator_1.IsInt()
+        class_validator_1.IsInt(),
+        swagger_1.ApiProperty()
     ], UpdateWarehouseSlipDto.prototype, "supplierId");
     __decorate([
         class_validator_1.IsOptional(),
         class_validator_1.IsArray(),
         class_validator_1.ValidateNested({ each: true }),
         class_validator_1.ArrayMinSize(1),
+        swagger_1.ApiProperty(),
         class_transformer_1.Type(function () { return WarehouseSlipDetailDto; })
     ], UpdateWarehouseSlipDto.prototype, "details");
     return UpdateWarehouseSlipDto;

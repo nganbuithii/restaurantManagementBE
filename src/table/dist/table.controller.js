@@ -13,6 +13,7 @@ exports.TableController = void 0;
 var common_1 = require("@nestjs/common");
 var customize_1 = require("decorators/customize");
 var jwt_auth_guard_1 = require("src/auth/jwt-auth.guard");
+var swagger_1 = require("@nestjs/swagger");
 var TableController = /** @class */ (function () {
     function TableController(tableService) {
         this.tableService = tableService;
@@ -49,6 +50,7 @@ var TableController = /** @class */ (function () {
         __param(0, common_1.Param('id', common_1.ParseIntPipe)), __param(1, customize_1.CurrentUser())
     ], TableController.prototype, "deleteTable");
     TableController = __decorate([
+        swagger_1.ApiTags("Table"),
         common_1.Controller('table')
     ], TableController);
     return TableController;

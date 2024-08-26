@@ -5,7 +5,10 @@ import { JwtAuthGuard } from 'src/auth/jwt-auth.guard';
 import { Ingredient } from '@prisma/client';
 import { CurrentUser, ResponseMessage } from 'decorators/customize';
 import { IUser } from 'interfaces/user.interface';
+import { ApiTags } from '@nestjs/swagger';
 
+
+@ApiTags("Ingredient")
 @Controller('ingredient')
 export class IngredientController {
   constructor(private readonly ingredientService: IngredientService) { }

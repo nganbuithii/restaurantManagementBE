@@ -13,6 +13,7 @@ exports.ReversationsController = void 0;
 var common_1 = require("@nestjs/common");
 var jwt_auth_guard_1 = require("src/auth/jwt-auth.guard");
 var customize_1 = require("decorators/customize");
+var swagger_1 = require("@nestjs/swagger");
 var ReversationsController = /** @class */ (function () {
     function ReversationsController(reversationsService) {
         this.reversationsService = reversationsService;
@@ -57,6 +58,7 @@ var ReversationsController = /** @class */ (function () {
         __param(0, common_1.Param('id', common_1.ParseIntPipe)), __param(1, common_1.Body()), __param(2, customize_1.CurrentUser())
     ], ReversationsController.prototype, "update");
     ReversationsController = __decorate([
+        swagger_1.ApiTags("Reservation"),
         common_1.Controller('reversations')
     ], ReversationsController);
     return ReversationsController;

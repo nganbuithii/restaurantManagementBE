@@ -7,16 +7,19 @@ var __decorate = (this && this.__decorate) || function (decorators, target, key,
 };
 exports.__esModule = true;
 exports.UpdateMenuItemDto = exports.CreateMenuItemDto = void 0;
+var swagger_1 = require("@nestjs/swagger");
 var class_validator_1 = require("class-validator");
 var CreateMenuItemDto = /** @class */ (function () {
     function CreateMenuItemDto() {
     }
     __decorate([
         class_validator_1.IsString({ message: 'Name must be a string' }),
-        class_validator_1.IsNotEmpty({ message: "name menu item can not empty" })
+        class_validator_1.IsNotEmpty({ message: "name menu item can not empty" }),
+        swagger_1.ApiProperty()
     ], CreateMenuItemDto.prototype, "name");
     __decorate([
-        class_validator_1.IsNotEmpty({ message: "price menu item can not empty" })
+        class_validator_1.IsNotEmpty({ message: "price menu item can not empty" }),
+        swagger_1.ApiProperty()
     ], CreateMenuItemDto.prototype, "price");
     return CreateMenuItemDto;
 }());
@@ -27,14 +30,20 @@ var UpdateMenuItemDto = /** @class */ (function () {
     __decorate([
         class_validator_1.IsOptional(),
         class_validator_1.IsString({ message: 'Name must be a string' }),
-        class_validator_1.IsNotEmpty({ message: "name menu item can not empty" })
+        class_validator_1.IsNotEmpty({ message: "name menu item can not empty" }),
+        swagger_1.ApiProperty()
     ], UpdateMenuItemDto.prototype, "name");
     __decorate([
         class_validator_1.IsOptional(),
-        class_validator_1.IsNotEmpty({ message: "price menu item can not empty" })
+        class_validator_1.IsNotEmpty({ message: "price menu item can not empty" }),
+        swagger_1.ApiProperty()
     ], UpdateMenuItemDto.prototype, "price");
     __decorate([
         class_validator_1.IsOptional()
+        // @IsString({ each: true })
+        // ingredientIds?: number[]; // ID của các nguyên liệu liên quan
+        ,
+        swagger_1.ApiProperty()
     ], UpdateMenuItemDto.prototype, "ingredientQuantities");
     return UpdateMenuItemDto;
 }());

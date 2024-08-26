@@ -6,7 +6,9 @@ import { IUser } from 'interfaces/user.interface';
 import { Order } from '@prisma/client';
 import { CreateOrderDto, OrderFilterType, OrderPaginationResponseType, UpdateOrderDto } from './dto/orders.dto';
 import { VouchersService } from 'src/vouchers/vouchers.service';
+import { ApiTags } from '@nestjs/swagger';
 
+@ApiTags("Orders")
 @Controller('orders')
 export class OrdersController {
   constructor(private readonly ordersService: OrdersService,

@@ -5,7 +5,10 @@ import { CurrentUser, ResponseMessage } from 'decorators/customize';
 import { IUser } from 'interfaces/user.interface';
 import { CreateFeedbackDto, CreateFeedbackReplyDto, FeedbackFilterType, FeedbackPaginationResponseType, UpdateFeedbackDto } from './dto/feecback.dto';
 import { Feedback } from '@prisma/client';
+import { ApiTags } from '@nestjs/swagger';
 
+
+@ApiTags("Feedbacks")
 @Controller('feedbacks')
 export class FeeckbacksController {
   constructor(private readonly s: FeeckbacksService) { }

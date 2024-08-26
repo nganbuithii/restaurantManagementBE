@@ -48,6 +48,7 @@ exports.__esModule = true;
 exports.PermissionController = void 0;
 var common_1 = require("@nestjs/common");
 var customize_1 = require("decorators/customize");
+var swagger_1 = require("@nestjs/swagger");
 var PermissionController = /** @class */ (function () {
     function PermissionController(permissionService) {
         this.permissionService = permissionService;
@@ -106,6 +107,7 @@ var PermissionController = /** @class */ (function () {
         __param(0, common_1.Param('id', common_1.ParseIntPipe))
     ], PermissionController.prototype, "remove");
     PermissionController = __decorate([
+        swagger_1.ApiTags("Permissions"),
         common_1.Controller('permission')
     ], PermissionController);
     return PermissionController;

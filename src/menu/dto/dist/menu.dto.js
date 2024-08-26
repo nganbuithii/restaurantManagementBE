@@ -7,20 +7,24 @@ var __decorate = (this && this.__decorate) || function (decorators, target, key,
 };
 exports.__esModule = true;
 exports.UpdateMenuDto = exports.CreateMenuDto = void 0;
+var swagger_1 = require("@nestjs/swagger");
 var class_validator_1 = require("class-validator");
 var CreateMenuDto = /** @class */ (function () {
     function CreateMenuDto() {
     }
     __decorate([
         class_validator_1.IsString({ message: 'Name must be a string' }),
-        class_validator_1.IsNotEmpty({ message: "name menu  can not empty" })
+        class_validator_1.IsNotEmpty({ message: "name menu  can not empty" }),
+        swagger_1.ApiProperty()
     ], CreateMenuDto.prototype, "name");
     __decorate([
         class_validator_1.IsOptional(),
-        class_validator_1.IsBoolean()
+        class_validator_1.IsBoolean(),
+        swagger_1.ApiProperty()
     ], CreateMenuDto.prototype, "isActive");
     __decorate([
         class_validator_1.IsOptional(),
+        swagger_1.ApiProperty(),
         class_validator_1.IsArray({ message: 'Menu item IDs must be an array of numbers' }),
         class_validator_1.IsNumber({}, { each: true, message: 'Each menu item ID must be a number' })
     ], CreateMenuDto.prototype, "menuItemIds");
@@ -33,12 +37,14 @@ var UpdateMenuDto = /** @class */ (function () {
     __decorate([
         class_validator_1.IsOptional(),
         class_validator_1.IsString({ message: 'Name must be a string' }),
-        class_validator_1.IsNotEmpty({ message: "name menu item can not empty" })
+        class_validator_1.IsNotEmpty({ message: "name menu item can not empty" }),
+        swagger_1.ApiProperty()
     ], UpdateMenuDto.prototype, "name");
     __decorate([
         class_validator_1.IsOptional(),
         class_validator_1.IsArray(),
-        class_validator_1.ArrayNotEmpty({ message: 'Menu items array cannot be empty' })
+        class_validator_1.ArrayNotEmpty({ message: 'Menu items array cannot be empty' }),
+        swagger_1.ApiProperty()
     ], UpdateMenuDto.prototype, "menuItems");
     return UpdateMenuDto;
 }());

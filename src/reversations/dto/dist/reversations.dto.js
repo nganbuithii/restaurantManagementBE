@@ -7,6 +7,7 @@ var __decorate = (this && this.__decorate) || function (decorators, target, key,
 };
 exports.__esModule = true;
 exports.UpdateReservationDto = exports.CreateReservationDto = void 0;
+var swagger_1 = require("@nestjs/swagger");
 var class_transformer_1 = require("class-transformer");
 var class_validator_1 = require("class-validator");
 var CreateReservationDto = /** @class */ (function () {
@@ -15,23 +16,28 @@ var CreateReservationDto = /** @class */ (function () {
     __decorate([
         class_validator_1.IsNotEmpty({ message: 'Start time cannot be empty' }),
         class_validator_1.IsDate({ message: 'startTime must be a Date instance' }),
-        class_transformer_1.Type(function () { return Date; })
+        class_transformer_1.Type(function () { return Date; }),
+        swagger_1.ApiProperty()
     ], CreateReservationDto.prototype, "startTime");
     __decorate([
         class_validator_1.IsNotEmpty({ message: 'End time cannot be empty' }),
         class_validator_1.IsDate({ message: 'endTime must be a Date instance' }),
-        class_transformer_1.Type(function () { return Date; })
+        class_transformer_1.Type(function () { return Date; }),
+        swagger_1.ApiProperty()
     ], CreateReservationDto.prototype, "endTime");
     __decorate([
         class_validator_1.IsString(),
-        class_validator_1.IsNotEmpty({ message: 'Status cannot be empty' })
+        class_validator_1.IsNotEmpty({ message: 'Status cannot be empty' }),
+        swagger_1.ApiProperty()
     ], CreateReservationDto.prototype, "status");
     __decorate([
         class_validator_1.IsInt(),
+        swagger_1.ApiProperty(),
         class_validator_1.IsNotEmpty({ message: 'Table ID cannot be empty' })
     ], CreateReservationDto.prototype, "tableId");
     __decorate([
-        class_validator_1.IsNotEmpty({ message: 'Customer ID cannot be empty' })
+        class_validator_1.IsNotEmpty({ message: 'Customer ID cannot be empty' }),
+        swagger_1.ApiProperty()
     ], CreateReservationDto.prototype, "customerId");
     return CreateReservationDto;
 }());
@@ -41,12 +47,14 @@ var UpdateReservationDto = /** @class */ (function () {
     }
     __decorate([
         class_validator_1.IsOptional(),
+        swagger_1.ApiProperty(),
         class_validator_1.IsNotEmpty({ message: 'Start time cannot be empty' }),
         class_validator_1.IsDate({ message: 'startTime must be a Date instance' }),
         class_transformer_1.Type(function () { return Date; })
     ], UpdateReservationDto.prototype, "startTime");
     __decorate([
         class_validator_1.IsOptional(),
+        swagger_1.ApiProperty(),
         class_validator_1.IsNotEmpty({ message: 'End time cannot be empty' }),
         class_validator_1.IsDate({ message: 'endTime must be a Date instance' }),
         class_transformer_1.Type(function () { return Date; })
@@ -54,6 +62,7 @@ var UpdateReservationDto = /** @class */ (function () {
     __decorate([
         class_validator_1.IsOptional(),
         class_validator_1.IsString(),
+        swagger_1.ApiProperty(),
         class_validator_1.IsNotEmpty({ message: 'Status cannot be empty' })
     ], UpdateReservationDto.prototype, "status");
     return UpdateReservationDto;

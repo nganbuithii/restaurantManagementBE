@@ -5,7 +5,9 @@ import { JwtAuthGuard } from 'src/auth/jwt-auth.guard';
 import { IUser } from 'interfaces/user.interface';
 import { CreateSupplierDto, SupplierFilterType, SupplierPaginationResponseType, UpdateSupplierDto } from './dto/supplier.dto';
 import { Supplier } from '@prisma/client';
+import { ApiTags } from '@nestjs/swagger';
 
+@ApiTags("Suppliers")
 @Controller('suppliers')
 export class SuppliersController {
   constructor(private readonly suppliersService: SuppliersService) {}

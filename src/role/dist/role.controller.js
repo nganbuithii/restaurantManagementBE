@@ -11,6 +11,7 @@ var __param = (this && this.__param) || function (paramIndex, decorator) {
 exports.__esModule = true;
 exports.RoleController = void 0;
 var common_1 = require("@nestjs/common");
+var swagger_1 = require("@nestjs/swagger");
 var RoleController = /** @class */ (function () {
     function RoleController(roleService) {
         this.roleService = roleService;
@@ -43,6 +44,7 @@ var RoleController = /** @class */ (function () {
         __param(0, common_1.Param('id')), __param(1, common_1.Body('name'))
     ], RoleController.prototype, "update");
     RoleController = __decorate([
+        swagger_1.ApiTags("Roles"),
         common_1.Controller('role')
     ], RoleController);
     return RoleController;

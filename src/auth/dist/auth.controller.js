@@ -1,4 +1,13 @@
 "use strict";
+var __decorate = (this && this.__decorate) || function (decorators, target, key, desc) {
+    var c = arguments.length, r = c < 3 ? target : desc === null ? desc = Object.getOwnPropertyDescriptor(target, key) : desc, d;
+    if (typeof Reflect === "object" && typeof Reflect.decorate === "function") r = Reflect.decorate(decorators, target, key, desc);
+    else for (var i = decorators.length - 1; i >= 0; i--) if (d = decorators[i]) r = (c < 3 ? d(r) : c > 3 ? d(target, key, r) : d(target, key)) || r;
+    return c > 3 && r && Object.defineProperty(target, key, r), r;
+};
+var __param = (this && this.__param) || function (paramIndex, decorator) {
+    return function (target, key) { decorator(target, key, paramIndex); }
+};
 var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, generator) {
     function adopt(value) { return value instanceof P ? value : new P(function (resolve) { resolve(value); }); }
     return new (P || (P = Promise))(function (resolve, reject) {
@@ -36,48 +45,44 @@ var __generator = (this && this.__generator) || function (thisArg, body) {
     }
 };
 exports.__esModule = true;
-var core_1 = require("@nestjs/core");
-var app_module_1 = require("./app.module");
-var response_interceptor_1 = require("interceptors/response.interceptor");
-var core_2 = require("@nestjs/core");
+exports.AuthController = void 0;
+var common_1 = require("@nestjs/common");
+var local_auth_guard_1 = require("./local-auth.guard");
 var swagger_1 = require("@nestjs/swagger");
-function bootstrap() {
-    return __awaiter(this, void 0, void 0, function () {
-        var app, config, document;
-        return __generator(this, function (_a) {
-            switch (_a.label) {
-                case 0: return [4 /*yield*/, core_1.NestFactory.create(app_module_1.AppModule)];
-                case 1:
-                    app = _a.sent();
-                    config = new swagger_1.DocumentBuilder()
-                        .setTitle("List API")
-                        .setDescription("List API for management restaurant by BTNgan")
-                        .setVersion("1.0")
-                        .addTag("Auth")
-                        .addTag("Users")
-                        .addTag("MenuItem")
-                        .addTag("Menu")
-                        .addTag("Reservation")
-                        .addTag("WarehouseSlip")
-                        .addTag("Suppliers")
-                        .addTag("Ingredient")
-                        .addTag("Vouchers")
-                        .addTag("Feedbacks")
-                        .addTag("Orders")
-                        .addTag("Table")
-                        .addTag("Roles")
-                        .addTag("Permissions")
-                        .addBearerAuth()
-                        .build();
-                    document = swagger_1.SwaggerModule.createDocument(app, config);
-                    swagger_1.SwaggerModule.setup('api', app, document);
-                    app.useGlobalInterceptors(new response_interceptor_1.ResponseInterceptor(new core_2.Reflector()));
-                    return [4 /*yield*/, app.listen(3005)];
-                case 2:
-                    _a.sent();
-                    return [2 /*return*/];
-            }
+var AuthController = /** @class */ (function () {
+    function AuthController(authService, userService) {
+        this.authService = authService;
+        this.userService = userService;
+    }
+    // Tạo controller đăng kí
+    AuthController.prototype.register = function (body) {
+        return __awaiter(this, void 0, Promise, function () {
+            return __generator(this, function (_a) {
+                return [2 /*return*/, this.authService.register(body)];
+            });
         });
-    });
-}
-bootstrap();
+    };
+    // api login
+    AuthController.prototype.login = function (body, req) {
+        return __awaiter(this, void 0, Promise, function () {
+            return __generator(this, function (_a) {
+                return [2 /*return*/, this.authService.login(body)];
+            });
+        });
+    };
+    __decorate([
+        common_1.Post('register'),
+        __param(0, common_1.Body())
+    ], AuthController.prototype, "register");
+    __decorate([
+        common_1.Post('login'),
+        common_1.UseGuards(local_auth_guard_1.LocalAuthGuard),
+        __param(0, common_1.Body()), __param(1, common_1.Request())
+    ], AuthController.prototype, "login");
+    AuthController = __decorate([
+        swagger_1.ApiTags("Auth"),
+        common_1.Controller('auth')
+    ], AuthController);
+    return AuthController;
+}());
+exports.AuthController = AuthController;

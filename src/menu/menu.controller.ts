@@ -5,7 +5,9 @@ import { CurrentUser, ResponseMessage } from 'decorators/customize';
 import { CreateMenuDto, MenuFilterType, MenuPaginationResponseType, UpdateMenuDto } from './dto/menu.dto';
 import { IUser } from 'interfaces/user.interface';
 import { Menu, MenuItem } from '@prisma/client';
+import { ApiTags } from '@nestjs/swagger';
 
+@ApiTags("Menu")
 @Controller('menu')
 export class MenuController {
   constructor(private readonly menuService: MenuService) { }

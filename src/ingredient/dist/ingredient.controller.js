@@ -49,6 +49,7 @@ exports.IngredientController = void 0;
 var common_1 = require("@nestjs/common");
 var jwt_auth_guard_1 = require("src/auth/jwt-auth.guard");
 var customize_1 = require("decorators/customize");
+var swagger_1 = require("@nestjs/swagger");
 var IngredientController = /** @class */ (function () {
     function IngredientController(ingredientService) {
         this.ingredientService = ingredientService;
@@ -105,6 +106,7 @@ var IngredientController = /** @class */ (function () {
         __param(0, common_1.Param('id', common_1.ParseIntPipe)), __param(1, customize_1.CurrentUser())
     ], IngredientController.prototype, "delete");
     IngredientController = __decorate([
+        swagger_1.ApiTags("Ingredient"),
         common_1.Controller('ingredient')
     ], IngredientController);
     return IngredientController;

@@ -51,6 +51,7 @@ var jwt_auth_guard_1 = require("src/auth/jwt-auth.guard");
 var platform_express_1 = require("@nestjs/platform-express");
 var config_1 = require("helper/config");
 var path_1 = require("path");
+var swagger_1 = require("@nestjs/swagger");
 var UserController = /** @class */ (function () {
     function UserController(userService) {
         this.userService = userService;
@@ -134,6 +135,7 @@ var UserController = /** @class */ (function () {
         __param(0, common_1.Req()), __param(1, common_1.UploadedFile())
     ], UserController.prototype, "uploadAvatar");
     UserController = __decorate([
+        swagger_1.ApiTags("Users"),
         common_1.Controller('users')
     ], UserController);
     return UserController;

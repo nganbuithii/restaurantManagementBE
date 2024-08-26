@@ -6,7 +6,9 @@ import { CreateMenuItemDto, MenuItemFilterType, MenuItemPaginationResponseType, 
 import { CurrentUser, ResponseMessage } from 'decorators/customize';
 import { IUser } from 'interfaces/user.interface';
 import { MenuItem } from '@prisma/client';
+import { ApiTags } from '@nestjs/swagger';
 
+@ApiTags("MenuItem")
 @Controller('menu-item')
 export class MenuItemController {
   constructor(private readonly menuItemService: MenuItemService) {}

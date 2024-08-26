@@ -5,7 +5,10 @@ import { CurrentUser, ResponseMessage } from 'decorators/customize';
 import { CreateWarehouseSlipDto, UpdateWarehouseSlipDto, WarehouserSlipFilterType, WarehouseSlipPaginationResponseType } from './dto/warehouse-slip.dto';
 import { IUser } from 'interfaces/user.interface';
 import { WarehouseSlip } from '@prisma/client';
+import { ApiTags } from '@nestjs/swagger';
 
+
+@ApiTags("WarehouseSlip")
 @Controller('warehouse-slips')
 export class WarehouseSlipsController {
   constructor(private readonly warehouseSlipsService: WarehouseSlipsService) {}

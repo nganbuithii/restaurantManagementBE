@@ -5,7 +5,10 @@ import { JwtAuthGuard } from 'src/auth/jwt-auth.guard';
 import { CreateVoucherDto, UpdateVoucherDto, VoucherFilterType, VoucherPaginationResponseType } from './dto/voucher.dto';
 import { CurrentUser, ResponseMessage } from 'decorators/customize';
 import { IUser } from 'interfaces/user.interface';
+import { ApiTags } from '@nestjs/swagger';
 
+
+@ApiTags("Vouchers")
 @Controller('vouchers')
 export class VouchersController {
   constructor(private readonly vouchersService: VouchersService) { }

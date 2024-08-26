@@ -2,13 +2,16 @@ import { WarehouseSlip } from '@prisma/client';
 
 import { IsNotEmpty, IsString, IsInt, IsArray, ValidateNested, ArrayMinSize, IsOptional } from 'class-validator';
 import { Type } from 'class-transformer';
+import { ApiProperty } from '@nestjs/swagger';
 
 class WarehouseSlipDetailDto {
     @IsInt()
     @IsNotEmpty()
+    @ApiProperty()
     ingredientId: number;
 
     @IsNotEmpty()
+    @ApiProperty()
     quantity: number;
 }
 export enum WarehouseSlipType {
@@ -18,18 +21,22 @@ export enum WarehouseSlipType {
 
 export class CreateWarehouseSlipDto {
     @IsNotEmpty({message:"type can not empty"})
+    @ApiProperty()
     type: string;
 
     @IsInt()
     @IsNotEmpty({message:"employee ID can not empty"})
+    @ApiProperty()
     employeeId: number;
 
     @IsInt()
+    @ApiProperty()
     @IsNotEmpty()
     supplierId: number;
 
     @IsArray()
     @ValidateNested({ each: true })
+    @ApiProperty()
     @ArrayMinSize(1)
     @Type(() => WarehouseSlipDetailDto)
     details: WarehouseSlipDetailDto[];
@@ -57,12 +64,14 @@ export class UpdateWarehouseSlipDto {
 
     @IsOptional()
     @IsInt()
+    @ApiProperty()
     supplierId?: number;
 
     @IsOptional()
     @IsArray()
     @ValidateNested({ each: true })
     @ArrayMinSize(1)
+    @ApiProperty()
     @Type(() => WarehouseSlipDetailDto)
     details?: WarehouseSlipDetailDto[];
 }

@@ -7,11 +7,13 @@ var __decorate = (this && this.__decorate) || function (decorators, target, key,
 };
 exports.__esModule = true;
 exports.CreateFeedbackReplyDto = exports.UpdateFeedbackDto = exports.CreateFeedbackDto = void 0;
+var swagger_1 = require("@nestjs/swagger");
 var class_validator_1 = require("class-validator");
 var CreateFeedbackDto = /** @class */ (function () {
     function CreateFeedbackDto() {
     }
     __decorate([
+        swagger_1.ApiProperty(),
         class_validator_1.IsNotEmpty({ message: " content  can not empty" }),
         class_validator_1.IsString({ message: "content must be a string" })
     ], CreateFeedbackDto.prototype, "content");
@@ -19,11 +21,13 @@ var CreateFeedbackDto = /** @class */ (function () {
         class_validator_1.IsOptional(),
         class_validator_1.IsInt(),
         class_validator_1.Min(1),
-        class_validator_1.Max(5)
+        class_validator_1.Max(5),
+        swagger_1.ApiProperty()
     ], CreateFeedbackDto.prototype, "rating");
     __decorate([
         class_validator_1.IsOptional(),
-        class_validator_1.IsBoolean()
+        class_validator_1.IsBoolean(),
+        swagger_1.ApiProperty()
     ], CreateFeedbackDto.prototype, "isActive");
     return CreateFeedbackDto;
 }());
@@ -34,12 +38,14 @@ var UpdateFeedbackDto = /** @class */ (function () {
     __decorate([
         class_validator_1.IsOptional(),
         class_validator_1.IsString({ message: 'Name must be a string' }),
-        class_validator_1.IsNotEmpty({ message: "name menu item can not empty" })
+        class_validator_1.IsNotEmpty({ message: "name menu item can not empty" }),
+        swagger_1.ApiProperty()
     ], UpdateFeedbackDto.prototype, "content");
     __decorate([
         class_validator_1.IsOptional(),
         class_validator_1.Min(1),
-        class_validator_1.Max(5)
+        class_validator_1.Max(5),
+        swagger_1.ApiProperty()
     ], UpdateFeedbackDto.prototype, "rating");
     return UpdateFeedbackDto;
 }());
@@ -49,7 +55,8 @@ var CreateFeedbackReplyDto = /** @class */ (function () {
     }
     __decorate([
         class_validator_1.IsNotEmpty(),
-        class_validator_1.IsString()
+        class_validator_1.IsString(),
+        swagger_1.ApiProperty()
     ], CreateFeedbackReplyDto.prototype, "content");
     return CreateFeedbackReplyDto;
 }());

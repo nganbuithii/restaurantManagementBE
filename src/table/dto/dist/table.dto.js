@@ -8,15 +8,18 @@ var __decorate = (this && this.__decorate) || function (decorators, target, key,
 exports.__esModule = true;
 exports.CreateTableDto = void 0;
 var class_validator_1 = require("class-validator");
+var swagger_1 = require("@nestjs/swagger");
 var CreateTableDto = /** @class */ (function () {
     function CreateTableDto() {
     }
     __decorate([
         class_validator_1.IsInt(),
+        swagger_1.ApiProperty(),
         class_validator_1.IsNotEmpty({ message: "number can not empty" })
     ], CreateTableDto.prototype, "number");
     __decorate([
         class_validator_1.IsInt(),
+        swagger_1.ApiProperty(),
         class_validator_1.IsNotEmpty({ message: "quantity seats can not empty" })
     ], CreateTableDto.prototype, "seats");
     return CreateTableDto;

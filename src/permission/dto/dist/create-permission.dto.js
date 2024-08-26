@@ -7,15 +7,18 @@ var __decorate = (this && this.__decorate) || function (decorators, target, key,
 };
 exports.__esModule = true;
 exports.CreatePermissionDto = void 0;
+var swagger_1 = require("@nestjs/swagger");
 var class_validator_1 = require("class-validator");
 var CreatePermissionDto = /** @class */ (function () {
     function CreatePermissionDto() {
     }
     __decorate([
+        swagger_1.ApiProperty(),
         class_validator_1.IsNotEmpty({ message: "action can not empty " }),
         class_validator_1.IsString()
     ], CreatePermissionDto.prototype, "action");
     __decorate([
+        swagger_1.ApiProperty(),
         class_validator_1.IsNotEmpty({ message: "description can not empty" }),
         class_validator_1.IsString()
     ], CreatePermissionDto.prototype, "description");

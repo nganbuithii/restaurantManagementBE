@@ -1,10 +1,14 @@
+import { ApiProperty } from "@nestjs/swagger";
 import { Permission } from "@prisma/client"
 import { IsNotEmpty, IsString } from "class-validator"
 
 export class CreatePermissionDto {
+    @ApiProperty()
     @IsNotEmpty({ message: "action can not empty " })
     @IsString()
     action: string
+
+    @ApiProperty()
     @IsNotEmpty({ message: "description can not empty" })
     @IsString()
     description: string

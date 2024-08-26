@@ -4,7 +4,9 @@ import { CurrentUser, ResponseMessage } from 'decorators/customize';
 import { CreateTableDto, TableFilterType, TablePaginationResponseType } from './dto/table.dto';
 import { JwtAuthGuard } from 'src/auth/jwt-auth.guard';
 import { IUser } from 'interfaces/user.interface';
+import { ApiTags } from '@nestjs/swagger';
 
+@ApiTags("Table")
 @Controller('table')
 export class TableController {
   constructor(private readonly tableService: TableService) {}

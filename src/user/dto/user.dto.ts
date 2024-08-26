@@ -1,3 +1,4 @@
+import { ApiProperty } from "@nestjs/swagger";
 import { User } from "@prisma/client";
 import { Exclude, Expose } from "class-transformer";
 import { IsEmail, IsNotEmpty, IsOptional, Matches, MinLength } from "class-validator"
@@ -19,19 +20,31 @@ import { IsEmail, IsNotEmpty, IsOptional, Matches, MinLength } from "class-valid
 // src/user/dto/user.dto.ts
 export class CreateUserDto {
   @IsEmail({}, { message: 'Email is not correct format' })
+  @ApiProperty()
   email: string;
+
   @Matches(/^(?:\+84|0)[3|5|7|8|9]\d{8}$/, {
     message: 'phone number is not correct',
   })
+  @ApiProperty()
   phone?: string;
+
+  @ApiProperty()
   @IsNotEmpty({ message: 'Username can not empty' })
   username: string;
+
+  @ApiProperty()
   @MinLength(8)
   password: string;
+
+  @ApiProperty()
   @IsNotEmpty({ message: 'Role can not empty' })
   roleId: number;
+
+  @ApiProperty()
   @IsNotEmpty({ message: 'Fullname can not empty' })
   fullName:string;
+  @ApiProperty()
   @IsOptional()
   avatar?: string; 
 }
@@ -54,21 +67,27 @@ export interface UserpaginationResponseType{
 
 export class UpdateUserDto {
   @IsOptional()
+  @ApiProperty()
   @IsEmail({}, { message: 'Email is not correct format' })
   email: string;
+
+  @ApiProperty()
   @IsOptional()
   @Matches(/^(?:\+84|0)[3|5|7|8|9]\d{8}$/, {
     message: 'phone number is not correct',
   })
   phone?: string;
+
+  @ApiProperty()
   @IsOptional()
   @IsNotEmpty({ message: 'Username can not empty' })
   username: string;
 
-  
+  @ApiProperty()
   @IsOptional()
   fullName:string;
 
+  @ApiProperty()
   @IsOptional()
   avatar:string;
 }

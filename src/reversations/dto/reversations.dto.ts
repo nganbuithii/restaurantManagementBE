@@ -1,3 +1,4 @@
+import { ApiProperty } from '@nestjs/swagger';
 import { Reservation } from '@prisma/client';
 import { Type } from 'class-transformer';
 import { IsDate, IsInt, IsNotEmpty, IsOptional, IsString } from 'class-validator';
@@ -6,22 +7,27 @@ export class CreateReservationDto {
     @IsNotEmpty({ message: 'Start time cannot be empty' })
     @IsDate({ message: 'startTime must be a Date instance' })
     @Type(() => Date)
+    @ApiProperty()
     startTime: Date;
   
     @IsNotEmpty({ message: 'End time cannot be empty' })
     @IsDate({ message: 'endTime must be a Date instance' })
     @Type(() => Date)
+    @ApiProperty()
     endTime: Date;
 
     @IsString()
     @IsNotEmpty({ message: 'Status cannot be empty' })
+    @ApiProperty()
     status: string;
 
     @IsInt()
+    @ApiProperty()
     @IsNotEmpty({ message: 'Table ID cannot be empty' })
     tableId: number;
 
     @IsNotEmpty({ message: 'Customer ID cannot be empty' })
+    @ApiProperty()
     customerId: number;
 }
 
@@ -47,12 +53,14 @@ export interface ReservationPaginationResponseType {
 
 export class UpdateReservationDto {
     @IsOptional()
+    @ApiProperty()
     @IsNotEmpty({ message: 'Start time cannot be empty' })
     @IsDate({ message: 'startTime must be a Date instance' })
     @Type(() => Date)
     startTime: Date;
   
     @IsOptional()
+    @ApiProperty()
     @IsNotEmpty({ message: 'End time cannot be empty' })
     @IsDate({ message: 'endTime must be a Date instance' })
     @Type(() => Date)
@@ -60,6 +68,7 @@ export class UpdateReservationDto {
 
     @IsOptional()
     @IsString()
+    @ApiProperty()
     @IsNotEmpty({ message: 'Status cannot be empty' })
     status: string;
 

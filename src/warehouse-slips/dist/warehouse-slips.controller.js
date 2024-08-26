@@ -13,6 +13,7 @@ exports.WarehouseSlipsController = void 0;
 var common_1 = require("@nestjs/common");
 var jwt_auth_guard_1 = require("src/auth/jwt-auth.guard");
 var customize_1 = require("decorators/customize");
+var swagger_1 = require("@nestjs/swagger");
 var WarehouseSlipsController = /** @class */ (function () {
     function WarehouseSlipsController(warehouseSlipsService) {
         this.warehouseSlipsService = warehouseSlipsService;
@@ -66,6 +67,7 @@ var WarehouseSlipsController = /** @class */ (function () {
         __param(0, common_1.Param('id', common_1.ParseIntPipe)), __param(1, common_1.Body()), __param(2, customize_1.CurrentUser())
     ], WarehouseSlipsController.prototype, "update");
     WarehouseSlipsController = __decorate([
+        swagger_1.ApiTags("WarehouseSlip"),
         common_1.Controller('warehouse-slips')
     ], WarehouseSlipsController);
     return WarehouseSlipsController;

@@ -14,6 +14,7 @@ var common_1 = require("@nestjs/common");
 var platform_express_1 = require("@nestjs/platform-express");
 var jwt_auth_guard_1 = require("src/auth/jwt-auth.guard");
 var customize_1 = require("decorators/customize");
+var swagger_1 = require("@nestjs/swagger");
 var MenuItemController = /** @class */ (function () {
     function MenuItemController(menuItemService) {
         this.menuItemService = menuItemService;
@@ -69,6 +70,7 @@ var MenuItemController = /** @class */ (function () {
         __param(0, common_1.Param('id', common_1.ParseIntPipe)), __param(1, customize_1.CurrentUser())
     ], MenuItemController.prototype, "deleteMenuItem");
     MenuItemController = __decorate([
+        swagger_1.ApiTags("MenuItem"),
         common_1.Controller('menu-item')
     ], MenuItemController);
     return MenuItemController;

@@ -7,6 +7,7 @@ var __decorate = (this && this.__decorate) || function (decorators, target, key,
 };
 exports.__esModule = true;
 exports.UpdateOrderDto = exports.CreateOrderDto = void 0;
+var swagger_1 = require("@nestjs/swagger");
 var class_transformer_1 = require("class-transformer");
 var class_validator_1 = require("class-validator");
 var OrderStatus;
@@ -21,11 +22,13 @@ var OrderDetailDto = /** @class */ (function () {
     }
     __decorate([
         class_validator_1.IsNumber(),
-        class_validator_1.IsNotEmpty()
+        class_validator_1.IsNotEmpty(),
+        swagger_1.ApiProperty()
     ], OrderDetailDto.prototype, "menuItemId");
     __decorate([
         class_validator_1.IsNumber(),
-        class_validator_1.IsNotEmpty()
+        class_validator_1.IsNotEmpty(),
+        swagger_1.ApiProperty()
     ], OrderDetailDto.prototype, "quantity");
     return OrderDetailDto;
 }());
@@ -34,13 +37,16 @@ var CreateOrderDto = /** @class */ (function () {
     }
     __decorate([
         class_validator_1.IsEnum(OrderStatus),
-        class_validator_1.IsNotEmpty()
+        class_validator_1.IsNotEmpty(),
+        swagger_1.ApiProperty()
     ], CreateOrderDto.prototype, "status");
     __decorate([
-        class_validator_1.IsNumber()
+        class_validator_1.IsNumber(),
+        swagger_1.ApiProperty()
     ], CreateOrderDto.prototype, "discountPrice");
     __decorate([
         class_validator_1.IsArray(),
+        swagger_1.ApiProperty(),
         class_validator_1.ValidateNested({ each: true }),
         class_transformer_1.Type(function () { return OrderDetailDto; })
     ], CreateOrderDto.prototype, "details");
@@ -52,15 +58,18 @@ var UpdateOrderDto = /** @class */ (function () {
     }
     __decorate([
         class_validator_1.IsOptional(),
-        class_validator_1.IsString()
+        class_validator_1.IsString(),
+        swagger_1.ApiProperty()
     ], UpdateOrderDto.prototype, "status");
     __decorate([
         class_validator_1.IsOptional(),
-        class_validator_1.IsNumber()
+        class_validator_1.IsNumber(),
+        swagger_1.ApiProperty()
     ], UpdateOrderDto.prototype, "totalPrice");
     __decorate([
         class_validator_1.IsOptional(),
-        class_validator_1.IsNumber()
+        class_validator_1.IsNumber(),
+        swagger_1.ApiProperty()
     ], UpdateOrderDto.prototype, "discountPrice");
     return UpdateOrderDto;
 }());

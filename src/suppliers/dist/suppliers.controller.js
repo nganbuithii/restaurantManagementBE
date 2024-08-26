@@ -13,6 +13,7 @@ exports.SuppliersController = void 0;
 var common_1 = require("@nestjs/common");
 var customize_1 = require("decorators/customize");
 var jwt_auth_guard_1 = require("src/auth/jwt-auth.guard");
+var swagger_1 = require("@nestjs/swagger");
 var SuppliersController = /** @class */ (function () {
     function SuppliersController(suppliersService) {
         this.suppliersService = suppliersService;
@@ -65,6 +66,7 @@ var SuppliersController = /** @class */ (function () {
         __param(0, common_1.Param('id', common_1.ParseIntPipe)), __param(1, customize_1.CurrentUser())
     ], SuppliersController.prototype, "delete");
     SuppliersController = __decorate([
+        swagger_1.ApiTags("Suppliers"),
         common_1.Controller('suppliers')
     ], SuppliersController);
     return SuppliersController;

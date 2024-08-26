@@ -7,25 +7,30 @@ var __decorate = (this && this.__decorate) || function (decorators, target, key,
 };
 exports.__esModule = true;
 exports.UpdateSupplierDto = exports.CreateSupplierDto = void 0;
+var swagger_1 = require("@nestjs/swagger");
 var class_validator_1 = require("class-validator");
 var CreateSupplierDto = /** @class */ (function () {
     function CreateSupplierDto() {
     }
     __decorate([
         class_validator_1.IsNotEmpty({ message: "Name can not empty" }),
-        class_validator_1.IsString()
+        class_validator_1.IsString(),
+        swagger_1.ApiProperty()
     ], CreateSupplierDto.prototype, "name");
     __decorate([
         class_validator_1.IsNotEmpty({ message: "Address can not empty" }),
-        class_validator_1.IsString()
+        class_validator_1.IsString(),
+        swagger_1.ApiProperty()
     ], CreateSupplierDto.prototype, "address");
     __decorate([
         class_validator_1.IsNotEmpty({ message: "Email can not empty" }),
-        class_validator_1.IsEmail()
+        class_validator_1.IsEmail(),
+        swagger_1.ApiProperty()
     ], CreateSupplierDto.prototype, "email");
     __decorate([
         class_validator_1.IsOptional(),
-        class_validator_1.IsBoolean()
+        class_validator_1.IsBoolean(),
+        swagger_1.ApiProperty()
     ], CreateSupplierDto.prototype, "isActive");
     return CreateSupplierDto;
 }());
@@ -35,15 +40,18 @@ var UpdateSupplierDto = /** @class */ (function () {
     }
     __decorate([
         class_validator_1.IsOptional(),
+        swagger_1.ApiProperty(),
         class_validator_1.IsString()
     ], UpdateSupplierDto.prototype, "name");
     __decorate([
         class_validator_1.IsOptional(),
-        class_validator_1.IsString()
+        class_validator_1.IsString(),
+        swagger_1.ApiProperty()
     ], UpdateSupplierDto.prototype, "address");
     __decorate([
         class_validator_1.IsOptional(),
-        class_validator_1.IsEmail()
+        class_validator_1.IsEmail(),
+        swagger_1.ApiProperty()
     ], UpdateSupplierDto.prototype, "email");
     return UpdateSupplierDto;
 }());

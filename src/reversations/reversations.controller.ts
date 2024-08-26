@@ -5,7 +5,10 @@ import { CurrentUser, ResponseMessage } from 'decorators/customize';
 import { CreateReservationDto, UpdateReservationDto ,ReservationFilterType, ReservationPaginationResponseType } from './dto/reversations.dto';
 import { IUser } from 'interfaces/user.interface';
 import { Reservation } from '@prisma/client';
+import { ApiTags } from '@nestjs/swagger';
 
+
+@ApiTags("Reservation")
 @Controller('reversations')
 export class ReversationsController {
   constructor(private readonly reversationsService: ReversationsService) {}
