@@ -71,7 +71,16 @@ export class UserService {
                 },
             },
         });
-
+        if (role.name !== 'ADMIN' && role.name !== 'CUSTOMER') {
+            await this.prismaService.employee.create({
+                data: {
+                    userId: result.id,
+                    hireDate: new Date(), 
+                    salary: 0, 
+                    position: role.name, 
+                },
+            });
+        }
         const { password, ...dataWithoutPassword } = result;
 
         return dataWithoutPassword;

@@ -28,6 +28,9 @@ export class RegisterDto {
     @ApiProperty()
     avatar: string
 
+    // @IsNotEmpty({ message: 'Role id can not empty' })
+    // roleId: number;
+
 }
 
 export class LoginDto {

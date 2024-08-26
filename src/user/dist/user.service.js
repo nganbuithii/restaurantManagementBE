@@ -127,6 +127,19 @@ var UserService = /** @class */ (function () {
                             })];
                     case 5:
                         result = _a.sent();
+                        if (!(role.name !== 'ADMIN' && role.name !== 'CUSTOMER')) return [3 /*break*/, 7];
+                        return [4 /*yield*/, this.prismaService.employee.create({
+                                data: {
+                                    userId: result.id,
+                                    hireDate: new Date(),
+                                    salary: 0,
+                                    position: role.name
+                                }
+                            })];
+                    case 6:
+                        _a.sent();
+                        _a.label = 7;
+                    case 7:
                         password = result.password, dataWithoutPassword = __rest(result, ["password"]);
                         return [2 /*return*/, dataWithoutPassword];
                 }

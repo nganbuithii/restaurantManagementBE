@@ -78,7 +78,7 @@ var AuthService = /** @class */ (function () {
             var _this = this;
             return __generator(this, function (_a) {
                 return [2 /*return*/, this.prismaService.$transaction(function (prisma) { return __awaiter(_this, void 0, void 0, function () {
-                        var existingAccount, existingUser, hashedPassword, defaultRole, newUser;
+                        var existingAccount, existingUser, hashedPassword, customerRole, newUser;
                         return __generator(this, function (_a) {
                             switch (_a.label) {
                                 case 0: return [4 /*yield*/, prisma.user.findUnique({
@@ -99,12 +99,12 @@ var AuthService = /** @class */ (function () {
                                     }
                                     hashedPassword = crypto_1.createHash('sha256').update(userData.password).digest('hex');
                                     return [4 /*yield*/, prisma.role.upsert({
-                                            where: { name: 'NORMAL_USER' },
+                                            where: { name: 'CUSTOMER' },
                                             update: {},
-                                            create: { name: 'NORMAL_USER' }
+                                            create: { name: 'CUSTOMER' }
                                         })];
                                 case 3:
-                                    defaultRole = _a.sent();
+                                    customerRole = _a.sent();
                                     return [4 /*yield*/, prisma.user.create({
                                             data: {
                                                 fullName: userData.fullName,
@@ -113,21 +113,30 @@ var AuthService = /** @class */ (function () {
                                                 username: userData.username,
                                                 password: hashedPassword,
                                                 role: {
-                                                    connect: { id: defaultRole.id } // Liên kết với role mặc định
+                                                    connect: { id: customerRole.id }
                                                 },
                                                 avatar: userData.avatar || ''
                                             }
                                         })];
                                 case 4:
                                     newUser = _a.sent();
-                                    return [2 /*return*/, newUser];
+                                    if (!(customerRole.name === 'CUSTOMER')) return [3 /*break*/, 6];
+                                    return [4 /*yield*/, prisma.customer.create({
+                                            data: {
+                                                userId: newUser.id
+                                            }
+                                        })];
+                                case 5:
+                                    _a.sent();
+                                    _a.label = 6;
+                                case 6: return [2 /*return*/, newUser];
                             }
                         });
                     }); })];
             });
         }); };
         this.login = function (data) { return __awaiter(_this, void 0, Promise, function () {
-            var account, payload, accessToken, refreshToken;
+            var account, hashedInputPassword, payload, accessToken, refreshToken;
             return __generator(this, function (_a) {
                 switch (_a.label) {
                     case 0: return [4 /*yield*/, this.prismaService.user.findUnique({
@@ -138,8 +147,11 @@ var AuthService = /** @class */ (function () {
                         if (!account) {
                             throw new common_1.HttpException({ message: 'Account does not exist' }, common_1.HttpStatus.UNAUTHORIZED);
                         }
-                        // So sánh mật khẩu đã băm
-                        if (account.password !== account.password) {
+                        return [4 /*yield*/, bcrypt.hash(data.password, account.password)];
+                    case 2:
+                        hashedInputPassword = _a.sent();
+                        // So sánh mật khẩu đã băm với mật khẩu lưu trữ trong cơ sở dữ liệu
+                        if (hashedInputPassword !== account.password) {
                             throw new common_1.HttpException({ message: 'Invalid password' }, common_1.HttpStatus.UNAUTHORIZED);
                         }
                         payload = {
@@ -151,13 +163,13 @@ var AuthService = /** @class */ (function () {
                                 secret: process.env.JWT_SECRET,
                                 expiresIn: '1h'
                             })];
-                    case 2:
+                    case 3:
                         accessToken = _a.sent();
                         return [4 /*yield*/, this.jwtService.signAsync(payload, {
                                 secret: process.env.JWT_SECRET,
                                 expiresIn: '7d'
                             })];
-                    case 3:
+                    case 4:
                         refreshToken = _a.sent();
                         return [2 /*return*/, {
                                 accessToken: accessToken,

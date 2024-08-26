@@ -23,55 +23,65 @@ export class AuthService {
             const existingAccount = await prisma.user.findUnique({
                 where: { username: userData.username },
             });
-    
+
             if (existingAccount) {
                 throw new HttpException(
                     { message: 'This username has been used' },
                     HttpStatus.BAD_REQUEST
                 );
             }
-    
+
             // Bước 2: Kiểm tra email đã tồn tại chưa
             const existingUser = await prisma.user.findUnique({
                 where: { email: userData.email },
             });
-    
+
             if (existingUser) {
                 throw new HttpException(
                     { message: 'This email has been used' },
                     HttpStatus.BAD_REQUEST
                 );
             }
-    
+
             // Bước 3: Băm mật khẩu
             const hashedPassword = createHash('sha256').update(userData.password).digest('hex');
-    
-            // Bước 4: Tạo hoặc lấy role mặc định
-            const defaultRole = await prisma.role.upsert({
-                where: { name: 'NORMAL_USER' },
-                update: {},
-                create: { name: 'NORMAL_USER' },
-            });
-    
-            // Bước 5: Tạo người dùng mới và liên kết với role mặc định
-            const newUser = await prisma.user.create({
+
+             // Lấy role 'CUSTOMER'
+        const customerRole = await prisma.role.upsert({
+            where: { name: 'CUSTOMER' },
+            update: {},
+            create: { name: 'CUSTOMER' },
+        });
+
+        // Tạo người dùng mới và liên kết với role 'CUSTOMER'
+        const newUser = await prisma.user.create({
+            data: {
+                fullName: userData.fullName,
+                email: userData.email,
+                phone: userData.phone || null,
+                username: userData.username,
+                password: hashedPassword,
+                role: {
+                    connect: { id: customerRole.id },
+                },
+                avatar: userData.avatar || '',
+            },
+        });
+        // Bước 5: Nếu role là CUSTOMER, thêm thông tin vào bảng CUSTOMER
+        if (customerRole.name === 'CUSTOMER') {
+            await prisma.customer.create({
                 data: {
-                    fullName: userData.fullName,
-                    email: userData.email,
-                    phone: userData.phone || null,
-                    username: userData.username,
-                    password: hashedPassword,  // Lưu mật khẩu đã được băm
-                    role: {
-                        connect: { id: defaultRole.id }  // Liên kết với role mặc định
-                    },
-                    avatar: userData.avatar || '', 
+                    userId: newUser.id,
+                
                 },
             });
-    
-            return newUser;
-        });
+        }
+        
+
+        return newUser;
+    });
     };
-    
+
 
     login = async (data: { username: string, password: string }): Promise<any> => {
         // Kiểm tra tài khoản có tồn tại không
@@ -86,32 +96,34 @@ export class AuthService {
             );
         }
 
-        // So sánh mật khẩu đã băm
 
-        if (account.password !== account.password) {
+        const hashedInputPassword = await bcrypt.hash(data.password, account.password);
+
+        // So sánh mật khẩu đã băm với mật khẩu lưu trữ trong cơ sở dữ liệu
+        if (hashedInputPassword !== account.password) {
             throw new HttpException(
                 { message: 'Invalid password' },
                 HttpStatus.UNAUTHORIZED
             );
         }
         // Bước 3: generate access token
-        const payload = { 
-           
-            username: account.username ,
-            sub:account.id,
-            role:account.roleId
+        const payload = {
+
+            username: account.username,
+            sub: account.id,
+            role: account.roleId
 
         }
         const accessToken = await this.jwtService.signAsync(payload, {
-            secret: process.env.JWT_SECRET,  
+            secret: process.env.JWT_SECRET,
             expiresIn: '1h'
         });
-        
+
         const refreshToken = await this.jwtService.signAsync(payload, {
-            secret: process.env.JWT_SECRET,  
+            secret: process.env.JWT_SECRET,
             expiresIn: '7d'
         });
-        
+
 
 
         return {
@@ -122,7 +134,6 @@ export class AuthService {
 
 
     private async getPermissionsForUser(userId: number): Promise<{ action: string; resource: string }[]> {
-        // Implement logic to get permissions from database
         const userWithPermissions = await this.prismaService.user.findUnique({
             where: { id: userId },
             include: {
@@ -137,22 +148,22 @@ export class AuthService {
                 }
             }
         });
-    
+
         // Trả về danh sách các quyền, mỗi quyền chứa action và resource
         return userWithPermissions.role.permissions.map(rp => ({
             action: rp.permission.action,
             resource: rp.permission.resource
         }));
     }
-    
+
     async validateUser(username: string, password: string): Promise<any> {
         const user = await this.userService.findOne(username);
         if (user && await bcrypt.compare(password, user.password)) {
             const { password, ...result } = user;
-    
+
             // Lấy permissions từ database
             const permissions = await this.getPermissionsForUser(user.id);
-    
+
             // Trả về đối tượng kết quả với các permissions
             return { ...result, permissions };
         }
