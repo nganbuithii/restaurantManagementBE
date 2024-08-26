@@ -74,7 +74,7 @@ function bootstrap() {
                     swagger_1.SwaggerModule.setup('api', app, document);
                     app.useGlobalInterceptors(new response_interceptor_1.ResponseInterceptor(new core_2.Reflector()));
                     app.useGlobalInterceptors(new user_interceptor_1.UserInterceptor());
-                    return [4 /*yield*/, app.listen(3005)];
+                    return [4 /*yield*/, app.listen(process.env.PORT)];
                 case 2:
                     _a.sent();
                     return [2 /*return*/];
