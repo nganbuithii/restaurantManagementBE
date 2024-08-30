@@ -115,7 +115,10 @@ export class AuthService {
 
             username: account.username,
             sub: account.id,
-            role: account.roleId
+            role: account.roleId,
+            fullName:account.fullName,
+            email:account.email,
+            
 
         }
         const accessToken = await this.jwtService.signAsync(payload, {

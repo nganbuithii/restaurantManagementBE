@@ -159,7 +159,9 @@ var AuthService = /** @class */ (function () {
                         payload = {
                             username: account.username,
                             sub: account.id,
-                            role: account.roleId
+                            role: account.roleId,
+                            fullName: account.fullName,
+                            email: account.email
                         };
                         return [4 /*yield*/, this.jwtService.signAsync(payload, {
                                 secret: process.env.JWT_SECRET,

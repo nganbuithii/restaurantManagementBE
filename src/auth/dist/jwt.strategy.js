@@ -76,7 +76,7 @@ var JwtStrategy = /** @class */ (function (_super) {
     JwtStrategy.prototype.validate = function (payload) {
         return __awaiter(this, void 0, void 0, function () {
             return __generator(this, function (_a) {
-                return [2 /*return*/, { userId: payload.sub, username: payload.username, role: payload.role.id }];
+                return [2 /*return*/, { userId: payload.sub, username: payload.username, role: payload.role.id, fullName: payload.fullName, email: payload.email }];
             });
         });
     };
