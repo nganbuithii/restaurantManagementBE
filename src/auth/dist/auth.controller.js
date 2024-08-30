@@ -47,7 +47,6 @@ var __generator = (this && this.__generator) || function (thisArg, body) {
 exports.__esModule = true;
 exports.AuthController = void 0;
 var common_1 = require("@nestjs/common");
-var local_auth_guard_1 = require("./local-auth.guard");
 var swagger_1 = require("@nestjs/swagger");
 var AuthController = /** @class */ (function () {
     function AuthController(authService, userService) {
@@ -90,7 +89,6 @@ var AuthController = /** @class */ (function () {
     ], AuthController.prototype, "register");
     __decorate([
         common_1.Post('login'),
-        common_1.UseGuards(local_auth_guard_1.LocalAuthGuard),
         __param(0, common_1.Body()), __param(1, common_1.Request())
     ], AuthController.prototype, "login");
     __decorate([

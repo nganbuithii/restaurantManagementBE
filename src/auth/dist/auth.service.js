@@ -66,7 +66,6 @@ var __rest = (this && this.__rest) || function (s, e) {
 exports.__esModule = true;
 exports.AuthService = void 0;
 var common_1 = require("@nestjs/common");
-var crypto_1 = require("crypto");
 var bcrypt = require("bcrypt");
 var AuthService = /** @class */ (function () {
     function AuthService(prismaService, jwtService, userService, otpService, emailService) {
@@ -99,13 +98,15 @@ var AuthService = /** @class */ (function () {
                                     if (existingUser) {
                                         throw new common_1.HttpException({ message: 'This email has been used' }, common_1.HttpStatus.BAD_REQUEST);
                                     }
-                                    hashedPassword = crypto_1.createHash('sha256').update(userData.password).digest('hex');
+                                    return [4 /*yield*/, bcrypt.hash(userData.password, 10)];
+                                case 3:
+                                    hashedPassword = _a.sent();
                                     return [4 /*yield*/, prisma.role.upsert({
                                             where: { name: 'CUSTOMER' },
                                             update: {},
                                             create: { name: 'CUSTOMER' }
                                         })];
-                                case 3:
+                                case 4:
                                     customerRole = _a.sent();
                                     return [4 /*yield*/, prisma.user.create({
                                             data: {
@@ -120,25 +121,25 @@ var AuthService = /** @class */ (function () {
                                                 avatar: userData.avatar || ''
                                             }
                                         })];
-                                case 4:
+                                case 5:
                                     newUser = _a.sent();
-                                    if (!(customerRole.name === 'CUSTOMER')) return [3 /*break*/, 6];
+                                    if (!(customerRole.name === 'CUSTOMER')) return [3 /*break*/, 7];
                                     return [4 /*yield*/, prisma.customer.create({
                                             data: {
                                                 userId: newUser.id
                                             }
                                         })];
-                                case 5:
+                                case 6:
                                     _a.sent();
-                                    _a.label = 6;
-                                case 6: return [2 /*return*/, newUser];
+                                    _a.label = 7;
+                                case 7: return [2 /*return*/, newUser];
                             }
                         });
                     }); })];
             });
         }); };
         this.login = function (data) { return __awaiter(_this, void 0, Promise, function () {
-            var account, hashedInputPassword, payload, accessToken, refreshToken;
+            var account, isPasswordValid, payload, accessToken, refreshToken;
             return __generator(this, function (_a) {
                 switch (_a.label) {
                     case 0: return [4 /*yield*/, this.prismaService.user.findUnique({
@@ -149,11 +150,10 @@ var AuthService = /** @class */ (function () {
                         if (!account) {
                             throw new common_1.HttpException({ message: 'Account does not exist' }, common_1.HttpStatus.UNAUTHORIZED);
                         }
-                        return [4 /*yield*/, bcrypt.hash(data.password, account.password)];
+                        return [4 /*yield*/, bcrypt.compare(data.password, account.password)];
                     case 2:
-                        hashedInputPassword = _a.sent();
-                        // So sánh mật khẩu đã băm với mật khẩu lưu trữ trong cơ sở dữ liệu
-                        if (hashedInputPassword !== account.password) {
+                        isPasswordValid = _a.sent();
+                        if (!isPasswordValid) {
                             throw new common_1.HttpException({ message: 'Invalid password' }, common_1.HttpStatus.UNAUTHORIZED);
                         }
                         payload = {

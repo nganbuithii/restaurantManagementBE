@@ -48,7 +48,8 @@ export class AuthService {
             }
 
             // Bước 3: Băm mật khẩu
-            const hashedPassword = createHash('sha256').update(userData.password).digest('hex');
+            const hashedPassword = await bcrypt.hash(userData.password, 10); // 10 là số vòng salt
+
 
             // Lấy role 'CUSTOMER'
             const customerRole = await prisma.role.upsert({
@@ -101,10 +102,9 @@ export class AuthService {
         }
 
 
-        const hashedInputPassword = await bcrypt.hash(data.password, account.password);
+        const isPasswordValid = await bcrypt.compare(data.password, account.password);
 
-        // So sánh mật khẩu đã băm với mật khẩu lưu trữ trong cơ sở dữ liệu
-        if (hashedInputPassword !== account.password) {
+        if (!isPasswordValid) {
             throw new HttpException(
                 { message: 'Invalid password' },
                 HttpStatus.UNAUTHORIZED
