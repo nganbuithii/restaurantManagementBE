@@ -50,6 +50,12 @@ function bootstrap() {
                 case 0: return [4 /*yield*/, core_1.NestFactory.create(app_module_1.AppModule)];
                 case 1:
                     app = _a.sent();
+                    // Cấu hình CORS
+                    app.enableCors({
+                        origin: 'http://localhost:3000',
+                        methods: 'GET,HEAD,PUT,PATCH,POST,DELETE',
+                        allowedHeaders: 'Content-Type, Authorization'
+                    });
                     config = new swagger_1.DocumentBuilder()
                         .setTitle("List API")
                         .setDescription("List API for management restaurant by BTNgan")

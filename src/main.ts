@@ -7,6 +7,12 @@ import { UserInterceptor } from 'interceptors/user.interceptor';
 
 async function bootstrap() {
   const app = await NestFactory.create(AppModule);
+    // Cấu hình CORS
+    app.enableCors({
+      origin: 'http://localhost:3000', //  địa chỉ frontend 
+      methods: 'GET,HEAD,PUT,PATCH,POST,DELETE',
+      allowedHeaders: 'Content-Type, Authorization',
+    });
   const config = new DocumentBuilder()
     .setTitle("List API")
     .setDescription("List API for management restaurant by BTNgan")
