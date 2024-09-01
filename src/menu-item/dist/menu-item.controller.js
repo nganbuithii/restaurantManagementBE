@@ -15,11 +15,12 @@ var platform_express_1 = require("@nestjs/platform-express");
 var jwt_auth_guard_1 = require("src/auth/jwt-auth.guard");
 var customize_1 = require("decorators/customize");
 var swagger_1 = require("@nestjs/swagger");
+var permission_1 = require("decorators/permission");
 var MenuItemController = /** @class */ (function () {
     function MenuItemController(menuItemService) {
         this.menuItemService = menuItemService;
     }
-    MenuItemController.prototype.createIngredient = function (body, user, files) {
+    MenuItemController.prototype.createMenuItem = function (body, user, files) {
         return this.menuItemService.create(body, user, files);
     };
     MenuItemController.prototype.getAll = function (params) {
@@ -38,15 +39,17 @@ var MenuItemController = /** @class */ (function () {
         common_1.Post(),
         common_1.HttpCode(common_1.HttpStatus.CREATED),
         common_1.UseGuards(jwt_auth_guard_1.JwtAuthGuard),
+        permission_1.RequirePermissions('CREATE_MENU_ITEM'),
         customize_1.ResponseMessage("create new menu item"),
         common_1.UseInterceptors(platform_express_1.FilesInterceptor('files')),
         __param(0, common_1.Body()),
         __param(1, customize_1.CurrentUser()),
         __param(2, common_1.UploadedFiles())
-    ], MenuItemController.prototype, "createIngredient");
+    ], MenuItemController.prototype, "createMenuItem");
     __decorate([
-        common_1.Get(),
-        common_1.UseGuards(jwt_auth_guard_1.JwtAuthGuard),
+        common_1.Get()
+        // @UseGuards(JwtAuthGuard)
+        ,
         customize_1.ResponseMessage("get all menu item with pagination"),
         __param(0, common_1.Query())
     ], MenuItemController.prototype, "getAll");
@@ -58,6 +61,7 @@ var MenuItemController = /** @class */ (function () {
     ], MenuItemController.prototype, "getDetail");
     __decorate([
         common_1.Patch(':id'),
+        permission_1.RequirePermissions('UPDATE_MENU_ITEM'),
         common_1.UseGuards(jwt_auth_guard_1.JwtAuthGuard),
         customize_1.ResponseMessage(" update menu item by id"),
         __param(0, common_1.Param('id', common_1.ParseIntPipe)), __param(1, common_1.Body()), __param(2, customize_1.CurrentUser())
@@ -66,6 +70,7 @@ var MenuItemController = /** @class */ (function () {
         common_1.Delete(':id'),
         common_1.UseGuards(jwt_auth_guard_1.JwtAuthGuard),
         common_1.HttpCode(common_1.HttpStatus.NO_CONTENT),
+        permission_1.RequirePermissions('DELETE_MENU_ITEM'),
         customize_1.ResponseMessage(" delete menu item by id"),
         __param(0, common_1.Param('id', common_1.ParseIntPipe)), __param(1, customize_1.CurrentUser())
     ], MenuItemController.prototype, "deleteMenuItem");

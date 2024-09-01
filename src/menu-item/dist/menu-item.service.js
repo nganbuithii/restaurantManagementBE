@@ -101,11 +101,13 @@ var MenuItemService = /** @class */ (function () {
     };
     MenuItemService.prototype.getAll = function (filter) {
         return __awaiter(this, void 0, Promise, function () {
-            var _a, page, _b, items_per_page, search, skip, take, where, _c, menuItems, total;
-            return __generator(this, function (_d) {
-                switch (_d.label) {
+            var items_per_page, page, search, skip, take, where, _a, menuItems, total;
+            return __generator(this, function (_b) {
+                switch (_b.label) {
                     case 0:
-                        _a = filter.page, page = _a === void 0 ? 1 : _a, _b = filter.items_per_page, items_per_page = _b === void 0 ? 10 : _b, search = filter.search;
+                        items_per_page = Number(process.env.ITEMS_PER_PAGE);
+                        page = Number(filter.page) || 1;
+                        search = filter.search || "";
                         skip = (page - 1) * items_per_page;
                         take = items_per_page;
                         where = search ? { name: { contains: search } } : {};
@@ -122,7 +124,7 @@ var MenuItemService = /** @class */ (function () {
                                 this.prismaService.menuItem.count({ where: where }),
                             ])];
                     case 1:
-                        _c = _d.sent(), menuItems = _c[0], total = _c[1];
+                        _a = _b.sent(), menuItems = _a[0], total = _a[1];
                         return [2 /*return*/, {
                                 data: menuItems,
                                 total: total,

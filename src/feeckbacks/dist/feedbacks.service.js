@@ -81,14 +81,17 @@ var FeeckbacksService = /** @class */ (function () {
             });
         });
     };
-    FeeckbacksService.prototype.getAll = function (params) {
+    FeeckbacksService.prototype.getAll = function (filter) {
         return __awaiter(this, void 0, Promise, function () {
-            var _a, page, _b, items_per_page, search, skip, where, _c, feedbacks, total;
-            return __generator(this, function (_d) {
-                switch (_d.label) {
+            var items_per_page, page, search, skip, take, where, _a, feedbacks, total;
+            return __generator(this, function (_b) {
+                switch (_b.label) {
                     case 0:
-                        _a = params.page, page = _a === void 0 ? 1 : _a, _b = params.items_per_page, items_per_page = _b === void 0 ? 10 : _b, search = params.search;
+                        items_per_page = Number(process.env.ITEMS_PER_PAGE);
+                        page = Number(filter.page) || 1;
+                        search = filter.search || "";
                         skip = (page - 1) * items_per_page;
+                        take = items_per_page;
                         where = search
                             ? {
                                 content: {
@@ -105,7 +108,7 @@ var FeeckbacksService = /** @class */ (function () {
                                 this.prisma.feedback.count({ where: where }),
                             ])];
                     case 1:
-                        _c = _d.sent(), feedbacks = _c[0], total = _c[1];
+                        _a = _b.sent(), feedbacks = _a[0], total = _a[1];
                         return [2 /*return*/, {
                                 data: feedbacks,
                                 total: total,

@@ -24,9 +24,13 @@ export class FeeckbacksService {
       }
 
 
-      async getAll(params: FeedbackFilterType): Promise<FeedbackPaginationResponseType> {
-        const { page = 1, items_per_page = 10, search } = params;
+      async getAll(filter: FeedbackFilterType): Promise<FeedbackPaginationResponseType> {
+        const items_per_page = Number(process.env.ITEMS_PER_PAGE) ; 
+        const page = Number(filter.page) || 1;
+        const search = filter.search || "";
+
         const skip = (page - 1) * items_per_page;
+        const take = items_per_page;
     
         const where = search
           ? {

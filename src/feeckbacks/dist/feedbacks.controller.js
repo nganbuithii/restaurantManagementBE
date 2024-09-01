@@ -49,6 +49,7 @@ exports.FeeckbacksController = void 0;
 var common_1 = require("@nestjs/common");
 var jwt_auth_guard_1 = require("src/auth/jwt-auth.guard");
 var customize_1 = require("decorators/customize");
+var swagger_1 = require("@nestjs/swagger");
 var FeeckbacksController = /** @class */ (function () {
     function FeeckbacksController(s) {
         this.s = s;
@@ -84,9 +85,7 @@ var FeeckbacksController = /** @class */ (function () {
         __param(1, customize_1.CurrentUser())
     ], FeeckbacksController.prototype, "createFeedback");
     __decorate([
-        common_1.Get()
-        // @UseGuards(JwtAuthGuard)
-        ,
+        common_1.Get(),
         customize_1.ResponseMessage("get feedbacks with pagination"),
         __param(0, common_1.Query())
     ], FeeckbacksController.prototype, "getAll");
@@ -118,6 +117,7 @@ var FeeckbacksController = /** @class */ (function () {
         __param(2, customize_1.CurrentUser())
     ], FeeckbacksController.prototype, "replyToFeedback");
     FeeckbacksController = __decorate([
+        swagger_1.ApiTags("Feedbacks"),
         common_1.Controller('feedbacks')
     ], FeeckbacksController);
     return FeeckbacksController;

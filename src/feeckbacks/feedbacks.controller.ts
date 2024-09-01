@@ -24,7 +24,6 @@ export class FeeckbacksController {
   }
 
   @Get()
-  // @UseGuards(JwtAuthGuard)
   @ResponseMessage("get feedbacks with pagination")
   getAll(@Query() params: FeedbackFilterType): Promise<FeedbackPaginationResponseType> {
     return this.s.getAll(params);

@@ -14,6 +14,7 @@ var common_1 = require("@nestjs/common");
 var jwt_auth_guard_1 = require("src/auth/jwt-auth.guard");
 var customize_1 = require("decorators/customize");
 var swagger_1 = require("@nestjs/swagger");
+var permission_1 = require("decorators/permission");
 var MenuController = /** @class */ (function () {
     function MenuController(menuService) {
         this.menuService = menuService;
@@ -38,24 +39,24 @@ var MenuController = /** @class */ (function () {
         common_1.HttpCode(common_1.HttpStatus.CREATED),
         common_1.UseGuards(jwt_auth_guard_1.JwtAuthGuard),
         customize_1.ResponseMessage("create new menu "),
+        permission_1.RequirePermissions('CREATE_MENU'),
         __param(0, common_1.Body()),
         __param(1, customize_1.CurrentUser())
     ], MenuController.prototype, "createMenu");
     __decorate([
         common_1.Get(),
-        common_1.UseGuards(jwt_auth_guard_1.JwtAuthGuard),
         customize_1.ResponseMessage("get all menu item with pagination"),
         __param(0, common_1.Query())
     ], MenuController.prototype, "getAll");
     __decorate([
         common_1.Get(':id'),
-        common_1.UseGuards(jwt_auth_guard_1.JwtAuthGuard),
         customize_1.ResponseMessage("get detail menu by id"),
         __param(0, common_1.Param('id', common_1.ParseIntPipe))
     ], MenuController.prototype, "getDetail");
     __decorate([
         common_1.Patch(':id'),
         common_1.UseGuards(jwt_auth_guard_1.JwtAuthGuard),
+        permission_1.RequirePermissions('UPDATE_MENU'),
         customize_1.ResponseMessage(" update menu by id"),
         __param(0, common_1.Param('id', common_1.ParseIntPipe)), __param(1, common_1.Body()), __param(2, customize_1.CurrentUser())
     ], MenuController.prototype, "update");
@@ -63,6 +64,7 @@ var MenuController = /** @class */ (function () {
         common_1.Delete(':id'),
         common_1.UseGuards(jwt_auth_guard_1.JwtAuthGuard),
         common_1.HttpCode(common_1.HttpStatus.NO_CONTENT),
+        permission_1.RequirePermissions('DELETE_MENU'),
         customize_1.ResponseMessage(" delete menu  by id"),
         __param(0, common_1.Param('id', common_1.ParseIntPipe)), __param(1, customize_1.CurrentUser())
     ], MenuController.prototype, "deleteMenuItem");

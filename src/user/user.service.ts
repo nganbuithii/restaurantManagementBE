@@ -87,7 +87,7 @@ export class UserService {
     }
 
     async getAll(filters: UserFilterType): Promise<UserpaginationResponseType> {
-        const items_per_page = Number(filters.items_per_page) || 10;
+        const items_per_page = Number(filters.items_per_page) || 4;
         const page = Number(filters.page) || 1;
         const search = filters.search || "";
 

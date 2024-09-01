@@ -23,6 +23,7 @@ import { SuppliersModule } from './suppliers/suppliers.module';
 import { WarehouseSlipsModule } from './warehouse-slips/warehouse-slips.module';
 import { EmailModule } from './email/email.module';
 import { OtpService } from './otp/otp.service';
+import { InventoryModule } from './inventory/inventory.module';
 
 
 @Module({
@@ -39,7 +40,7 @@ import { OtpService } from './otp/otp.service';
     
     ConfigModule,
     UserModule,
-    AuthModule, RoleModule, PermissionModule, MenuItemModule, CloudinaryModule, IngredientModule, MenuModule, TableModule, ReversationsModule, OrdersModule, FeeckbacksModule, VouchersModule, SuppliersModule, WarehouseSlipsModule, EmailModule,  
+    AuthModule, RoleModule, PermissionModule, MenuItemModule, CloudinaryModule, IngredientModule, MenuModule, TableModule, ReversationsModule, OrdersModule, FeeckbacksModule, VouchersModule, SuppliersModule, WarehouseSlipsModule, EmailModule, InventoryModule,  
   ],
   controllers: [AppController],
   providers: [

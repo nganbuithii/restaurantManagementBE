@@ -59,9 +59,10 @@ export class MenuItemService {
 
 
     async getAll(filter: MenuItemFilterType): Promise<MenuItemPaginationResponseType> {
-        const { page = 1, items_per_page = 10, search } = filter;
+        const items_per_page = Number(process.env.ITEMS_PER_PAGE) ; 
+        const page = Number(filter.page) || 1;
+        const search = filter.search || "";
 
-        // Xác định skip và take để phân trang
         const skip = (page - 1) * items_per_page;
         const take = items_per_page;
 
