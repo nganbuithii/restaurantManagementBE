@@ -11,13 +11,15 @@ var common_1 = require("@nestjs/common");
 var permission_service_1 = require("./permission.service");
 var permission_controller_1 = require("./permission.controller");
 var prisma_service_1 = require("src/prisma.service");
+var jwt_1 = require("@nestjs/jwt");
+var config_1 = require("@nestjs/config");
 var PermissionModule = /** @class */ (function () {
     function PermissionModule() {
     }
     PermissionModule = __decorate([
         common_1.Module({
             controllers: [permission_controller_1.PermissionController],
-            providers: [permission_service_1.PermissionService, prisma_service_1.PrismaService]
+            providers: [permission_service_1.PermissionService, prisma_service_1.PrismaService, jwt_1.JwtService, config_1.ConfigService]
         })
     ], PermissionModule);
     return PermissionModule;

@@ -39,9 +39,8 @@ var ReversationsController = /** @class */ (function () {
         __param(1, customize_1.CurrentUser())
     ], ReversationsController.prototype, "createReversation");
     __decorate([
-        common_1.Get()
-        // @UseGuards(JwtAuthGuard)
-        ,
+        common_1.Get(),
+        common_1.UseGuards(jwt_auth_guard_1.JwtAuthGuard),
         customize_1.ResponseMessage("get all menu item with pagination"),
         __param(0, common_1.Query())
     ], ReversationsController.prototype, "getAll");

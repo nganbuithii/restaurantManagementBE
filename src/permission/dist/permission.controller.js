@@ -49,6 +49,7 @@ exports.PermissionController = void 0;
 var common_1 = require("@nestjs/common");
 var customize_1 = require("decorators/customize");
 var swagger_1 = require("@nestjs/swagger");
+var jwt_auth_guard_1 = require("src/auth/jwt-auth.guard");
 var PermissionController = /** @class */ (function () {
     function PermissionController(permissionService) {
         this.permissionService = permissionService;
@@ -84,25 +85,30 @@ var PermissionController = /** @class */ (function () {
     __decorate([
         common_1.Post(),
         customize_1.ResponseMessage("create permission"),
+        common_1.UseGuards(jwt_auth_guard_1.JwtAuthGuard),
         __param(0, common_1.Body()), __param(1, customize_1.CurrentUser())
     ], PermissionController.prototype, "create");
     __decorate([
         common_1.Get(),
+        common_1.UseGuards(jwt_auth_guard_1.JwtAuthGuard),
         customize_1.ResponseMessage("get all permissions"),
         __param(0, common_1.Query())
     ], PermissionController.prototype, "getAll");
     __decorate([
         common_1.Get(':id'),
+        common_1.UseGuards(jwt_auth_guard_1.JwtAuthGuard),
         __param(0, common_1.Param('id', common_1.ParseIntPipe))
     ], PermissionController.prototype, "getDetail");
     __decorate([
         common_1.Patch(':id'),
+        common_1.UseGuards(jwt_auth_guard_1.JwtAuthGuard),
         customize_1.ResponseMessage("update permission"),
         __param(0, common_1.Param('id', common_1.ParseIntPipe)),
         __param(1, common_1.Body())
     ], PermissionController.prototype, "update");
     __decorate([
         common_1.Delete(':id'),
+        common_1.UseGuards(jwt_auth_guard_1.JwtAuthGuard),
         common_1.HttpCode(common_1.HttpStatus.NO_CONTENT),
         __param(0, common_1.Param('id', common_1.ParseIntPipe))
     ], PermissionController.prototype, "remove");

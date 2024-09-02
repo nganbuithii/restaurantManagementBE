@@ -26,7 +26,7 @@ export class ReversationsController {
 
 
   @Get()
-  // @UseGuards(JwtAuthGuard)
+  @UseGuards(JwtAuthGuard)
   @ResponseMessage("get all menu item with pagination")
   getAll(@Query() params: ReservationFilterType): Promise<ReservationPaginationResponseType> {
     return this.reversationsService.getAll(params);

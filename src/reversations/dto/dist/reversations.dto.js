@@ -6,10 +6,19 @@ var __decorate = (this && this.__decorate) || function (decorators, target, key,
     return c > 3 && r && Object.defineProperty(target, key, r), r;
 };
 exports.__esModule = true;
-exports.UpdateReservationDto = exports.CreateReservationDto = void 0;
+exports.UpdateReservationDto = exports.CreateReservationDto = exports.ReservationStatus = void 0;
 var swagger_1 = require("@nestjs/swagger");
 var class_transformer_1 = require("class-transformer");
 var class_validator_1 = require("class-validator");
+var ReservationStatus;
+(function (ReservationStatus) {
+    ReservationStatus["PENDING"] = "PENDING";
+    ReservationStatus["CONFIRMED"] = "CONFIRMED";
+    ReservationStatus["CANCELLED"] = "CANCELLED";
+    ReservationStatus["COMPLETED"] = "COMPLETED";
+    ReservationStatus["FAILED"] = "FAILED";
+    ReservationStatus["RESCHEDULED"] = "RESCHEDULED";
+})(ReservationStatus = exports.ReservationStatus || (exports.ReservationStatus = {}));
 var CreateReservationDto = /** @class */ (function () {
     function CreateReservationDto() {
     }
@@ -26,9 +35,9 @@ var CreateReservationDto = /** @class */ (function () {
         swagger_1.ApiProperty()
     ], CreateReservationDto.prototype, "endTime");
     __decorate([
-        class_validator_1.IsString(),
+        class_validator_1.IsEnum(ReservationStatus, { message: 'Status must be a valid enum value' }),
         class_validator_1.IsNotEmpty({ message: 'Status cannot be empty' }),
-        swagger_1.ApiProperty()
+        swagger_1.ApiProperty({ "enum": ReservationStatus })
     ], CreateReservationDto.prototype, "status");
     __decorate([
         class_validator_1.IsInt(),

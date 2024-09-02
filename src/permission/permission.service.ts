@@ -35,9 +35,9 @@ export class PermissionService {
   }
 
   async getAll(filters: PermissionFilterType): Promise<PermissionPaginationResponseType> {
-    const items_per_page = Number(filters.items_per_page) || 10;
+    const items_per_page = Number(process.env.ITEMS_PER_PAGE) ; 
     const page = Number(filters.page) || 1;
-    const search = filters.search || '';
+    const search = filters.search || "";
 
     const skip = page > 1 ? (page - 1) * items_per_page : 0;
     const permissions = await this.prismaService.permission.findMany({

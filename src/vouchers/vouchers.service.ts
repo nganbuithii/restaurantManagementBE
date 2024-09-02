@@ -46,20 +46,24 @@ export class VouchersService {
     return voucher;
   }
 
+  async getAll(filter: VoucherFilterType): Promise<VoucherPaginationResponseType> {
+    const items_per_page = Number(process.env.ITEMS_PER_PAGE) ; 
+    const page = Number(filter.page) || 1;
+    const search = filter.search || "";
 
-  async getAll(params: VoucherFilterType): Promise<VoucherPaginationResponseType> {
-    const { page = 1, items_per_page = 10, search } = params;
     const skip = (page - 1) * items_per_page;
-
+    const take = items_per_page;
+  
     const where = search
       ? {
-        OR: [
-          { code: { contains: search, mode: 'insensitive' } },
-          { description: { contains: search, mode: 'insensitive' } },
-        ],
-      }
+          OR: [
+            { code: { contains: search.toLowerCase() } },
+            { description: { contains: search.toLowerCase() } },
+            { percent: isNaN(Number(search)) ? undefined : Number(search) },
+          ],
+        }
       : {};
-
+  
     const [vouchers, total] = await Promise.all([
       this.prisma.voucher.findMany({
         where,
@@ -68,7 +72,7 @@ export class VouchersService {
       }),
       this.prisma.voucher.count({ where }),
     ]);
-
+  
     return {
       data: vouchers,
       total,
@@ -76,8 +80,7 @@ export class VouchersService {
       itemsPerPage: items_per_page,
     };
   }
-
-
+  
   async getById(id: number): Promise<Voucher> {
     const voucher = await this.prisma.voucher.findUnique({
       where: { id },

@@ -83,9 +83,9 @@ var PermissionService = /** @class */ (function () {
             return __generator(this, function (_a) {
                 switch (_a.label) {
                     case 0:
-                        items_per_page = Number(filters.items_per_page) || 10;
+                        items_per_page = Number(process.env.ITEMS_PER_PAGE);
                         page = Number(filters.page) || 1;
-                        search = filters.search || '';
+                        search = filters.search || "";
                         skip = page > 1 ? (page - 1) * items_per_page : 0;
                         return [4 /*yield*/, this.prismaService.permission.findMany({
                                 take: items_per_page,
