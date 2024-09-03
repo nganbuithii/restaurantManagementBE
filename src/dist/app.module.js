@@ -63,6 +63,13 @@ var table_module_1 = require("./table/table.module");
 var reversations_module_1 = require("./reversations/reversations.module");
 var orders_module_1 = require("./orders/orders.module");
 var feedbacks_module_1 = require("./feeckbacks/feedbacks.module");
+var vouchers_module_1 = require("./vouchers/vouchers.module");
+var suppliers_module_1 = require("./suppliers/suppliers.module");
+var warehouse_slips_module_1 = require("./warehouse-slips/warehouse-slips.module");
+var email_module_1 = require("./email/email.module");
+var otp_service_1 = require("./otp/otp.service");
+var inventory_module_1 = require("./inventory/inventory.module");
+var prisma_service_1 = require("./prisma.service");
 var AppModule = /** @class */ (function () {
     function AppModule() {
     }
@@ -84,7 +91,7 @@ var AppModule = /** @class */ (function () {
                 }),
                 config_1.ConfigModule,
                 user_module_1.UserModule,
-                auth_module_1.AuthModule, role_module_1.RoleModule, permission_module_1.PermissionModule, menu_item_module_1.MenuItemModule, cloudinary_module_1.CloudinaryModule, ingredient_module_1.IngredientModule, menu_module_1.MenuModule, table_module_1.TableModule, reversations_module_1.ReversationsModule, orders_module_1.OrdersModule, feedbacks_module_1.FeeckbacksModule,
+                auth_module_1.AuthModule, role_module_1.RoleModule, permission_module_1.PermissionModule, menu_item_module_1.MenuItemModule, cloudinary_module_1.CloudinaryModule, ingredient_module_1.IngredientModule, menu_module_1.MenuModule, table_module_1.TableModule, reversations_module_1.ReversationsModule, orders_module_1.OrdersModule, feedbacks_module_1.FeeckbacksModule, vouchers_module_1.VouchersModule, suppliers_module_1.SuppliersModule, warehouse_slips_module_1.WarehouseSlipsModule, email_module_1.EmailModule, inventory_module_1.InventoryModule,
             ],
             controllers: [app_controller_1.AppController],
             providers: [
@@ -95,6 +102,8 @@ var AppModule = /** @class */ (function () {
                     useClass: common_1.ValidationPipe
                 },
                 cloudinary_service_1.CloudinaryService,
+                otp_service_1.OtpService,
+                prisma_service_1.PrismaService
             ]
         })
     ], AppModule);

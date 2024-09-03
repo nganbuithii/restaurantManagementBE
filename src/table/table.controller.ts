@@ -23,7 +23,7 @@ export class TableController {
 
 
   @Get()
-  @UseGuards(JwtAuthGuard)
+  // @UseGuards(JwtAuthGuard)
   @ResponseMessage("get all table with pagination")
   getAll(@Query() params: TableFilterType): Promise<TablePaginationResponseType> {
     return this.tableService.getAll(params);

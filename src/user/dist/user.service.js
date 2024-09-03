@@ -117,7 +117,7 @@ var UserService = /** @class */ (function () {
                                     fullName: body.fullName,
                                     username: body.username,
                                     password: hashedPassword,
-                                    avatar: body.avatar || "",
+                                    avatar: body.avatar || "https://res.cloudinary.com/dp0daqkme/image/upload/v1725284251/6932514_pxqscj.png",
                                     role: {
                                         connect: {
                                             id: body.roleId
@@ -342,6 +342,26 @@ var UserService = /** @class */ (function () {
                     case 1:
                         updatedUser = _a.sent();
                         return [2 /*return*/, updatedUser];
+                }
+            });
+        });
+    };
+    UserService.prototype.getUserWithRole = function (userId) {
+        return __awaiter(this, void 0, void 0, function () {
+            var user, role;
+            return __generator(this, function (_a) {
+                switch (_a.label) {
+                    case 0: return [4 /*yield*/, this.prismaService.user.findUnique({
+                            where: { id: userId }
+                        })];
+                    case 1:
+                        user = _a.sent();
+                        return [4 /*yield*/, this.prismaService.role.findUnique({
+                                where: { id: user.roleId }
+                            })];
+                    case 2:
+                        role = _a.sent();
+                        return [2 /*return*/, __assign(__assign({}, user), { roleName: role === null || role === void 0 ? void 0 : role.name })];
                 }
             });
         });

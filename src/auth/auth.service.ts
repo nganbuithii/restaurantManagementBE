@@ -93,6 +93,7 @@ export class AuthService {
         const account = await this.prismaService.user.findUnique({
             where: { username: data.username },
         });
+        console.log("ACCOUNT", account)
 
         if (!account) {
             throw new HttpException(
@@ -118,9 +119,10 @@ export class AuthService {
             role: account.roleId,
             fullName:account.fullName,
             email:account.email,
-            
+            avt:account.avatar            
 
         }
+
         const accessToken = await this.jwtService.signAsync(payload, {
             secret: process.env.JWT_SECRET,
             expiresIn: '1h'

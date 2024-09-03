@@ -37,8 +37,9 @@ var TableController = /** @class */ (function () {
         __param(1, customize_1.CurrentUser())
     ], TableController.prototype, "createTable");
     __decorate([
-        common_1.Get(),
-        common_1.UseGuards(jwt_auth_guard_1.JwtAuthGuard),
+        common_1.Get()
+        // @UseGuards(JwtAuthGuard)
+        ,
         customize_1.ResponseMessage("get all table with pagination"),
         __param(0, common_1.Query())
     ], TableController.prototype, "getAll");

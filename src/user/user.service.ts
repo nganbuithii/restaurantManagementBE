@@ -63,7 +63,7 @@ export class UserService {
                 fullName: body.fullName,
                 username: body.username,
                 password: hashedPassword,
-                avatar: body.avatar || "",
+                avatar: body.avatar || "https://res.cloudinary.com/dp0daqkme/image/upload/v1725284251/6932514_pxqscj.png",
                 role: {
                     connect: {
                         id: body.roleId,
@@ -239,12 +239,27 @@ export class UserService {
     }
 
     async updatePassword(userId: number, newPassword: string): Promise<User> {
-            const updatedUser = await this.prismaService.user.update({
-                where: { id: userId },
-                data: { password: newPassword },
-            });
+        const updatedUser = await this.prismaService.user.update({
+            where: { id: userId },
+            data: { password: newPassword },
+        });
 
-            return updatedUser;
-        
+        return updatedUser;
+
+    }
+
+    async getUserWithRole(userId: number) {
+        const user = await this.prismaService.user.findUnique({
+            where: { id: userId },
+        });
+
+        const role = await this.prismaService.role.findUnique({
+            where: { id: user.roleId },
+        });
+
+        return {
+            ...user,
+            roleName: role?.name,
+        };
     }
 }

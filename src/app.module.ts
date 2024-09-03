@@ -24,6 +24,7 @@ import { WarehouseSlipsModule } from './warehouse-slips/warehouse-slips.module';
 import { EmailModule } from './email/email.module';
 import { OtpService } from './otp/otp.service';
 import { InventoryModule } from './inventory/inventory.module';
+import { PrismaService } from './prisma.service';
 
 
 @Module({
@@ -52,6 +53,7 @@ import { InventoryModule } from './inventory/inventory.module';
     },
     CloudinaryService,
     OtpService,
+    PrismaService
   ],
 })
 export class AppModule {}

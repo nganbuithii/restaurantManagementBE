@@ -147,6 +147,7 @@ var AuthService = /** @class */ (function () {
                         })];
                     case 1:
                         account = _a.sent();
+                        console.log("ACCOUNT", account);
                         if (!account) {
                             throw new common_1.HttpException({ message: 'Account does not exist' }, common_1.HttpStatus.UNAUTHORIZED);
                         }
@@ -161,7 +162,8 @@ var AuthService = /** @class */ (function () {
                             sub: account.id,
                             role: account.roleId,
                             fullName: account.fullName,
-                            email: account.email
+                            email: account.email,
+                            avt: account.avatar
                         };
                         return [4 /*yield*/, this.jwtService.signAsync(payload, {
                                 secret: process.env.JWT_SECRET,
