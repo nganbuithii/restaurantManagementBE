@@ -1,4 +1,4 @@
-import { BadRequestException, Body, Controller, Get, Param, ParseIntPipe, Patch, Post, Query, Req, UploadedFile, UseGuards, UseInterceptors } from '@nestjs/common';
+import { BadRequestException, Body, Controller, Delete, Get, HttpCode, HttpStatus, Param, ParseIntPipe, Patch, Post, Query, Req, UploadedFile, UseGuards, UseInterceptors } from '@nestjs/common';
 import { CreateUserDto, UpdateUserDto, UserFilterType, UserpaginationResponseType } from './dto/user.dto';
 import { UserService } from './user.service';
 import { User } from '@prisma/client';
@@ -9,6 +9,8 @@ import { storageConfig } from 'helper/config';
 import { extname } from 'path';
 import { ApiTags } from '@nestjs/swagger';
 import { RequirePermissions } from 'decorators/permission';
+import { CurrentUser, ResponseMessage } from 'decorators/customize';
+import { IUser } from 'interfaces/user.interface';
 
 
 
@@ -77,4 +79,11 @@ export class UserController {
         }
     }
     
+    @Delete(':id')
+  @UseGuards(JwtAuthGuard)
+  @HttpCode(HttpStatus.NO_CONTENT)
+  @ResponseMessage(" delete user by id")
+  deleteUser(@Param('id', ParseIntPipe) id: number, @CurrentUser() user: IUser): Promise<void> {
+    return this.userService.delete(id, user);
+  }
 }

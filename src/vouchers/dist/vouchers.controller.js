@@ -15,7 +15,6 @@ var jwt_auth_guard_1 = require("src/auth/jwt-auth.guard");
 var customize_1 = require("decorators/customize");
 var swagger_1 = require("@nestjs/swagger");
 var permission_1 = require("decorators/permission");
-var permissions_guard_1 = require("src/auth/permissions.guard");
 var VouchersController = /** @class */ (function () {
     function VouchersController(vouchersService) {
         this.vouchersService = vouchersService;
@@ -38,8 +37,10 @@ var VouchersController = /** @class */ (function () {
     __decorate([
         common_1.Post(),
         common_1.HttpCode(common_1.HttpStatus.CREATED),
-        permission_1.RequirePermissions('CREATE_VOUCHER'),
-        common_1.UseGuards(jwt_auth_guard_1.JwtAuthGuard, permissions_guard_1.PermissionGuard),
+        permission_1.RequirePermissions('CREATE_VOUCHER')
+        // @UseGuards(JwtAuthGuard, PermissionGuard)
+        ,
+        common_1.UseGuards(jwt_auth_guard_1.JwtAuthGuard),
         customize_1.ResponseMessage("create new voucher successfully"),
         __param(0, common_1.Body()),
         __param(1, customize_1.CurrentUser())

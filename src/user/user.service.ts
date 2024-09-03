@@ -5,6 +5,7 @@ import { hash, compareSync } from 'bcrypt';
 import { User } from '@prisma/client';
 import { plainToClass } from 'class-transformer';
 import { CloudinaryService } from 'src/cloudinary/cloudinary.service';
+import { IUser } from 'interfaces/user.interface';
 
 @Injectable()
 export class UserService {
@@ -92,6 +93,8 @@ export class UserService {
         const search = filters.search || "";
 
         const skip = page > 1 ? (page - 1) * items_per_page : 0;
+
+        // Lấy danh sách người dùng với thông tin vai trò
         const users = await this.prismaService.user.findMany({
             take: items_per_page,
             skip,
@@ -107,7 +110,22 @@ export class UserService {
                             contains: search,
                         },
                     },
+                    {
+                        username: {
+                            contains: search,
+                        },
+                    },
+                    {
+                        role: {
+                            name: {
+                                contains: search,  // Tìm kiếm theo tên vai trò
+                            },
+                        },
+                    },
                 ],
+            },
+            include: {
+                role: true,  // Bao gồm thông tin vai trò
             },
             orderBy: {
                 createdAt: "desc",
@@ -115,7 +133,11 @@ export class UserService {
         });
 
         // Chuyển đổi dữ liệu thành UserDto
-        const userDtos = users.map(user => plainToClass(UserDto, user));
+        const userDtos = users.map(user => {
+            const userDto = plainToClass(UserDto, user);
+            userDto.roleName = user.role.name;  // Gán tên vai trò vào DTO
+            return userDto;
+        });
 
         // Tính tổng số người dùng
         const total = await this.prismaService.user.count({
@@ -131,6 +153,18 @@ export class UserService {
                             contains: search,
                         },
                     },
+                    {
+                        username: {
+                            contains: search,
+                        },
+                    },
+                    {
+                        role: {
+                            name: {
+                                contains: search,
+                            },
+                        },
+                    },
                 ],
             },
         });
@@ -142,6 +176,7 @@ export class UserService {
             itemsPerPage: items_per_page,
         };
     }
+
 
     async getDetail(id: number): Promise<Omit<User, 'password'>> {
         const user = await this.prismaService.user.findUnique({
@@ -261,5 +296,24 @@ export class UserService {
             ...user,
             roleName: role?.name,
         };
+    }
+
+
+    async delete(id: number, user: IUser): Promise<void> {
+        const u = await this.prismaService.user.findUnique({
+            where: { id },
+        });
+
+        if (!u) {
+            throw new NotFoundException(`user with id ${id} not found`);
+        }
+
+        await this.prismaService.user.update({
+            where: { id },
+            data: {
+                isActive: false,
+                updatedAt: new Date(),
+            },
+        });
     }
 }

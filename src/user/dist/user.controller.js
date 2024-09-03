@@ -53,6 +53,7 @@ var config_1 = require("helper/config");
 var path_1 = require("path");
 var swagger_1 = require("@nestjs/swagger");
 var permission_1 = require("decorators/permission");
+var customize_1 = require("decorators/customize");
 var UserController = /** @class */ (function () {
     function UserController(userService) {
         this.userService = userService;
@@ -100,6 +101,9 @@ var UserController = /** @class */ (function () {
             });
         });
     };
+    UserController.prototype.deleteUser = function (id, user) {
+        return this.userService["delete"](id, user);
+    };
     __decorate([
         common_1.Post(),
         permission_1.RequirePermissions('CREATE_USER'),
@@ -138,6 +142,13 @@ var UserController = /** @class */ (function () {
         })),
         __param(0, common_1.Req()), __param(1, common_1.UploadedFile())
     ], UserController.prototype, "uploadAvatar");
+    __decorate([
+        common_1.Delete(':id'),
+        common_1.UseGuards(jwt_auth_guard_1.JwtAuthGuard),
+        common_1.HttpCode(common_1.HttpStatus.NO_CONTENT),
+        customize_1.ResponseMessage(" delete user by id"),
+        __param(0, common_1.Param('id', common_1.ParseIntPipe)), __param(1, customize_1.CurrentUser())
+    ], UserController.prototype, "deleteUser");
     UserController = __decorate([
         swagger_1.ApiTags("Users"),
         common_1.Controller('users')

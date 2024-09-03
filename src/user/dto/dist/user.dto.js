@@ -120,6 +120,12 @@ var UserDto = /** @class */ (function () {
     __decorate([
         class_transformer_1.Expose()
     ], UserDto.prototype, "updatedAt");
+    __decorate([
+        class_transformer_1.Expose()
+    ], UserDto.prototype, "isActive");
+    __decorate([
+        class_transformer_1.Expose()
+    ], UserDto.prototype, "roleName");
     UserDto = __decorate([
         class_transformer_1.Exclude()
     ], UserDto);

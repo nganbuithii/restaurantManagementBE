@@ -171,7 +171,22 @@ var UserService = /** @class */ (function () {
                                                 contains: search
                                             }
                                         },
+                                        {
+                                            username: {
+                                                contains: search
+                                            }
+                                        },
+                                        {
+                                            role: {
+                                                name: {
+                                                    contains: search
+                                                }
+                                            }
+                                        },
                                     ]
+                                },
+                                include: {
+                                    role: true
                                 },
                                 orderBy: {
                                     createdAt: "desc"
@@ -179,7 +194,11 @@ var UserService = /** @class */ (function () {
                             })];
                     case 1:
                         users = _a.sent();
-                        userDtos = users.map(function (user) { return class_transformer_1.plainToClass(user_dto_1.UserDto, user); });
+                        userDtos = users.map(function (user) {
+                            var userDto = class_transformer_1.plainToClass(user_dto_1.UserDto, user);
+                            userDto.roleName = user.role.name; // Gán tên vai trò vào DTO
+                            return userDto;
+                        });
                         return [4 /*yield*/, this.prismaService.user.count({
                                 where: {
                                     OR: [
@@ -191,6 +210,18 @@ var UserService = /** @class */ (function () {
                                         {
                                             email: {
                                                 contains: search
+                                            }
+                                        },
+                                        {
+                                            username: {
+                                                contains: search
+                                            }
+                                        },
+                                        {
+                                            role: {
+                                                name: {
+                                                    contains: search
+                                                }
                                             }
                                         },
                                     ]
@@ -362,6 +393,33 @@ var UserService = /** @class */ (function () {
                     case 2:
                         role = _a.sent();
                         return [2 /*return*/, __assign(__assign({}, user), { roleName: role === null || role === void 0 ? void 0 : role.name })];
+                }
+            });
+        });
+    };
+    UserService.prototype["delete"] = function (id, user) {
+        return __awaiter(this, void 0, Promise, function () {
+            var u;
+            return __generator(this, function (_a) {
+                switch (_a.label) {
+                    case 0: return [4 /*yield*/, this.prismaService.user.findUnique({
+                            where: { id: id }
+                        })];
+                    case 1:
+                        u = _a.sent();
+                        if (!u) {
+                            throw new common_1.NotFoundException("user with id " + id + " not found");
+                        }
+                        return [4 /*yield*/, this.prismaService.user.update({
+                                where: { id: id },
+                                data: {
+                                    isActive: false,
+                                    updatedAt: new Date()
+                                }
+                            })];
+                    case 2:
+                        _a.sent();
+                        return [2 /*return*/];
                 }
             });
         });

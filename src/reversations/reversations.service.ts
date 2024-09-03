@@ -34,7 +34,7 @@ export class ReversationsService {
         const newReservation = await this.prisma.reservation.create({
             data: {
                 ...createReservationDto,
-                customerId: user.sub,
+                // customerId: user.sub,
             },
         });
 

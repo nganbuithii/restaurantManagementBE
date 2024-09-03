@@ -82,7 +82,7 @@ var ReversationsService = /** @class */ (function () {
                             throw new common_1.BadRequestException('Table is already reserved for the selected time');
                         }
                         return [4 /*yield*/, this.prisma.reservation.create({
-                                data: __assign(__assign({}, createReservationDto), { customerId: user.sub })
+                                data: __assign({}, createReservationDto)
                             })];
                     case 2:
                         newReservation = _a.sent();

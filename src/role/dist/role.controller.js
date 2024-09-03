@@ -49,6 +49,7 @@ exports.RoleController = void 0;
 var common_1 = require("@nestjs/common");
 var swagger_1 = require("@nestjs/swagger");
 var permission_1 = require("decorators/permission");
+var jwt_auth_guard_1 = require("src/auth/jwt-auth.guard");
 var RoleController = /** @class */ (function () {
     function RoleController(roleService) {
         this.roleService = roleService;
@@ -75,10 +76,12 @@ var RoleController = /** @class */ (function () {
     };
     __decorate([
         common_1.Post(),
+        common_1.UseGuards(jwt_auth_guard_1.JwtAuthGuard),
         __param(0, common_1.Body())
     ], RoleController.prototype, "create");
     __decorate([
-        common_1.Get()
+        common_1.Get(),
+        common_1.UseGuards(jwt_auth_guard_1.JwtAuthGuard)
     ], RoleController.prototype, "getAll");
     __decorate([
         common_1.Get(':id'),

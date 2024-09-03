@@ -119,4 +119,8 @@ export class UserDto {
 
   @Expose()
   updatedAt: Date;
+  @Expose()
+  isActive:Boolean;
+  @Expose()
+  roleName?: string;
 }

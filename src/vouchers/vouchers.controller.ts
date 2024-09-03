@@ -18,7 +18,8 @@ export class VouchersController {
   @Post()
   @HttpCode(HttpStatus.CREATED)
   @RequirePermissions('CREATE_VOUCHER')
-  @UseGuards(JwtAuthGuard, PermissionGuard)
+  // @UseGuards(JwtAuthGuard, PermissionGuard)
+  @UseGuards(JwtAuthGuard)
   @ResponseMessage("create new voucher successfully")
   createVoucher(
     @Body() body: CreateVoucherDto,
