@@ -56,8 +56,8 @@ var CreateVoucherDto = /** @class */ (function () {
         swagger_1.ApiProperty()
     ], CreateVoucherDto.prototype, "pointCost");
     __decorate([
-        class_validator_1.IsNotEmpty({ message: 'Customer ID is required' }),
         swagger_1.ApiProperty(),
+        class_validator_1.IsOptional(),
         class_validator_1.IsInt({ message: 'Customer ID must be an integer' })
     ], CreateVoucherDto.prototype, "customerId");
     return CreateVoucherDto;

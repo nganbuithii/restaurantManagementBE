@@ -48,8 +48,8 @@ export class CreateVoucherDto {
     @ApiProperty()
     pointCost: number;
 
-    @IsNotEmpty({ message: 'Customer ID is required' })
     @ApiProperty()
+    @IsOptional()
     @IsInt({ message: 'Customer ID must be an integer' })
     customerId: number;
 }

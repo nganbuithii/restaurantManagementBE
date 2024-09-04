@@ -12,6 +12,7 @@ exports.__esModule = true;
 exports.InventoryController = void 0;
 var common_1 = require("@nestjs/common");
 var customize_1 = require("decorators/customize");
+var jwt_auth_guard_1 = require("src/auth/jwt-auth.guard");
 var InventoryController = /** @class */ (function () {
     function InventoryController(inventoryService) {
         this.inventoryService = inventoryService;
@@ -22,6 +23,7 @@ var InventoryController = /** @class */ (function () {
     __decorate([
         common_1.Get(),
         customize_1.ResponseMessage("Get inventory list"),
+        common_1.UseGuards(jwt_auth_guard_1.JwtAuthGuard),
         __param(0, common_1.Query())
     ], InventoryController.prototype, "getAll");
     InventoryController = __decorate([

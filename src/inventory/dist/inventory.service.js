@@ -1,4 +1,15 @@
 "use strict";
+var __assign = (this && this.__assign) || function () {
+    __assign = Object.assign || function(t) {
+        for (var s, i = 1, n = arguments.length; i < n; i++) {
+            s = arguments[i];
+            for (var p in s) if (Object.prototype.hasOwnProperty.call(s, p))
+                t[p] = s[p];
+        }
+        return t;
+    };
+    return __assign.apply(this, arguments);
+};
 var __decorate = (this && this.__decorate) || function (decorators, target, key, desc) {
     var c = arguments.length, r = c < 3 ? target : desc === null ? desc = Object.getOwnPropertyDescriptor(target, key) : desc, d;
     if (typeof Reflect === "object" && typeof Reflect.decorate === "function") r = Reflect.decorate(decorators, target, key, desc);
@@ -68,14 +79,22 @@ var InventoryService = /** @class */ (function () {
                                 this.prismaService.inventory.findMany({
                                     where: where,
                                     skip: skip,
-                                    take: items_per_page
+                                    take: items_per_page,
+                                    include: {
+                                        ingredient: {
+                                            select: { name: true }
+                                        }
+                                    }
                                 }),
                                 this.prismaService.inventory.count({ where: where }),
                             ])];
                     case 1:
                         _c = _d.sent(), inventoryItems = _c[0], total = _c[1];
                         return [2 /*return*/, {
-                                data: inventoryItems,
+                                data: inventoryItems.map(function (item) {
+                                    var _a;
+                                    return (__assign(__assign({}, item), { ingredientName: (_a = item.ingredient) === null || _a === void 0 ? void 0 : _a.name }));
+                                }),
                                 total: total,
                                 currentPage: page,
                                 itemsPerPage: items_per_page

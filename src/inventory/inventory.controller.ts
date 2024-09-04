@@ -1,7 +1,8 @@
-import { Controller, Get, Query } from '@nestjs/common';
+import { Controller, Get, Query, UseGuards } from '@nestjs/common';
 import { InventoryService } from './inventory.service';
 import { ResponseMessage } from 'decorators/customize';
 import { InventoryFilterType, InventoryPaginationResponseType } from './dto/inventory.dto';
+import { JwtAuthGuard } from 'src/auth/jwt-auth.guard';
 
 @Controller('inventory')
 export class InventoryController {
@@ -9,6 +10,7 @@ export class InventoryController {
 
   @Get()
   @ResponseMessage("Get inventory list")
+  @UseGuards(JwtAuthGuard)
   getAll(@Query() params: InventoryFilterType): Promise<InventoryPaginationResponseType> {
     return this.inventoryService.getAll(params);
   }

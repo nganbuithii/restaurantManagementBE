@@ -24,10 +24,8 @@ export class CreateWarehouseSlipDto {
     @ApiProperty()
     type: string;
 
-    @IsInt()
-    @IsNotEmpty({message:"employee ID can not empty"})
     @ApiProperty()
-    employeeId: number;
+    userId: number;
 
     @IsInt()
     @ApiProperty()

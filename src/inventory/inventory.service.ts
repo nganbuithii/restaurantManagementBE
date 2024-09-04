@@ -9,7 +9,7 @@ export class InventoryService {
     async getAll(params: InventoryFilterType): Promise<InventoryPaginationResponseType> {
         const { page = parseInt(process.env.DEFAULT_PAGE, 10) || 1, items_per_page = parseInt(process.env.ITEMS_PER_PAGE, 10) || 10, search } = params;
         const skip = (page - 1) * items_per_page;
-
+    
         const where: any = search
             ? {
                 OR: [
@@ -18,21 +18,30 @@ export class InventoryService {
                 ],
             }
             : {};
-
+    
         const [inventoryItems, total] = await Promise.all([
             this.prismaService.inventory.findMany({
                 where,
                 skip,
                 take: items_per_page,
+                include: {
+                    ingredient: {
+                        select: { name: true }, // Chỉ lấy name của ingredient
+                    },
+                },
             }),
             this.prismaService.inventory.count({ where }),
         ]);
-
+    
         return {
-            data: inventoryItems,
+            data: inventoryItems.map(item => ({
+                ...item,
+                ingredientName: item.ingredient?.name, // Gắn thêm name của ingredient vào item
+            })),
             total,
             currentPage: page,
             itemsPerPage: items_per_page,
         };
     }
+    
 }

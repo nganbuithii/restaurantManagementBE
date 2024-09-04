@@ -37,10 +37,8 @@ var CreateWarehouseSlipDto = /** @class */ (function () {
         swagger_1.ApiProperty()
     ], CreateWarehouseSlipDto.prototype, "type");
     __decorate([
-        class_validator_1.IsInt(),
-        class_validator_1.IsNotEmpty({ message: "employee ID can not empty" }),
         swagger_1.ApiProperty()
-    ], CreateWarehouseSlipDto.prototype, "employeeId");
+    ], CreateWarehouseSlipDto.prototype, "userId");
     __decorate([
         class_validator_1.IsInt(),
         swagger_1.ApiProperty(),

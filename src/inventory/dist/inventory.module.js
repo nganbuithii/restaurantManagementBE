@@ -12,6 +12,7 @@ var inventory_service_1 = require("./inventory.service");
 var inventory_controller_1 = require("./inventory.controller");
 var jwt_1 = require("@nestjs/jwt");
 var prisma_service_1 = require("src/prisma.service");
+var config_1 = require("@nestjs/config");
 var InventoryModule = /** @class */ (function () {
     function InventoryModule() {
     }
@@ -19,7 +20,7 @@ var InventoryModule = /** @class */ (function () {
         common_1.Module({
             imports: [jwt_1.JwtModule],
             controllers: [inventory_controller_1.InventoryController],
-            providers: [inventory_service_1.InventoryService, prisma_service_1.PrismaService]
+            providers: [inventory_service_1.InventoryService, prisma_service_1.PrismaService, config_1.ConfigService]
         })
     ], InventoryModule);
     return InventoryModule;

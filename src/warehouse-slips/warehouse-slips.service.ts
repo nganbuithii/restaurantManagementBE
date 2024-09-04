@@ -41,7 +41,7 @@ export class WarehouseSlipsService {
         const warehouseSlip = await this.prisma.warehouseSlip.create({
             data: {
                 type: body.type,
-                employeeId: body.employeeId,
+                employeeId: user.sub,
                 supplierId: body.supplierId,
                 details: {
                     create: body.details.map(detail => ({

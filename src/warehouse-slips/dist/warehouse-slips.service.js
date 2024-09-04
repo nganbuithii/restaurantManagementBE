@@ -87,7 +87,7 @@ var WarehouseSlipsService = /** @class */ (function () {
                         return [4 /*yield*/, this.prisma.warehouseSlip.create({
                                 data: {
                                     type: body.type,
-                                    employeeId: body.employeeId,
+                                    employeeId: user.sub,
                                     supplierId: body.supplierId,
                                     details: {
                                         create: body.details.map(function (detail) { return ({
