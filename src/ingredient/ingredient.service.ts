@@ -47,8 +47,21 @@ export class IngredientService {
         const items_per_page = Number(filters.items_per_page) || 10;
         const page = Number(filters.page) || 1;
         const search = filters.search || "";
+        const sort = filters.sort;
 
         const skip = page > 1 ? (page - 1) * items_per_page : 0;
+        let orderBy: any = {
+            createdAt: "desc",
+        };
+        if (sort === 'price_asc') {
+            orderBy = {
+                price: 'asc',
+            };
+        } else if (sort === 'price_desc') {
+            orderBy = {
+                price: 'desc',
+            };
+        }
         const ingredients = await this.prismaService.ingredient.findMany({
             take: items_per_page,
             skip,
@@ -67,9 +80,7 @@ export class IngredientService {
                 ],
                 isActive: filters.isActive === undefined ? undefined : filters.isActive === 'true',
             },
-            orderBy: {
-                createdAt: "desc",
-            },
+            orderBy: orderBy,
         });
 
         const total = await this.prismaService.ingredient.count({

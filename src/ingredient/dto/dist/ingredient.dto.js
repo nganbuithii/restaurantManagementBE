@@ -36,8 +36,8 @@ var CreateIngredientDto = /** @class */ (function () {
         swagger_1.ApiProperty()
     ], CreateIngredientDto.prototype, "quantity");
     __decorate([
-        class_validator_1.IsIn(['available', 'out_of_stock', 'pending'], {
-            message: 'Status must be one of the following: available, out_of_stock, pending'
+        class_validator_1.IsIn(['available', 'out_of_stock'], {
+            message: 'Status must be one of the following: available, out_of_stock'
         }),
         swagger_1.ApiProperty()
     ], CreateIngredientDto.prototype, "status");

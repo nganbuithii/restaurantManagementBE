@@ -44,13 +44,13 @@ export class MenuItemController {
     return this.menuItemService.getDetail(id)
   }
 
-  @Patch(':id')
-  @RequirePermissions('UPDATE_MENU_ITEM')
-  @UseGuards(JwtAuthGuard)
-  @ResponseMessage(" update menu item by id")
-    update(@Param('id', ParseIntPipe) id: number, @Body() data: UpdateMenuItemDto, @CurrentUser() user:IUser): Promise<MenuItem> {
-        return this.menuItemService.update(id, data, user);
-    }
+  // @Patch(':id')
+  // @RequirePermissions('UPDATE_MENU_ITEM')
+  // @UseGuards(JwtAuthGuard)
+  // @ResponseMessage(" update menu item by id")
+  //   update(@Param('id', ParseIntPipe) id: number, @Body() data: UpdateMenuItemDto, @CurrentUser() user:IUser): Promise<MenuItem> {
+  //       return this.menuItemService.update(id, data, user);
+  //   }
 
 
     

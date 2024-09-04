@@ -5,20 +5,18 @@ import { IsNotEmpty, IsNumber, IsOptional, IsString, Min } from 'class-validator
 export class CreateMenuItemDto {
 
     @IsString({ message: 'Name must be a string' })
-    @IsNotEmpty({ message: "name menu item can not empty" })
+    @IsNotEmpty({ message: "Name of the menu item cannot be empty" })
     @ApiProperty()
     name: string;
 
-    @IsNotEmpty({ message: "price menu item can not empty" })
+    @IsNotEmpty({ message: "Price of the menu item cannot be empty" })
     @ApiProperty()
-    price: number;
+    price: string;
 
-    // @IsOptional()
-    // @IsString({ each: true })
-    // ingredientIds?: number[]; // ID của các nguyên liệu liên quan
-    ingredientQuantities: { ingredientId: number; quantity: number }[];
+    @IsOptional()
+    @ApiProperty({ type: [Number], description: 'Array of ingredient IDs' })
+    ingredientIds?: number[];
 }
-
 
 
 export interface MenuItemFilterType {
@@ -35,22 +33,21 @@ export interface MenuItemPaginationResponseType {
 }
 
 
-
 export class UpdateMenuItemDto {
     @IsOptional()
     @IsString({ message: 'Name must be a string' })
-    @IsNotEmpty({ message: "name menu item can not empty" })
+    @IsNotEmpty({ message: "Name of the menu item cannot be empty" })
     @ApiProperty()
-    name: string;
+    name?: string;
 
     @IsOptional()
-    @IsNotEmpty({ message: "price menu item can not empty" })
+    @IsNumber({}, { message: "Price must be a number" })
+    @IsNotEmpty({ message: "Price of the menu item cannot be empty" })
     @ApiProperty()
-    price: number;
+    price?: number;
 
     @IsOptional()
-    // @IsString({ each: true })
-    // ingredientIds?: number[]; // ID của các nguyên liệu liên quan
-    @ApiProperty()
-    ingredientQuantities: { ingredientId: number; quantity: number }[];
-}  
+    // @IsNumber({}, { each: true, message: "Each ingredient ID must be a number" })
+    @ApiProperty({ type: [Number], description: 'Array of ingredient IDs' })
+    ingredientIds?: string[];
+}

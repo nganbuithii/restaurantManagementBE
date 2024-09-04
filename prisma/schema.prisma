@@ -219,7 +219,7 @@ model Ingredient {
 model MenuItemIngredient {
   menuItemId   Int
   ingredientId Int
-  quantity     Float
+  // quantity     Float
   menuItem     MenuItem   @relation(fields: [menuItemId], references: [id])
   ingredient   Ingredient @relation(fields: [ingredientId], references: [id])
 

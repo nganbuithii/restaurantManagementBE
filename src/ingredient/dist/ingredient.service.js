@@ -108,14 +108,28 @@ var IngredientService = /** @class */ (function () {
     };
     IngredientService.prototype.getAll = function (filters) {
         return __awaiter(this, void 0, Promise, function () {
-            var items_per_page, page, search, skip, ingredients, total;
+            var items_per_page, page, search, sort, skip, orderBy, ingredients, total;
             return __generator(this, function (_a) {
                 switch (_a.label) {
                     case 0:
                         items_per_page = Number(filters.items_per_page) || 10;
                         page = Number(filters.page) || 1;
                         search = filters.search || "";
+                        sort = filters.sort;
                         skip = page > 1 ? (page - 1) * items_per_page : 0;
+                        orderBy = {
+                            createdAt: "desc"
+                        };
+                        if (sort === 'price_asc') {
+                            orderBy = {
+                                price: 'asc'
+                            };
+                        }
+                        else if (sort === 'price_desc') {
+                            orderBy = {
+                                price: 'desc'
+                            };
+                        }
                         return [4 /*yield*/, this.prismaService.ingredient.findMany({
                                 take: items_per_page,
                                 skip: skip,
@@ -134,9 +148,7 @@ var IngredientService = /** @class */ (function () {
                                     ],
                                     isActive: filters.isActive === undefined ? undefined : filters.isActive === 'true'
                                 },
-                                orderBy: {
-                                    createdAt: "desc"
-                                }
+                                orderBy: orderBy
                             })];
                     case 1:
                         ingredients = _a.sent();

@@ -11,28 +11,24 @@ export class MenuItemService {
         private cloudinaryService: CloudinaryService
     ) { }
     async create(body: CreateMenuItemDto, user: IUser, files: Array<Express.Multer.File>) {
-        const { name, price, ingredientQuantities } = body;
-        const numericPrice = typeof price === 'string' ? parseFloat(price) : price;
-
-        // Kiểm tra nếu không có hình ảnh
+        const { name, price, ingredientIds } = body;
+        const numericPrice = parseFloat(price.toString());
+    
+        if (isNaN(numericPrice)) {
+            throw new BadRequestException('Price must be a number');
+        }
+    
         if (!files || files.length === 0) {
-            throw new BadRequestException('At least one image is required.');
+            throw new BadRequestException('Ít nhất một hình ảnh là bắt buộc.');
         }
-
-        // Phân tích cú pháp ingredientQuantities nếu nó là chuỗi JSON
-        let parsedIngredientQuantities;
-        try {
-            parsedIngredientQuantities = typeof ingredientQuantities === 'string'
-                ? JSON.parse(ingredientQuantities)
-                : ingredientQuantities;
-        } catch (e) {
-            throw new BadRequestException('Invalid format for ingredientQuantities.');
-        }
-
-        // Upload images to Cloudinary
+    
+        // Chuyển đổi các ID thành số, đảm bảo rằng ingredientIds là mảng
+        const ingredientIdsAsNumbers = Array.isArray(ingredientIds)
+            ? ingredientIds.map(id => Number(id))
+            : [];
+    
         const uploadedImages = await this.cloudinaryService.uploadImages(files);
-
-        // Create menu item with images and ingredients
+    
         const menuItem = await this.prismaService.menuItem.create({
             data: {
                 name,
@@ -40,24 +36,26 @@ export class MenuItemService {
                 createdBy: user.sub,
                 images: {
                     create: uploadedImages.map(image => ({
-                        url: image.secure_url
+                        url: image.secure_url,
                     })),
                 },
                 ingredients: {
-                    create: parsedIngredientQuantities.map(item => ({
+                    create: ingredientIdsAsNumbers.map(id => ({
                         ingredient: {
-                            connect: { id: item.ingredientId },
+                            connect: { id },
                         },
-                        quantity: item.quantity,
                     })),
                 },
             },
         });
-
+    
         return menuItem;
     }
-
-
+    
+    
+    
+    
+    
     async getAll(filter: MenuItemFilterType): Promise<MenuItemPaginationResponseType> {
         const items_per_page = Number(process.env.ITEMS_PER_PAGE) ; 
         const page = Number(filter.page) || 1;
@@ -106,54 +104,55 @@ export class MenuItemService {
 
         return menuItem;
     }
-    async update(id: number, data: UpdateMenuItemDto, user: IUser): Promise<MenuItem> {
-        // Kiểm tra xem mục menu có tồn tại không
-        const existingMenuItem = await this.prismaService.menuItem.findUnique({
-            where: { id },
-            include: { ingredients: true },
-        });
-
-        if (!existingMenuItem) {
-            throw new NotFoundException(`Không tìm thấy mục menu với ID ${id}`);
-        }
-
-        // Chuẩn bị dữ liệu để cập nhật
-        const updateData: any = {
-            updatedBy: user.sub,
-            updatedAt: new Date(),
-        };
-        if (data.name !== undefined) updateData.name = data.name;
-        if (data.price !== undefined) updateData.price = data.price;
-
-        // Cập nhật mục menu
-        const updatedMenuItem = await this.prismaService.menuItem.update({
-            where: { id },
-            data: updateData,
-        });
-
-        // Chỉ cập nhật nguyên liệu nếu được cung cấp
-        if (data.ingredientQuantities && data.ingredientQuantities.length > 0) {
-            // Xóa các mối quan hệ hiện có
-            await this.prismaService.menuItemIngredient.deleteMany({
-                where: { menuItemId: id },
-            });
-
-            // Tạo các mối quan hệ mới
-            await this.prismaService.menuItemIngredient.createMany({
-                data: data.ingredientQuantities.map(iq => ({
-                    menuItemId: id,
-                    ingredientId: iq.ingredientId,
-                    quantity: iq.quantity,
-                })),
-            });
-        }
-
-        // Truy vấn và trả về mục menu đã được cập nhật cùng với các nguyên liệu của nó
-        return this.prismaService.menuItem.findUnique({
-            where: { id },
-            include: { ingredients: true },
-        });
-    }
+    // async update(id: number, data: UpdateMenuItemDto, user: IUser): Promise<MenuItem> {
+    //     // Kiểm tra xem mục menu có tồn tại không
+    //     const existingMenuItem = await this.prismaService.menuItem.findUnique({
+    //         where: { id },
+    //         include: { ingredients: true },
+    //     });
+    
+    //     if (!existingMenuItem) {
+    //         throw new NotFoundException(`Không tìm thấy mục menu với ID ${id}`);
+    //     }
+    
+    //     // Chuẩn bị dữ liệu để cập nhật
+    //     const updateData: any = {
+    //         updatedBy: user.sub,
+    //         updatedAt: new Date(),
+    //     };
+    //     if (data.name !== undefined) updateData.name = data.name;
+    //     if (data.price !== undefined) updateData.price = data.price;
+    
+    //     // Cập nhật mục menu
+    //     const updatedMenuItem = await this.prismaService.menuItem.update({
+    //         where: { id },
+    //         data: updateData,
+    //     });
+    
+    //     // Chỉ cập nhật nguyên liệu nếu được cung cấp
+    //     if (data.ingredientIds && data.ingredientIds.length > 0) {
+    //         // Xóa các mối quan hệ hiện có
+    //         await this.prismaService.menuItemIngredient.deleteMany({
+    //             where: { menuItemId: id },
+    //         });
+    
+    //         // Tạo các mối quan hệ mới
+    //         await this.prismaService.menuItemIngredient.createMany({
+    //             data: data.ingredientIds.map(ingredientId => ({
+    //                 menuItemId: id,
+    //                 ingredientId,
+    //             })),
+    //         });
+    //     }
+    
+    //     // Truy vấn và trả về mục menu đã được cập nhật cùng với các nguyên liệu của nó
+    //     return this.prismaService.menuItem.findUnique({
+    //         where: { id },
+    //         include: { ingredients: true },
+    //     });
+    // }
+    
+    
 
 
     async delete(id: number, user: IUser): Promise<void> {

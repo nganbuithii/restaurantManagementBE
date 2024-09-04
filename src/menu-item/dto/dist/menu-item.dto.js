@@ -14,13 +14,17 @@ var CreateMenuItemDto = /** @class */ (function () {
     }
     __decorate([
         class_validator_1.IsString({ message: 'Name must be a string' }),
-        class_validator_1.IsNotEmpty({ message: "name menu item can not empty" }),
+        class_validator_1.IsNotEmpty({ message: "Name of the menu item cannot be empty" }),
         swagger_1.ApiProperty()
     ], CreateMenuItemDto.prototype, "name");
     __decorate([
-        class_validator_1.IsNotEmpty({ message: "price menu item can not empty" }),
+        class_validator_1.IsNotEmpty({ message: "Price of the menu item cannot be empty" }),
         swagger_1.ApiProperty()
     ], CreateMenuItemDto.prototype, "price");
+    __decorate([
+        class_validator_1.IsOptional(),
+        swagger_1.ApiProperty({ type: [Number], description: 'Array of ingredient IDs' })
+    ], CreateMenuItemDto.prototype, "ingredientIds");
     return CreateMenuItemDto;
 }());
 exports.CreateMenuItemDto = CreateMenuItemDto;
@@ -30,21 +34,21 @@ var UpdateMenuItemDto = /** @class */ (function () {
     __decorate([
         class_validator_1.IsOptional(),
         class_validator_1.IsString({ message: 'Name must be a string' }),
-        class_validator_1.IsNotEmpty({ message: "name menu item can not empty" }),
+        class_validator_1.IsNotEmpty({ message: "Name of the menu item cannot be empty" }),
         swagger_1.ApiProperty()
     ], UpdateMenuItemDto.prototype, "name");
     __decorate([
         class_validator_1.IsOptional(),
-        class_validator_1.IsNotEmpty({ message: "price menu item can not empty" }),
+        class_validator_1.IsNumber({}, { message: "Price must be a number" }),
+        class_validator_1.IsNotEmpty({ message: "Price of the menu item cannot be empty" }),
         swagger_1.ApiProperty()
     ], UpdateMenuItemDto.prototype, "price");
     __decorate([
         class_validator_1.IsOptional()
-        // @IsString({ each: true })
-        // ingredientIds?: number[]; // ID của các nguyên liệu liên quan
+        // @IsNumber({}, { each: true, message: "Each ingredient ID must be a number" })
         ,
-        swagger_1.ApiProperty()
-    ], UpdateMenuItemDto.prototype, "ingredientQuantities");
+        swagger_1.ApiProperty({ type: [Number], description: 'Array of ingredient IDs' })
+    ], UpdateMenuItemDto.prototype, "ingredientIds");
     return UpdateMenuItemDto;
 }());
 exports.UpdateMenuItemDto = UpdateMenuItemDto;

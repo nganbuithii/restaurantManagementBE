@@ -30,8 +30,8 @@ export class CreateIngredientDto {
     quantity: number;
 
 
-    @IsIn(['available', 'out_of_stock', 'pending'], {
-        message: 'Status must be one of the following: available, out_of_stock, pending',
+    @IsIn(['available', 'out_of_stock'], {
+        message: 'Status must be one of the following: available, out_of_stock',
     })
     @ApiProperty()
     status?: string;
@@ -44,6 +44,7 @@ export interface IngredientFilterType {
     page?:number;
     search?:string
     isActive?:string
+    sort?: 'price_asc' | 'price_desc';
   }
   
   export interface IngredientPaginationResponseType{

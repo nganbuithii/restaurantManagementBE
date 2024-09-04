@@ -51,24 +51,21 @@ var MenuItemService = /** @class */ (function () {
     }
     MenuItemService.prototype.create = function (body, user, files) {
         return __awaiter(this, void 0, void 0, function () {
-            var name, price, ingredientQuantities, numericPrice, parsedIngredientQuantities, uploadedImages, menuItem;
+            var name, price, ingredientIds, numericPrice, ingredientIdsAsNumbers, uploadedImages, menuItem;
             return __generator(this, function (_a) {
                 switch (_a.label) {
                     case 0:
-                        name = body.name, price = body.price, ingredientQuantities = body.ingredientQuantities;
-                        numericPrice = typeof price === 'string' ? parseFloat(price) : price;
-                        // Kiểm tra nếu không có hình ảnh
+                        name = body.name, price = body.price, ingredientIds = body.ingredientIds;
+                        numericPrice = parseFloat(price.toString());
+                        if (isNaN(numericPrice)) {
+                            throw new common_1.BadRequestException('Price must be a number');
+                        }
                         if (!files || files.length === 0) {
-                            throw new common_1.BadRequestException('At least one image is required.');
+                            throw new common_1.BadRequestException('Ít nhất một hình ảnh là bắt buộc.');
                         }
-                        try {
-                            parsedIngredientQuantities = typeof ingredientQuantities === 'string'
-                                ? JSON.parse(ingredientQuantities)
-                                : ingredientQuantities;
-                        }
-                        catch (e) {
-                            throw new common_1.BadRequestException('Invalid format for ingredientQuantities.');
-                        }
+                        ingredientIdsAsNumbers = Array.isArray(ingredientIds)
+                            ? ingredientIds.map(function (id) { return Number(id); })
+                            : [];
                         return [4 /*yield*/, this.cloudinaryService.uploadImages(files)];
                     case 1:
                         uploadedImages = _a.sent();
@@ -83,11 +80,10 @@ var MenuItemService = /** @class */ (function () {
                                         }); })
                                     },
                                     ingredients: {
-                                        create: parsedIngredientQuantities.map(function (item) { return ({
+                                        create: ingredientIdsAsNumbers.map(function (id) { return ({
                                             ingredient: {
-                                                connect: { id: item.ingredientId }
-                                            },
-                                            quantity: item.quantity
+                                                connect: { id: id }
+                                            }
                                         }); })
                                     }
                                 }
@@ -157,64 +153,47 @@ var MenuItemService = /** @class */ (function () {
             });
         });
     };
-    MenuItemService.prototype.update = function (id, data, user) {
-        return __awaiter(this, void 0, Promise, function () {
-            var existingMenuItem, updateData, updatedMenuItem;
-            return __generator(this, function (_a) {
-                switch (_a.label) {
-                    case 0: return [4 /*yield*/, this.prismaService.menuItem.findUnique({
-                            where: { id: id },
-                            include: { ingredients: true }
-                        })];
-                    case 1:
-                        existingMenuItem = _a.sent();
-                        if (!existingMenuItem) {
-                            throw new common_1.NotFoundException("Kh\u00F4ng t\u00ECm th\u1EA5y m\u1EE5c menu v\u1EDBi ID " + id);
-                        }
-                        updateData = {
-                            updatedBy: user.sub,
-                            updatedAt: new Date()
-                        };
-                        if (data.name !== undefined)
-                            updateData.name = data.name;
-                        if (data.price !== undefined)
-                            updateData.price = data.price;
-                        return [4 /*yield*/, this.prismaService.menuItem.update({
-                                where: { id: id },
-                                data: updateData
-                            })];
-                    case 2:
-                        updatedMenuItem = _a.sent();
-                        if (!(data.ingredientQuantities && data.ingredientQuantities.length > 0)) return [3 /*break*/, 5];
-                        // Xóa các mối quan hệ hiện có
-                        return [4 /*yield*/, this.prismaService.menuItemIngredient.deleteMany({
-                                where: { menuItemId: id }
-                            })];
-                    case 3:
-                        // Xóa các mối quan hệ hiện có
-                        _a.sent();
-                        // Tạo các mối quan hệ mới
-                        return [4 /*yield*/, this.prismaService.menuItemIngredient.createMany({
-                                data: data.ingredientQuantities.map(function (iq) { return ({
-                                    menuItemId: id,
-                                    ingredientId: iq.ingredientId,
-                                    quantity: iq.quantity
-                                }); })
-                            })];
-                    case 4:
-                        // Tạo các mối quan hệ mới
-                        _a.sent();
-                        _a.label = 5;
-                    case 5: 
-                    // Truy vấn và trả về mục menu đã được cập nhật cùng với các nguyên liệu của nó
-                    return [2 /*return*/, this.prismaService.menuItem.findUnique({
-                            where: { id: id },
-                            include: { ingredients: true }
-                        })];
-                }
-            });
-        });
-    };
+    // async update(id: number, data: UpdateMenuItemDto, user: IUser): Promise<MenuItem> {
+    //     // Kiểm tra xem mục menu có tồn tại không
+    //     const existingMenuItem = await this.prismaService.menuItem.findUnique({
+    //         where: { id },
+    //         include: { ingredients: true },
+    //     });
+    //     if (!existingMenuItem) {
+    //         throw new NotFoundException(`Không tìm thấy mục menu với ID ${id}`);
+    //     }
+    //     // Chuẩn bị dữ liệu để cập nhật
+    //     const updateData: any = {
+    //         updatedBy: user.sub,
+    //         updatedAt: new Date(),
+    //     };
+    //     if (data.name !== undefined) updateData.name = data.name;
+    //     if (data.price !== undefined) updateData.price = data.price;
+    //     // Cập nhật mục menu
+    //     const updatedMenuItem = await this.prismaService.menuItem.update({
+    //         where: { id },
+    //         data: updateData,
+    //     });
+    //     // Chỉ cập nhật nguyên liệu nếu được cung cấp
+    //     if (data.ingredientIds && data.ingredientIds.length > 0) {
+    //         // Xóa các mối quan hệ hiện có
+    //         await this.prismaService.menuItemIngredient.deleteMany({
+    //             where: { menuItemId: id },
+    //         });
+    //         // Tạo các mối quan hệ mới
+    //         await this.prismaService.menuItemIngredient.createMany({
+    //             data: data.ingredientIds.map(ingredientId => ({
+    //                 menuItemId: id,
+    //                 ingredientId,
+    //             })),
+    //         });
+    //     }
+    //     // Truy vấn và trả về mục menu đã được cập nhật cùng với các nguyên liệu của nó
+    //     return this.prismaService.menuItem.findUnique({
+    //         where: { id },
+    //         include: { ingredients: true },
+    //     });
+    // }
     MenuItemService.prototype["delete"] = function (id, user) {
         return __awaiter(this, void 0, Promise, function () {
             var existingMenuItem;

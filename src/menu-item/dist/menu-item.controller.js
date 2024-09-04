@@ -29,9 +29,13 @@ var MenuItemController = /** @class */ (function () {
     MenuItemController.prototype.getDetail = function (id) {
         return this.menuItemService.getDetail(id);
     };
-    MenuItemController.prototype.update = function (id, data, user) {
-        return this.menuItemService.update(id, data, user);
-    };
+    // @Patch(':id')
+    // @RequirePermissions('UPDATE_MENU_ITEM')
+    // @UseGuards(JwtAuthGuard)
+    // @ResponseMessage(" update menu item by id")
+    //   update(@Param('id', ParseIntPipe) id: number, @Body() data: UpdateMenuItemDto, @CurrentUser() user:IUser): Promise<MenuItem> {
+    //       return this.menuItemService.update(id, data, user);
+    //   }
     MenuItemController.prototype.deleteMenuItem = function (id, user) {
         return this.menuItemService["delete"](id, user);
     };
@@ -59,13 +63,6 @@ var MenuItemController = /** @class */ (function () {
         customize_1.ResponseMessage(" get detail menu item by id"),
         __param(0, common_1.Param('id', common_1.ParseIntPipe))
     ], MenuItemController.prototype, "getDetail");
-    __decorate([
-        common_1.Patch(':id'),
-        permission_1.RequirePermissions('UPDATE_MENU_ITEM'),
-        common_1.UseGuards(jwt_auth_guard_1.JwtAuthGuard),
-        customize_1.ResponseMessage(" update menu item by id"),
-        __param(0, common_1.Param('id', common_1.ParseIntPipe)), __param(1, common_1.Body()), __param(2, customize_1.CurrentUser())
-    ], MenuItemController.prototype, "update");
     __decorate([
         common_1.Delete(':id'),
         common_1.UseGuards(jwt_auth_guard_1.JwtAuthGuard),
