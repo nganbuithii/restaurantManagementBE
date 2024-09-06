@@ -25,38 +25,46 @@ export class FeeckbacksService {
 
 
       async getAll(filter: FeedbackFilterType): Promise<FeedbackPaginationResponseType> {
-        const items_per_page = Number(process.env.ITEMS_PER_PAGE) ; 
+        const items_per_page = Number(process.env.ITEMS_PER_PAGE); 
         const page = Number(filter.page) || 1;
         const search = filter.search || "";
-
+    
         const skip = (page - 1) * items_per_page;
         const take = items_per_page;
     
         const where = search
-          ? {
-              content: {
-                contains: search,
-              },
+            ? {
+                content: {
+                    contains: search,
+                },
             }
-          : {};
+            : {};
     
         const [feedbacks, total] = await Promise.all([
-          this.prisma.feedback.findMany({
-            where,
-            skip,
-            take: items_per_page,
-          }),
-          this.prisma.feedback.count({ where }),
+            this.prisma.feedback.findMany({
+                where,
+                skip,
+                take: items_per_page,
+                include: {
+                    user: {
+                        select: {
+                            fullName: true, // Only select fullName
+                        },
+                    },
+                },
+            }),
+            this.prisma.feedback.count({ where }),
         ]);
     
         return {
-          data: feedbacks,
-          total,
-          currentPage: page,
-          itemsPerPage: items_per_page,
+            data: feedbacks,
+            total,
+            currentPage: page,
+            itemsPerPage: items_per_page,
         };
-      }
-
+    }
+    
+    
 
       async getDetail(id: number): Promise<Feedback> {
         const feedback = await this.prisma.feedback.findUnique({

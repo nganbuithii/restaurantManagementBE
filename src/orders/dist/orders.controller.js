@@ -74,6 +74,13 @@ var OrdersController = /** @class */ (function () {
     OrdersController.prototype.applyVoucher = function (orderId, body) {
         return this.vouchersService.applyVoucher(orderId, body.voucherCode);
     };
+    OrdersController.prototype.changeStatus = function (id, body, user) {
+        return __awaiter(this, void 0, Promise, function () {
+            return __generator(this, function (_a) {
+                return [2 /*return*/, this.ordersService.updateStatus(id, body.status, user)];
+            });
+        });
+    };
     __decorate([
         common_1.Post(),
         common_1.HttpCode(common_1.HttpStatus.CREATED),
@@ -89,9 +96,8 @@ var OrdersController = /** @class */ (function () {
         __param(0, common_1.Query())
     ], OrdersController.prototype, "getAll");
     __decorate([
-        common_1.Get(':id')
-        // @UseGuards(JwtAuthGuard)
-        ,
+        common_1.Get(':id'),
+        common_1.UseGuards(jwt_auth_guard_1.JwtAuthGuard),
         customize_1.ResponseMessage(" get order by id"),
         __param(0, common_1.Param('id', common_1.ParseIntPipe))
     ], OrdersController.prototype, "getDetail");
@@ -110,6 +116,14 @@ var OrdersController = /** @class */ (function () {
         __param(0, common_1.Param('orderId', common_1.ParseIntPipe)),
         __param(1, common_1.Body())
     ], OrdersController.prototype, "applyVoucher");
+    __decorate([
+        common_1.Patch(':id/change-status'),
+        common_1.UseGuards(jwt_auth_guard_1.JwtAuthGuard),
+        customize_1.ResponseMessage('Order status updated successfully'),
+        __param(0, common_1.Param('id', common_1.ParseIntPipe)),
+        __param(1, common_1.Body()),
+        __param(2, customize_1.CurrentUser())
+    ], OrdersController.prototype, "changeStatus");
     OrdersController = __decorate([
         swagger_1.ApiTags("Orders"),
         common_1.Controller('orders')

@@ -1,7 +1,7 @@
 import { Order } from '@prisma/client';
 import { ForbiddenException, Injectable, NotFoundException } from '@nestjs/common';
 import { PrismaService } from 'src/prisma.service';
-import { CreateOrderDto, OrderFilterType, OrderPaginationResponseType, UpdateOrderDto } from './dto/orders.dto';
+import { CreateOrderDto, OrderFilterType, OrderPaginationResponseType, OrderStatus, UpdateOrderDto } from './dto/orders.dto';
 import { IUser } from 'interfaces/user.interface';
 @Injectable()
 export class OrdersService {
@@ -50,15 +50,13 @@ export class OrdersService {
 
 
   async getAll(params: OrderFilterType): Promise<OrderPaginationResponseType> {
-    const { page = 1, items_per_page = 10, search } = params;
+    const { page = 1, items_per_page = parseInt(process.env.ITEMS_PER_PAGE, 10) || 10, search } = params;
     const skip = (page - 1) * items_per_page;
 
+    // Xử lý tìm kiếm chỉ theo trạng thái
     const where = search
       ? {
-          OR: [
-            { status: { contains: search, mode: 'insensitive' } },
-            { totalPrice: { equals: parseFloat(search) } },
-          ],
+          status: { contains: search }
         }
       : {};
 
@@ -71,10 +69,10 @@ export class OrdersService {
           details: true,
         },
       }),
-      this.prisma.order.count({ where }),
+      this.prisma.order.count({ where }), // Sửa ở đây
     ]);
 
-    // Transform orders to OrderResponseDto
+    // Chuyển đổi orders thành OrderResponseDto
     const customOrders = orders.map(order => ({
         id: order.id,
         status: order.status,
@@ -83,12 +81,12 @@ export class OrdersService {
         userId: order.userId,
         createdAt: order.createdAt,
         updatedAt: order.updatedAt,
-        usedVoucherId: order.usedVoucherId, // Add this line
+        usedVoucherId: order.usedVoucherId,
         details: order.details.map(detail => ({
             id: detail.id,
             quantity: detail.quantity,
             menuItemId: detail.menuItemId,
-            // createdAt: detail.createdAt, // Uncomment if you need createdAt for details
+            // createdAt: detail.createdAt, // Bỏ comment nếu cần createdAt cho details
         })),
     }));
 
@@ -99,6 +97,10 @@ export class OrdersService {
       itemsPerPage: items_per_page,
     };
 }
+
+
+
+
 
     async getDetail(id: number): Promise<any> {
       const order = await this.prisma.order.findUnique({
@@ -145,6 +147,20 @@ export class OrdersService {
         data: {
           ...updateOrderDto,
         },
+      });
+    }
+    
+
+    async updateStatus(orderId: number, status: OrderStatus, user: IUser): Promise<Order> {
+      const order = await this.prisma.order.findUnique({ where: { id: orderId } });
+      
+      if (!order) {
+        throw new NotFoundException('Order not found');
+      }
+    
+      return this.prisma.order.update({
+        where: { id: orderId },
+        data: { status },
       });
     }
     

@@ -103,7 +103,14 @@ var FeeckbacksService = /** @class */ (function () {
                                 this.prisma.feedback.findMany({
                                     where: where,
                                     skip: skip,
-                                    take: items_per_page
+                                    take: items_per_page,
+                                    include: {
+                                        user: {
+                                            select: {
+                                                fullName: true
+                                            }
+                                        }
+                                    }
                                 }),
                                 this.prisma.feedback.count({ where: where }),
                             ])];

@@ -139,7 +139,8 @@ export class WarehouseSlipsService {
         await this.prisma.warehouseSlip.update({
             where: { id },
             data: {
-
+                isActive: false,
+                updatedAt: new Date(),
             },
         });
     }
@@ -175,4 +176,60 @@ export class WarehouseSlipsService {
 
         return updatedWarehouseSlip;
     }
+
+    async getStatistics(): Promise<any> {
+        try {
+            // Thống kê phiếu kho
+            const totalIn = await this.prisma.warehouseSlip.count({
+                where: { type: 'IN' },
+            });
+
+            const totalOut = await this.prisma.warehouseSlip.count({
+                where: { type: 'OUT' },
+            });
+
+            const totalActive = await this.prisma.warehouseSlip.count({
+                where: { isActive: true },
+            });
+
+            const totalInactive = await this.prisma.warehouseSlip.count({
+                where: { isActive: false },
+            });
+
+            const totalDetails = await this.prisma.warehouseSlipDetail.count();
+
+            // Thống kê nguyên liệu
+            const totalIngredients = await this.prisma.ingredient.count();
+
+            const ingredientsInInventory = await this.prisma.inventory.count();
+
+            const ingredientsWithoutInventory = totalIngredients - ingredientsInInventory;
+
+            const totalInventoryQuantity = await this.prisma.inventory.aggregate({
+                _sum: {
+                    quantity: true,
+                },
+            });
+
+            return {
+                warehouseStatistics: {
+                    totalIn,
+                    totalOut,
+                    totalActive,
+                    totalInactive,
+                    totalDetails,
+                },
+                ingredientStatistics: {
+                    totalIngredients,
+                    ingredientsInInventory,
+                    ingredientsWithoutInventory,
+                    totalInventoryQuantity: totalInventoryQuantity._sum.quantity || 0,
+                },
+            };
+        } catch (error) {
+            console.error('Error fetching statistics:', error);
+            throw error;
+        }
+    }
 }
+    

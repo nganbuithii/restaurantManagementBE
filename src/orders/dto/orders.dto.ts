@@ -3,7 +3,7 @@ import { Order } from '@prisma/client';
 import { Type } from 'class-transformer';
 import { IsArray, IsEnum, IsNotEmpty, IsNumber, IsOptional, IsString, ValidateNested } from 'class-validator';
 
-enum OrderStatus {
+export enum OrderStatus {
     PENDING = 'PENDING',
     PROCESSING = 'PROCESSING',
     COMPLETED = 'COMPLETED',

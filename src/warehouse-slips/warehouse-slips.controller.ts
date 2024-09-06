@@ -51,6 +51,13 @@ export class WarehouseSlipsController {
     update(@Param('id', ParseIntPipe) id: number, @Body() data: UpdateWarehouseSlipDto, @CurrentUser() user:IUser): Promise<WarehouseSlip> {
       return this.warehouseSlipsService.update(id, data, user);
     }
+
+
+    @Post('/statistics')
+    // @ResponseMessage("Statictics by slip ware house")
+  async getStatistics() {
+    return this.warehouseSlipsService.getStatistics();
+  }
 }
 
 

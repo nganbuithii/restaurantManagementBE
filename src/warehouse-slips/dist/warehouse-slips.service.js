@@ -207,7 +207,10 @@ var WarehouseSlipsService = /** @class */ (function () {
                         }
                         return [4 /*yield*/, this.prisma.warehouseSlip.update({
                                 where: { id: id },
-                                data: {}
+                                data: {
+                                    isActive: false,
+                                    updatedAt: new Date()
+                                }
                             })];
                     case 2:
                         _a.sent();
@@ -251,6 +254,74 @@ var WarehouseSlipsService = /** @class */ (function () {
                     case 2:
                         updatedWarehouseSlip = _b.sent();
                         return [2 /*return*/, updatedWarehouseSlip];
+                }
+            });
+        });
+    };
+    WarehouseSlipsService.prototype.getStatistics = function () {
+        return __awaiter(this, void 0, Promise, function () {
+            var totalIn, totalOut, totalActive, totalInactive, totalDetails, totalIngredients, ingredientsInInventory, ingredientsWithoutInventory, totalInventoryQuantity, error_1;
+            return __generator(this, function (_a) {
+                switch (_a.label) {
+                    case 0:
+                        _a.trys.push([0, 9, , 10]);
+                        return [4 /*yield*/, this.prisma.warehouseSlip.count({
+                                where: { type: 'IN' }
+                            })];
+                    case 1:
+                        totalIn = _a.sent();
+                        return [4 /*yield*/, this.prisma.warehouseSlip.count({
+                                where: { type: 'OUT' }
+                            })];
+                    case 2:
+                        totalOut = _a.sent();
+                        return [4 /*yield*/, this.prisma.warehouseSlip.count({
+                                where: { isActive: true }
+                            })];
+                    case 3:
+                        totalActive = _a.sent();
+                        return [4 /*yield*/, this.prisma.warehouseSlip.count({
+                                where: { isActive: false }
+                            })];
+                    case 4:
+                        totalInactive = _a.sent();
+                        return [4 /*yield*/, this.prisma.warehouseSlipDetail.count()];
+                    case 5:
+                        totalDetails = _a.sent();
+                        return [4 /*yield*/, this.prisma.ingredient.count()];
+                    case 6:
+                        totalIngredients = _a.sent();
+                        return [4 /*yield*/, this.prisma.inventory.count()];
+                    case 7:
+                        ingredientsInInventory = _a.sent();
+                        ingredientsWithoutInventory = totalIngredients - ingredientsInInventory;
+                        return [4 /*yield*/, this.prisma.inventory.aggregate({
+                                _sum: {
+                                    quantity: true
+                                }
+                            })];
+                    case 8:
+                        totalInventoryQuantity = _a.sent();
+                        return [2 /*return*/, {
+                                warehouseStatistics: {
+                                    totalIn: totalIn,
+                                    totalOut: totalOut,
+                                    totalActive: totalActive,
+                                    totalInactive: totalInactive,
+                                    totalDetails: totalDetails
+                                },
+                                ingredientStatistics: {
+                                    totalIngredients: totalIngredients,
+                                    ingredientsInInventory: ingredientsInInventory,
+                                    ingredientsWithoutInventory: ingredientsWithoutInventory,
+                                    totalInventoryQuantity: totalInventoryQuantity._sum.quantity || 0
+                                }
+                            }];
+                    case 9:
+                        error_1 = _a.sent();
+                        console.error('Error fetching statistics:', error_1);
+                        throw error_1;
+                    case 10: return [2 /*return*/];
                 }
             });
         });

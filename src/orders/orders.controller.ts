@@ -7,6 +7,7 @@ import { Order } from '@prisma/client';
 import { CreateOrderDto, OrderFilterType, OrderPaginationResponseType, UpdateOrderDto } from './dto/orders.dto';
 import { VouchersService } from 'src/vouchers/vouchers.service';
 import { ApiTags } from '@nestjs/swagger';
+import { OrderStatus } from './dto/orders.dto';
 
 @ApiTags("Orders")
 @Controller('orders')
@@ -36,7 +37,7 @@ export class OrdersController {
   }
 
   @Get(':id')
-  // @UseGuards(JwtAuthGuard)
+  @UseGuards(JwtAuthGuard)
   @ResponseMessage(" get order by id")
   getDetail(@Param('id', ParseIntPipe) id: number): Promise<Order> {
     return this.ordersService.getDetail(id)
@@ -62,5 +63,16 @@ export class OrdersController {
   ): Promise<Order> {
       return this.vouchersService.applyVoucher(orderId, body.voucherCode);
   }
+
+  @Patch(':id/change-status')
+@UseGuards(JwtAuthGuard)
+@ResponseMessage('Order status updated successfully')
+async changeStatus(
+  @Param('id', ParseIntPipe) id: number,
+  @Body() body: { status: OrderStatus },
+  @CurrentUser() user: IUser,
+): Promise<Order> {
+  return this.ordersService.updateStatus(id, body.status, user);
+}
   
 }

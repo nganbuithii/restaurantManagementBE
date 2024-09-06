@@ -116,14 +116,11 @@ var OrdersService = /** @class */ (function () {
             return __generator(this, function (_d) {
                 switch (_d.label) {
                     case 0:
-                        _a = params.page, page = _a === void 0 ? 1 : _a, _b = params.items_per_page, items_per_page = _b === void 0 ? 10 : _b, search = params.search;
+                        _a = params.page, page = _a === void 0 ? 1 : _a, _b = params.items_per_page, items_per_page = _b === void 0 ? parseInt(process.env.ITEMS_PER_PAGE, 10) || 10 : _b, search = params.search;
                         skip = (page - 1) * items_per_page;
                         where = search
                             ? {
-                                OR: [
-                                    { status: { contains: search, mode: 'insensitive' } },
-                                    { totalPrice: { equals: parseFloat(search) } },
-                                ]
+                                status: { contains: search }
                             }
                             : {};
                         return [4 /*yield*/, Promise.all([
@@ -216,6 +213,25 @@ var OrdersService = /** @class */ (function () {
                         return [2 /*return*/, this.prisma.order.update({
                                 where: { id: id },
                                 data: __assign({}, updateOrderDto)
+                            })];
+                }
+            });
+        });
+    };
+    OrdersService.prototype.updateStatus = function (orderId, status, user) {
+        return __awaiter(this, void 0, Promise, function () {
+            var order;
+            return __generator(this, function (_a) {
+                switch (_a.label) {
+                    case 0: return [4 /*yield*/, this.prisma.order.findUnique({ where: { id: orderId } })];
+                    case 1:
+                        order = _a.sent();
+                        if (!order) {
+                            throw new common_1.NotFoundException('Order not found');
+                        }
+                        return [2 /*return*/, this.prisma.order.update({
+                                where: { id: orderId },
+                                data: { status: status }
                             })];
                 }
             });
