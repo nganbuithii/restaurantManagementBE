@@ -72,19 +72,36 @@ export class MenuService {
         };
     }
 
-    async getDetail(id: number): Promise<Menu & { menuItems: MenuItem[] }> {
-
+    async getDetail(id: number): Promise<Menu & { menuItems: { name: string }[] }> {
         const menu = await this.prismaService.menu.findUnique({
             where: { id },
-            include: { menuItems: true }, // Bao gồm các món ăn của menu
+            select: {
+                id: true,
+                name: true,
+                isActive: true,
+                createdAt: true,
+                updatedAt: true,
+                updatedBy: true,  
+                deletedBy: true,  
+                createdBy: true,  
+                menuItems: {
+                    select: {
+                        id:true,
+                        name: true,
+                    },
+                },
+            },
         });
-
+    
         if (!menu) {
             throw new NotFoundException(`Không tìm thấy menu với ID ${id}`);
         }
-
+    
         return menu;
     }
+    
+    
+    
 
     async update(id: number, data: UpdateMenuDto, user: IUser): Promise<Menu> {
         // Kiểm tra xem menu có tồn tại không

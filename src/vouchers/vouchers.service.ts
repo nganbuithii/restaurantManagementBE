@@ -1,6 +1,6 @@
 import { BadRequestException, Injectable, NotFoundException } from '@nestjs/common';
 import { PrismaService } from 'src/prisma.service';
-import { CreateVoucherDto, UpdateVoucherDto, VoucherFilterType, VoucherPaginationResponseType } from './dto/voucher.dto';
+import { CreateVoucherDto, UpdateVoucherDto, VoucherFilterType, VoucherPaginationResponseType, VoucherStatus } from './dto/voucher.dto';
 import { IUser } from 'interfaces/user.interface';
 import { Order, Voucher } from '@prisma/client';
 import { generateVoucherCode } from 'helper/voucher.helper';
@@ -69,6 +69,9 @@ export class VouchersService {
         where,
         skip,
         take: items_per_page,
+        orderBy: {
+          id: 'desc', 
+        },
       }),
       this.prisma.voucher.count({ where }),
     ]);
@@ -174,5 +177,13 @@ export class VouchersService {
     return updatedOrder;
   }
   
-
+  async updateStatus(id: number, status: VoucherStatus, user: IUser): Promise<Partial<Voucher>> {
+    return this.prisma.voucher.update({
+      where: { id },
+      data: { status, updatedBy: user.sub },
+      select: { id: true, status: true, code: true, percent: true },  
+    });
+  }
+  
+  
 }

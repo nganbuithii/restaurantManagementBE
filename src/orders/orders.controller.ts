@@ -14,21 +14,21 @@ import { OrderStatus } from './dto/orders.dto';
 export class OrdersController {
   constructor(private readonly ordersService: OrdersService,
     private readonly vouchersService: VouchersService
-  ) {}
+  ) { }
 
   @Post()
   @HttpCode(HttpStatus.CREATED)
   @UseGuards(JwtAuthGuard)
   @ResponseMessage('Order created successfully')
   createOrder(
-    @Body() body: CreateOrderDto, 
+    @Body() body: CreateOrderDto,
     @CurrentUser() user: IUser,
   ): Promise<Order> {
     return this.ordersService.create(body, user);
   }
 
 
-  
+
   @Get()
   @UseGuards(JwtAuthGuard)
   @ResponseMessage("get all orders with pagination")
@@ -58,21 +58,21 @@ export class OrdersController {
   @UseGuards(JwtAuthGuard)
   @ResponseMessage("Apply voucher to order")
   applyVoucher(
-      @Param('orderId', ParseIntPipe) orderId: number,
-      @Body() body: { voucherCode: string } 
+    @Param('orderId', ParseIntPipe) orderId: number,
+    @Body() body: { voucherCode: string }
   ): Promise<Order> {
-      return this.vouchersService.applyVoucher(orderId, body.voucherCode);
+    return this.vouchersService.applyVoucher(orderId, body.voucherCode);
   }
 
   @Patch(':id/change-status')
-@UseGuards(JwtAuthGuard)
-@ResponseMessage('Order status updated successfully')
-async changeStatus(
-  @Param('id', ParseIntPipe) id: number,
-  @Body() body: { status: OrderStatus },
-  @CurrentUser() user: IUser,
-): Promise<Order> {
-  return this.ordersService.updateStatus(id, body.status, user);
-}
-  
+  @UseGuards(JwtAuthGuard)
+  @ResponseMessage('Order status updated successfully')
+  async changeStatus(
+    @Param('id', ParseIntPipe) id: number,
+    @Body() body: { status: OrderStatus },
+    @CurrentUser() user: IUser,
+  ): Promise<Order> {
+    return this.ordersService.updateStatus(id, body.status, user);
+  }
+
 }

@@ -33,9 +33,10 @@ export class MenuController {
 
   @Get(':id')
   @ResponseMessage("get detail menu by id")
-  getDetail(@Param('id', ParseIntPipe) id: number): Promise<Menu & { menuItems: MenuItem[] }> {
-    return this.menuService.getDetail(id);
+  getDetail(@Param('id', ParseIntPipe) id: number): Promise<Menu & { menuItems: { name: string }[] }> {
+      return this.menuService.getDetail(id);
   }
+  
 
   @Patch(':id')
   @UseGuards(JwtAuthGuard)

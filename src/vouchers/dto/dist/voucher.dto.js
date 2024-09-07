@@ -6,7 +6,7 @@ var __decorate = (this && this.__decorate) || function (decorators, target, key,
     return c > 3 && r && Object.defineProperty(target, key, r), r;
 };
 exports.__esModule = true;
-exports.UpdateVoucherDto = exports.CreateVoucherDto = void 0;
+exports.VoucherStatus = exports.UpdateVoucherDto = exports.CreateVoucherDto = void 0;
 var swagger_1 = require("@nestjs/swagger");
 var class_validator_1 = require("class-validator");
 var CreateVoucherDto = /** @class */ (function () {
@@ -118,3 +118,10 @@ var UpdateVoucherDto = /** @class */ (function () {
     return UpdateVoucherDto;
 }());
 exports.UpdateVoucherDto = UpdateVoucherDto;
+var VoucherStatus;
+(function (VoucherStatus) {
+    VoucherStatus["PENDING"] = "ACTIVE";
+    VoucherStatus["PROCESSING"] = "PAUSED";
+    VoucherStatus["COMPLETED"] = "EXPIRED";
+    VoucherStatus["CANCELLED"] = "USED_UP";
+})(VoucherStatus = exports.VoucherStatus || (exports.VoucherStatus = {})); // "ACTIVE", "PAUSED", "EXPIRED", "USED_UP"

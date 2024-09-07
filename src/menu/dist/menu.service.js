@@ -126,7 +126,22 @@ var MenuService = /** @class */ (function () {
                 switch (_a.label) {
                     case 0: return [4 /*yield*/, this.prismaService.menu.findUnique({
                             where: { id: id },
-                            include: { menuItems: true }
+                            select: {
+                                id: true,
+                                name: true,
+                                isActive: true,
+                                createdAt: true,
+                                updatedAt: true,
+                                updatedBy: true,
+                                deletedBy: true,
+                                createdBy: true,
+                                menuItems: {
+                                    select: {
+                                        id: true,
+                                        name: true
+                                    }
+                                }
+                            }
                         })];
                     case 1:
                         menu = _a.sent();

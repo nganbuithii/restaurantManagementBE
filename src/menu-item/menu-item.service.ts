@@ -93,9 +93,15 @@ export class MenuItemService {
             where: { id },
             include: {
                 images: true,
-                ingredients: true,
-
-            },
+                ingredients: {
+                    include: {
+                        ingredient: {
+                            select: {
+                                name: true, // Chỉ lấy tên nguyên liệu
+                            },
+                        },
+                    },
+                },}
         });
 
         if (!menuItem) {
@@ -104,54 +110,7 @@ export class MenuItemService {
 
         return menuItem;
     }
-    // async update(id: number, data: UpdateMenuItemDto, user: IUser): Promise<MenuItem> {
-    //     // Kiểm tra xem mục menu có tồn tại không
-    //     const existingMenuItem = await this.prismaService.menuItem.findUnique({
-    //         where: { id },
-    //         include: { ingredients: true },
-    //     });
-    
-    //     if (!existingMenuItem) {
-    //         throw new NotFoundException(`Không tìm thấy mục menu với ID ${id}`);
-    //     }
-    
-    //     // Chuẩn bị dữ liệu để cập nhật
-    //     const updateData: any = {
-    //         updatedBy: user.sub,
-    //         updatedAt: new Date(),
-    //     };
-    //     if (data.name !== undefined) updateData.name = data.name;
-    //     if (data.price !== undefined) updateData.price = data.price;
-    
-    //     // Cập nhật mục menu
-    //     const updatedMenuItem = await this.prismaService.menuItem.update({
-    //         where: { id },
-    //         data: updateData,
-    //     });
-    
-    //     // Chỉ cập nhật nguyên liệu nếu được cung cấp
-    //     if (data.ingredientIds && data.ingredientIds.length > 0) {
-    //         // Xóa các mối quan hệ hiện có
-    //         await this.prismaService.menuItemIngredient.deleteMany({
-    //             where: { menuItemId: id },
-    //         });
-    
-    //         // Tạo các mối quan hệ mới
-    //         await this.prismaService.menuItemIngredient.createMany({
-    //             data: data.ingredientIds.map(ingredientId => ({
-    //                 menuItemId: id,
-    //                 ingredientId,
-    //             })),
-    //         });
-    //     }
-    
-    //     // Truy vấn và trả về mục menu đã được cập nhật cùng với các nguyên liệu của nó
-    //     return this.prismaService.menuItem.findUnique({
-    //         where: { id },
-    //         include: { ingredients: true },
-    //     });
-    // }
-    
+
     
 
 

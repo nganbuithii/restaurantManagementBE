@@ -120,3 +120,10 @@ export interface VoucherPaginationResponseType {
     currentPage: number
     itemsPerPage: number
 }
+
+export enum VoucherStatus {
+    PENDING = 'ACTIVE',
+    PROCESSING = 'PAUSED',
+    COMPLETED = 'EXPIRED',
+    CANCELLED = 'USED_UP',
+} // "ACTIVE", "PAUSED", "EXPIRED", "USED_UP"

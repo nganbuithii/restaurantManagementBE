@@ -2,7 +2,7 @@ import { Voucher } from '@prisma/client';
 import { Body, Controller, Get, HttpCode, HttpStatus, Post, Query,Param, UseGuards, ParseIntPipe, Patch, Delete } from '@nestjs/common';
 import { VouchersService } from './vouchers.service';
 import { JwtAuthGuard } from 'src/auth/jwt-auth.guard';
-import { CreateVoucherDto, UpdateVoucherDto, VoucherFilterType, VoucherPaginationResponseType } from './dto/voucher.dto';
+import { CreateVoucherDto, UpdateVoucherDto, VoucherFilterType, VoucherPaginationResponseType, VoucherStatus } from './dto/voucher.dto';
 import { CurrentUser, ResponseMessage } from 'decorators/customize';
 import { IUser } from 'interfaces/user.interface';
 import { ApiTags } from '@nestjs/swagger';
@@ -60,7 +60,18 @@ export class VouchersController {
     //   return this.vouchersService.getCustomerVouchers(customerId);
     // }
 
-
+    
+    @Patch(':id/change-status')
+    @UseGuards(JwtAuthGuard)
+    @ResponseMessage('Voucher status updated successfully')
+    async changeStatus(
+      @Param('id', ParseIntPipe) id: number,
+      @Body() body: { status: VoucherStatus },
+      @CurrentUser() user: IUser,
+    ): Promise<Partial<Voucher>> {
+      return this.vouchersService.updateStatus(id, body.status, user);
+    }
+    
 
 
 }

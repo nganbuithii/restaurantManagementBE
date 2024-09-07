@@ -117,7 +117,10 @@ var VouchersService = /** @class */ (function () {
                                 this.prisma.voucher.findMany({
                                     where: where,
                                     skip: skip,
-                                    take: items_per_page
+                                    take: items_per_page,
+                                    orderBy: {
+                                        id: 'desc'
+                                    }
                                 }),
                                 this.prisma.voucher.count({ where: where }),
                             ])];
@@ -240,6 +243,17 @@ var VouchersService = /** @class */ (function () {
                         updatedOrder = _a.sent();
                         return [2 /*return*/, updatedOrder];
                 }
+            });
+        });
+    };
+    VouchersService.prototype.updateStatus = function (id, status, user) {
+        return __awaiter(this, void 0, Promise, function () {
+            return __generator(this, function (_a) {
+                return [2 /*return*/, this.prisma.voucher.update({
+                        where: { id: id },
+                        data: { status: status, updatedBy: user.sub },
+                        select: { id: true, status: true, code: true, percent: true }
+                    })];
             });
         });
     };

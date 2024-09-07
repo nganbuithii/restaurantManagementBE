@@ -169,7 +169,11 @@ var OrdersService = /** @class */ (function () {
                     case 0: return [4 /*yield*/, this.prisma.order.findUnique({
                             where: { id: id },
                             include: {
-                                details: true
+                                details: {
+                                    include: {
+                                        menuItem: true
+                                    }
+                                }
                             }
                         })];
                     case 1:
@@ -187,7 +191,8 @@ var OrdersService = /** @class */ (function () {
                                 details: order.details.map(function (detail) { return ({
                                     id: detail.id,
                                     quantity: detail.quantity,
-                                    menuItemId: detail.menuItemId
+                                    menuItemId: detail.menuItemId,
+                                    menuItemName: detail.menuItem ? detail.menuItem.name : 'Unknown'
                                 }); })
                             }];
                 }
