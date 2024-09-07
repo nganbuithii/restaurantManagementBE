@@ -44,7 +44,7 @@ export class IngredientService {
     }
 
     async getAll(filters: IngredientFilterType): Promise<IngredientPaginationResponseType> {
-        const items_per_page = Number(filters.items_per_page) || 10;
+        const items_per_page = Number(filters.items_per_page) || 4;
         const page = Number(filters.page) || 1;
         const search = filters.search || "";
         const sort = filters.sort;

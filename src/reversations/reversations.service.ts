@@ -1,5 +1,5 @@
 import { BadRequestException, Injectable, NotFoundException } from '@nestjs/common';
-import { CreateReservationDto, ReservationFilterType, ReservationPaginationResponseType, UpdateReservationDto } from './dto/reversations.dto';
+import { CreateReservationDto, ReservationFilterType, ReservationPaginationResponseType, ReservationStatus, UpdateReservationDto } from './dto/reversations.dto';
 import { PrismaService } from 'src/prisma.service';
 import { IUser } from 'interfaces/user.interface';
 import { Reservation } from '@prisma/client';
@@ -42,9 +42,9 @@ export class ReversationsService {
     }
 
     async getAll(params: ReservationFilterType): Promise<ReservationPaginationResponseType> {
-        const { page = 1, items_per_page = 10, search } = params;
+        const { page = 1, items_per_page = 4, search } = params;
         const skip = (page - 1) * items_per_page;
-    
+
         // Xây dựng điều kiện tìm kiếm
         const where = search
             ? {
@@ -55,10 +55,10 @@ export class ReversationsService {
                 ],
             }
             : {};
-    
+
         // Tính tổng số bản ghi
         const total = await this.prisma.reservation.count({ where });
-    
+
         // Lấy danh sách các đặt chỗ
         const reservations = await this.prisma.reservation.findMany({
             where,
@@ -74,17 +74,17 @@ export class ReversationsService {
             },
             orderBy: { createdAt: 'desc' },
         });
-    
+
         // Chuyển đổi dữ liệu theo định dạng mong đợi
         const data = reservations.map(reservation => ({
             id: reservation.id,
             startTime: reservation.startTime,
             endTime: reservation.endTime,
             status: reservation.status,
-            tableId: reservation.table.id,        
-            customerId: reservation.customer.id,   
+            tableId: reservation.table.id,
+            customerId: reservation.customer.id,
         }));
-    
+
         return {
             data,
             total,
@@ -92,7 +92,7 @@ export class ReversationsService {
             itemsPerPage: items_per_page,
         };
     }
-    
+
     async getDetail(id: number): Promise<any> {
         const reservation = await this.prisma.reservation.findUnique({
             where: { id },
@@ -140,21 +140,36 @@ export class ReversationsService {
     }
     async update(id: number, data: UpdateReservationDto, user: IUser): Promise<Reservation> {
         const reservation = await this.prisma.reservation.findUnique({
-          where: { id },
+            where: { id },
         });
-    
+
         if (!reservation) {
-          throw new NotFoundException('Reservation not found');
+            throw new NotFoundException('Reservation not found');
         }
-    
+
         const updatedReservation = await this.prisma.reservation.update({
-          where: { id },
-          data: {
-            ...data,
-            updatedAt: new Date(),
-          },
+            where: { id },
+            data: {
+                ...data,
+                updatedAt: new Date(),
+            },
         });
-    
+
         return updatedReservation;
-      }
+    }
+
+    async changeStatus(id: number, status: ReservationStatus, user: IUser): Promise<Reservation> {
+        const reservation = await this.prisma.reservation.findUnique({ where: { id } });
+
+        if (!reservation) {
+            throw new NotFoundException('Reservation not found');
+        }
+
+
+        return this.prisma.reservation.update({
+            where: { id },
+            data: { status }
+        });
+    }
+
 }

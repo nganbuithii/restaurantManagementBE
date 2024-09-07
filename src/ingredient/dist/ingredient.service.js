@@ -112,7 +112,7 @@ var IngredientService = /** @class */ (function () {
             return __generator(this, function (_a) {
                 switch (_a.label) {
                     case 0:
-                        items_per_page = Number(filters.items_per_page) || 10;
+                        items_per_page = Number(filters.items_per_page) || 4;
                         page = Number(filters.page) || 1;
                         search = filters.search || "";
                         sort = filters.sort;

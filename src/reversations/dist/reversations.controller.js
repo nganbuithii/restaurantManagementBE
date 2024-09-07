@@ -30,6 +30,9 @@ var ReversationsController = /** @class */ (function () {
     ReversationsController.prototype.update = function (id, data, user) {
         return this.reversationsService.update(id, data, user);
     };
+    ReversationsController.prototype.changeReservationStatus = function (id, status, user) {
+        return this.reversationsService.changeStatus(id, status, user);
+    };
     __decorate([
         common_1.Post(),
         common_1.HttpCode(common_1.HttpStatus.CREATED),
@@ -56,6 +59,14 @@ var ReversationsController = /** @class */ (function () {
         customize_1.ResponseMessage(" update menu item by id"),
         __param(0, common_1.Param('id', common_1.ParseIntPipe)), __param(1, common_1.Body()), __param(2, customize_1.CurrentUser())
     ], ReversationsController.prototype, "update");
+    __decorate([
+        common_1.Patch(':id/change-status'),
+        common_1.UseGuards(jwt_auth_guard_1.JwtAuthGuard),
+        customize_1.ResponseMessage("update reservation status by id"),
+        __param(0, common_1.Param('id', common_1.ParseIntPipe)),
+        __param(1, common_1.Body('status')),
+        __param(2, customize_1.CurrentUser())
+    ], ReversationsController.prototype, "changeReservationStatus");
     ReversationsController = __decorate([
         swagger_1.ApiTags("Reservation"),
         common_1.Controller('reversations')

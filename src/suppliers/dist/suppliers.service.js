@@ -91,7 +91,7 @@ var SuppliersService = /** @class */ (function () {
                 switch (_a.label) {
                     case 0:
                         itemsPerPage = parseInt(process.env.ITEMS_PER_PAGE);
-                        currentPage = parseInt(process.env.DEFAULT_PAGE);
+                        currentPage = parseInt(String(filter.page || process.env.DEFAULT_PAGE));
                         search = filter.search || '';
                         return [4 /*yield*/, this.prisma.supplier.findMany({
                                 where: {
@@ -113,6 +113,7 @@ var SuppliersService = /** @class */ (function () {
                             })];
                     case 2:
                         total = _a.sent();
+                        // Trả về kết quả với tổng số lượng và dữ liệu theo trang
                         return [2 /*return*/, {
                                 data: suppliers,
                                 total: total,

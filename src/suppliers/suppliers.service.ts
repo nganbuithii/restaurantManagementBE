@@ -32,9 +32,12 @@ export class SuppliersService {
 
 
     async getAll(filter: SupplierFilterType): Promise<SupplierPaginationResponseType> {
-        const itemsPerPage =parseInt(process.env.ITEMS_PER_PAGE);
-        const currentPage =parseInt(process.env.DEFAULT_PAGE);
+        const itemsPerPage = parseInt(process.env.ITEMS_PER_PAGE);
+        const currentPage = parseInt(String(filter.page || process.env.DEFAULT_PAGE));
+
         const search = filter.search || '';
+        
+        // Lấy các supplier theo trang và số lượng items
         const suppliers = await this.prisma.supplier.findMany({
             where: {
                 name: {
@@ -44,7 +47,8 @@ export class SuppliersService {
             skip: (currentPage - 1) * itemsPerPage,
             take: itemsPerPage,
         });
-
+    
+        // Đếm tổng số suppliers
         const total = await this.prisma.supplier.count({
             where: {
                 name: {
@@ -52,7 +56,8 @@ export class SuppliersService {
                 },
             },
         });
-
+    
+        // Trả về kết quả với tổng số lượng và dữ liệu theo trang
         return {
             data: suppliers,
             total,
@@ -60,6 +65,7 @@ export class SuppliersService {
             itemsPerPage,
         };
     }
+    
 
     async getById(id: number): Promise<Supplier> {
         const supplier = await this.prisma.supplier.findUnique({

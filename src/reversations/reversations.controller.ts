@@ -2,7 +2,7 @@ import { Body, Controller, Delete, Get, HttpCode, HttpStatus, Param, ParseIntPip
 import { ReversationsService } from './reversations.service';
 import { JwtAuthGuard } from 'src/auth/jwt-auth.guard';
 import { CurrentUser, ResponseMessage } from 'decorators/customize';
-import { CreateReservationDto, UpdateReservationDto ,ReservationFilterType, ReservationPaginationResponseType } from './dto/reversations.dto';
+import { CreateReservationDto, UpdateReservationDto ,ReservationFilterType, ReservationPaginationResponseType, ReservationStatus } from './dto/reversations.dto';
 import { IUser } from 'interfaces/user.interface';
 import { Reservation } from '@prisma/client';
 import { ApiTags } from '@nestjs/swagger';
@@ -46,5 +46,15 @@ export class ReversationsController {
         return this.reversationsService.update(id, data, user);
     }
 
-
+    @Patch(':id/change-status')
+    @UseGuards(JwtAuthGuard)
+    @ResponseMessage("update reservation status by id")
+    changeReservationStatus(
+      @Param('id', ParseIntPipe) id: number, 
+      @Body('status') status: ReservationStatus, 
+      @CurrentUser() user: IUser
+    ): Promise<Reservation> {
+      return this.reversationsService.changeStatus(id, status, user);
+    }
+    
 }

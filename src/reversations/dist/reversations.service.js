@@ -97,7 +97,7 @@ var ReversationsService = /** @class */ (function () {
             return __generator(this, function (_c) {
                 switch (_c.label) {
                     case 0:
-                        _a = params.page, page = _a === void 0 ? 1 : _a, _b = params.items_per_page, items_per_page = _b === void 0 ? 10 : _b, search = params.search;
+                        _a = params.page, page = _a === void 0 ? 1 : _a, _b = params.items_per_page, items_per_page = _b === void 0 ? 4 : _b, search = params.search;
                         skip = (page - 1) * items_per_page;
                         where = search
                             ? {
@@ -216,6 +216,25 @@ var ReversationsService = /** @class */ (function () {
                     case 2:
                         updatedReservation = _a.sent();
                         return [2 /*return*/, updatedReservation];
+                }
+            });
+        });
+    };
+    ReversationsService.prototype.changeStatus = function (id, status, user) {
+        return __awaiter(this, void 0, Promise, function () {
+            var reservation;
+            return __generator(this, function (_a) {
+                switch (_a.label) {
+                    case 0: return [4 /*yield*/, this.prisma.reservation.findUnique({ where: { id: id } })];
+                    case 1:
+                        reservation = _a.sent();
+                        if (!reservation) {
+                            throw new common_1.NotFoundException('Reservation not found');
+                        }
+                        return [2 /*return*/, this.prisma.reservation.update({
+                                where: { id: id },
+                                data: { status: status }
+                            })];
                 }
             });
         });
