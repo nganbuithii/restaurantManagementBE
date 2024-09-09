@@ -37,9 +37,6 @@ var CreateWarehouseSlipDto = /** @class */ (function () {
         swagger_1.ApiProperty()
     ], CreateWarehouseSlipDto.prototype, "type");
     __decorate([
-        swagger_1.ApiProperty()
-    ], CreateWarehouseSlipDto.prototype, "userId");
-    __decorate([
         class_validator_1.IsInt(),
         swagger_1.ApiProperty(),
         class_validator_1.IsNotEmpty()

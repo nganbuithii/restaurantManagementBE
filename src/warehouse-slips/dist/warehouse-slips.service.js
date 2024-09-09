@@ -87,7 +87,7 @@ var WarehouseSlipsService = /** @class */ (function () {
                         return [4 /*yield*/, this.prisma.warehouseSlip.create({
                                 data: {
                                     type: body.type,
-                                    employeeId: user.sub,
+                                    userId: user.sub,
                                     supplierId: body.supplierId,
                                     details: {
                                         create: body.details.map(function (detail) { return ({
@@ -179,13 +179,32 @@ var WarehouseSlipsService = /** @class */ (function () {
                     case 0: return [4 /*yield*/, this.prisma.warehouseSlip.findUnique({
                             where: { id: id },
                             include: {
-                                details: true
+                                user: {
+                                    select: {
+                                        fullName: true,
+                                        email: true
+                                    }
+                                },
+                                supplier: {
+                                    select: {
+                                        name: true
+                                    }
+                                },
+                                details: {
+                                    include: {
+                                        ingredient: {
+                                            select: {
+                                                name: true
+                                            }
+                                        }
+                                    }
+                                }
                             }
                         })];
                     case 1:
                         warehouseSlip = _a.sent();
                         if (!warehouseSlip) {
-                            throw new common_1.NotFoundException("WarehouseSlip with ID " + id + " not found");
+                            throw new common_1.NotFoundException("WarehouseSlip v\u1EDBi ID " + id + " kh\u00F4ng \u0111\u01B0\u1EE3c t\u00ECm th\u1EA5y");
                         }
                         return [2 /*return*/, warehouseSlip];
                 }

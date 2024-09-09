@@ -286,12 +286,14 @@ model WarehouseSlip {
   isActive   Boolean               @default(true)
   createdAt  DateTime              @default(now())
   updatedAt  DateTime              @updatedAt
-  userId Int
-  user   User            @relation(fields: [userId], references: [id])
+  userId Int?
+  user   User?            @relation(fields: [userId], references: [id])
   supplierId Int
   supplier   Supplier              @relation(fields: [supplierId], references: [id])
   details    WarehouseSlipDetail[]
+
 }
+
 
 model WarehouseSlipDetail {
   id              Int           @id @default(autoincrement())

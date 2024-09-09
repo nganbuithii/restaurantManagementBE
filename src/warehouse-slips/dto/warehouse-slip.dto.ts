@@ -24,8 +24,6 @@ export class CreateWarehouseSlipDto {
     @ApiProperty()
     type: string;
 
-    @ApiProperty()
-    userId: number;
 
     @IsInt()
     @ApiProperty()

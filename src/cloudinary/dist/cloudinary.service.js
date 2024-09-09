@@ -55,17 +55,25 @@ var CloudinaryService = /** @class */ (function () {
     }
     CloudinaryService.prototype.uploadImage = function (file) {
         return __awaiter(this, void 0, Promise, function () {
+            var result, error_1;
             return __generator(this, function (_a) {
-                return [2 /*return*/, new Promise(function (resolve, reject) {
-                        cloudinary_config_1["default"].uploader.upload_stream({ folder: 'avatars', allowed_formats: ['jpg', 'png', 'jpeg'] }, function (error, result) {
-                            if (error) {
-                                reject(new Error("Failed to upload image: " + error.message));
-                            }
-                            else {
-                                resolve(result);
-                            }
-                        }).end(file.buffer);
-                    })];
+                switch (_a.label) {
+                    case 0:
+                        if (!file || !file.path) {
+                            throw new common_1.BadRequestException('Tệp tin trống hoặc bị thiếu');
+                        }
+                        _a.label = 1;
+                    case 1:
+                        _a.trys.push([1, 3, , 4]);
+                        return [4 /*yield*/, cloudinary_config_1["default"].uploader.upload(file.path)];
+                    case 2:
+                        result = _a.sent();
+                        return [2 /*return*/, result];
+                    case 3:
+                        error_1 = _a.sent();
+                        throw new common_1.BadRequestException('Lỗi khi tải ảnh lên');
+                    case 4: return [2 /*return*/];
+                }
             });
         });
     };

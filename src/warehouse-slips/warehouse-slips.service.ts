@@ -41,7 +41,7 @@ export class WarehouseSlipsService {
         const warehouseSlip = await this.prisma.warehouseSlip.create({
             data: {
                 type: body.type,
-                employeeId: user.sub,
+                userId: user.sub,
                 supplierId: body.supplierId,
                 details: {
                     create: body.details.map(detail => ({
@@ -110,21 +110,43 @@ export class WarehouseSlipsService {
             itemsPerPage: perPage,
         };
     }
-
     async getById(id: number): Promise<WarehouseSlip> {
         const warehouseSlip = await this.prisma.warehouseSlip.findUnique({
             where: { id },
             include: {
-                details: true,
+                user: { // Bao gồm thông tin từ bảng User liên kết với WarehouseSlip
+                    select: {
+                        fullName: true, // Lấy các trường cụ thể từ model User
+                        email: true,
+                    },
+                },
+                supplier: {
+                    select: {
+                        name: true,
+                    },
+                },
+                details: {
+                    include: {
+                        ingredient: {
+                            select: {
+                                name: true,
+                            },
+                        },
+                    },
+                },
             },
         });
-
+    
         if (!warehouseSlip) {
-            throw new NotFoundException(`WarehouseSlip with ID ${id} not found`);
+            throw new NotFoundException(`WarehouseSlip với ID ${id} không được tìm thấy`);
         }
-
+    
         return warehouseSlip;
     }
+    
+    
+    
+    
 
 
     async delete(id: number, user: IUser): Promise<void> {
