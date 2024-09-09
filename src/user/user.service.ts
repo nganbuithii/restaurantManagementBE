@@ -195,27 +195,19 @@ export class UserService {
         return userData;
     }
 
-    async update(id: number, updateUserDto: UpdateUserDto) {
-        // Kiểm tra email đã tồn tại hay chưa
-        if (updateUserDto.email) {
-            const existingUser = await this.prismaService.user.findUnique({
-                where: { email: updateUserDto.email },
-            });
-    
-            // Nếu email đã tồn tại và không phải của người dùng hiện tại, ném lỗi
-            if (existingUser && existingUser.id !== id) {
-                throw new BadRequestException('Email already exists.');
-            }
-        }
-    
-        // Cập nhật thông tin người dùng
+    async update(id: number, data: UpdateUserDto): Promise<User> {
+        // Xử lý dữ liệu cập nhật
+        const updateData: any = { ...data };
+
+
+
         return await this.prismaService.user.update({
-            where: { id },
-            data: updateUserDto,
+            where: {
+                id
+            },
+            data: updateData,
         });
     }
-    
-    
 
 
     async getMe() {

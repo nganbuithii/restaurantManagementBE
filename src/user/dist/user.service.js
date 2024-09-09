@@ -260,30 +260,20 @@ var UserService = /** @class */ (function () {
             });
         });
     };
-    UserService.prototype.update = function (id, updateUserDto) {
-        return __awaiter(this, void 0, void 0, function () {
-            var existingUser;
+    UserService.prototype.update = function (id, data) {
+        return __awaiter(this, void 0, Promise, function () {
+            var updateData;
             return __generator(this, function (_a) {
                 switch (_a.label) {
                     case 0:
-                        if (!updateUserDto.email) return [3 /*break*/, 2];
-                        return [4 /*yield*/, this.prismaService.user.findUnique({
-                                where: { email: updateUserDto.email }
+                        updateData = __assign({}, data);
+                        return [4 /*yield*/, this.prismaService.user.update({
+                                where: {
+                                    id: id
+                                },
+                                data: updateData
                             })];
-                    case 1:
-                        existingUser = _a.sent();
-                        // Nếu email đã tồn tại và không phải của người dùng hiện tại, ném lỗi
-                        if (existingUser && existingUser.id !== id) {
-                            throw new common_1.BadRequestException('Email already exists.');
-                        }
-                        _a.label = 2;
-                    case 2: return [4 /*yield*/, this.prismaService.user.update({
-                            where: { id: id },
-                            data: updateUserDto
-                        })];
-                    case 3: 
-                    // Cập nhật thông tin người dùng
-                    return [2 /*return*/, _a.sent()];
+                    case 1: return [2 /*return*/, _a.sent()];
                 }
             });
         });
