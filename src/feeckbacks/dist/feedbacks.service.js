@@ -107,7 +107,9 @@ var FeeckbacksService = /** @class */ (function () {
                                     include: {
                                         user: {
                                             select: {
-                                                fullName: true
+                                                fullName: true,
+                                                avatar: true,
+                                                username: true
                                             }
                                         }
                                     }

@@ -85,8 +85,9 @@ var FeeckbacksController = /** @class */ (function () {
         __param(1, customize_1.CurrentUser())
     ], FeeckbacksController.prototype, "createFeedback");
     __decorate([
-        common_1.Get(),
-        common_1.UseGuards(jwt_auth_guard_1.JwtAuthGuard),
+        common_1.Get()
+        // @UseGuards(JwtAuthGuard)
+        ,
         customize_1.ResponseMessage("get feedbacks with pagination"),
         __param(0, common_1.Query())
     ], FeeckbacksController.prototype, "getAll");

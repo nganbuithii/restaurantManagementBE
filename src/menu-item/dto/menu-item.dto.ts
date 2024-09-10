@@ -23,6 +23,8 @@ export interface MenuItemFilterType {
     items_per_page?: number;
     page?: number;
     search?: string
+    isBestSeller?: boolean;
+    menuId?: number | string; 
 }
 
 export interface MenuItemPaginationResponseType {

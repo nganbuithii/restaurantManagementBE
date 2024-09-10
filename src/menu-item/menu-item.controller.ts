@@ -38,7 +38,7 @@ export class MenuItemController {
 
 
   @Get(':id')
-  @UseGuards(JwtAuthGuard)
+  // @UseGuards(JwtAuthGuard)
   @ResponseMessage(" get detail menu item by id")
   getDetail(@Param('id', ParseIntPipe) id: number): Promise<MenuItem> {
     return this.menuItemService.getDetail(id)

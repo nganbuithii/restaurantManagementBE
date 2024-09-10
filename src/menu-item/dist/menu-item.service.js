@@ -97,27 +97,52 @@ var MenuItemService = /** @class */ (function () {
     };
     MenuItemService.prototype.getAll = function (filter) {
         return __awaiter(this, void 0, Promise, function () {
-            var items_per_page, page, search, skip, take, where, _a, menuItems, total;
+            var items_per_page, page, search, menuId, isBestSeller, skip, take, where, filteredWhere, _a, menuItems, total;
             return __generator(this, function (_b) {
                 switch (_b.label) {
                     case 0:
                         items_per_page = Number(process.env.ITEMS_PER_PAGE);
                         page = Number(filter.page) || 1;
                         search = filter.search || "";
+                        menuId = filter.menuId ? Number(filter.menuId) : undefined;
+                        if (typeof filter.isBestSeller === 'string') {
+                            // Chuyển đổi từ chuỗi thành boolean
+                            isBestSeller = filter.isBestSeller === 'true' ? true :
+                                filter.isBestSeller === 'false' ? false :
+                                    undefined;
+                        }
+                        else if (typeof filter.isBestSeller === 'boolean') {
+                            // Nếu isBestSeller đã là boolean, sử dụng trực tiếp
+                            isBestSeller = filter.isBestSeller;
+                        }
+                        else {
+                            isBestSeller = undefined;
+                        }
                         skip = (page - 1) * items_per_page;
                         take = items_per_page;
-                        where = search ? { name: { contains: search } } : {};
+                        where = {
+                            name: search ? { contains: search } : undefined,
+                            isBestSeller: isBestSeller,
+                            menuId: menuId
+                        };
+                        filteredWhere = Object.fromEntries(Object.entries(where).filter(function (_a) {
+                            var _ = _a[0], v = _a[1];
+                            return v !== undefined;
+                        }));
                         return [4 /*yield*/, this.prismaService.$transaction([
                                 this.prismaService.menuItem.findMany({
-                                    where: where,
+                                    where: filteredWhere,
                                     skip: skip,
                                     take: take,
                                     include: {
                                         images: true,
                                         ingredients: true
+                                    },
+                                    orderBy: {
+                                        id: 'desc'
                                     }
                                 }),
-                                this.prismaService.menuItem.count({ where: where }),
+                                this.prismaService.menuItem.count({ where: filteredWhere }),
                             ])];
                     case 1:
                         _a = _b.sent(), menuItems = _a[0], total = _a[1];

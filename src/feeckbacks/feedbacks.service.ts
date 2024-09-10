@@ -48,7 +48,9 @@ export class FeeckbacksService {
                 include: {
                     user: {
                         select: {
-                            fullName: true, // Only select fullName
+                            fullName: true, 
+                            avatar:true,
+                            username:true,
                         },
                     },
                 },

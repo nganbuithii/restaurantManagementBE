@@ -147,6 +147,8 @@ model MenuItem {
   id        Int      @id @default(autoincrement())
   name      String
   price     Float
+  description String?
+  isBestSeller Boolean @default(false)
   // status       String
   isActive  Boolean  @default(true)
   createdAt DateTime @default(now())

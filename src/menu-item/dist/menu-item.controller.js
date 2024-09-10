@@ -58,8 +58,9 @@ var MenuItemController = /** @class */ (function () {
         __param(0, common_1.Query())
     ], MenuItemController.prototype, "getAll");
     __decorate([
-        common_1.Get(':id'),
-        common_1.UseGuards(jwt_auth_guard_1.JwtAuthGuard),
+        common_1.Get(':id')
+        // @UseGuards(JwtAuthGuard)
+        ,
         customize_1.ResponseMessage(" get detail menu item by id"),
         __param(0, common_1.Param('id', common_1.ParseIntPipe))
     ], MenuItemController.prototype, "getDetail");

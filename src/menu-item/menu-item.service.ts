@@ -52,34 +52,56 @@ export class MenuItemService {
         return menuItem;
     }
     
-    
-    
-    
-    
     async getAll(filter: MenuItemFilterType): Promise<MenuItemPaginationResponseType> {
-        const items_per_page = Number(process.env.ITEMS_PER_PAGE) ; 
+        const items_per_page = Number(process.env.ITEMS_PER_PAGE); 
         const page = Number(filter.page) || 1;
         const search = filter.search || "";
-
+        const menuId = filter.menuId ? Number(filter.menuId) : undefined; // Convert menuId to number if provided
+    
+        // Xử lý chuyển đổi isBestSeller từ chuỗi thành boolean
+        let isBestSeller: boolean | undefined;
+        if (typeof filter.isBestSeller === 'string') {
+            // Chuyển đổi từ chuỗi thành boolean
+            isBestSeller = filter.isBestSeller === 'true' ? true :
+                           filter.isBestSeller === 'false' ? false :
+                           undefined;
+        } else if (typeof filter.isBestSeller === 'boolean') {
+            // Nếu isBestSeller đã là boolean, sử dụng trực tiếp
+            isBestSeller = filter.isBestSeller;
+        } else {
+            isBestSeller = undefined;
+        }
+    
         const skip = (page - 1) * items_per_page;
         const take = items_per_page;
-
-        const where = search ? { name: { contains: search } } : {};
-
-        // Lấy danh sách menu items với phân trang và lọc
+    
+        const where = {
+            name: search ? { contains: search } : undefined,
+            isBestSeller: isBestSeller,
+            menuId: menuId, // Add menuId to the filter
+        };
+    
+        // Loại bỏ các thuộc tính undefined
+        const filteredWhere = Object.fromEntries(
+            Object.entries(where).filter(([_, v]) => v !== undefined)
+        );
+    
         const [menuItems, total] = await this.prismaService.$transaction([
             this.prismaService.menuItem.findMany({
-                where,
+                where: filteredWhere,
                 skip,
                 take,
                 include: {
                     images: true,
                     ingredients: true,
                 },
+                orderBy: {
+                    id: 'desc',
+                },
             }),
-            this.prismaService.menuItem.count({ where }),
+            this.prismaService.menuItem.count({ where: filteredWhere }),
         ]);
-
+    
         return {
             data: menuItems,
             total,
@@ -87,7 +109,10 @@ export class MenuItemService {
             itemsPerPage: items_per_page,
         };
     }
-
+    
+    
+    
+    
     async getDetail(id: number): Promise<MenuItem> {
         const menuItem = await this.prismaService.menuItem.findUnique({
             where: { id },
