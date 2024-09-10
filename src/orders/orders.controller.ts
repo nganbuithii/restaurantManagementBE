@@ -4,7 +4,7 @@ import { JwtAuthGuard } from 'src/auth/jwt-auth.guard';
 import { CurrentUser, ResponseMessage } from 'decorators/customize';
 import { IUser } from 'interfaces/user.interface';
 import { Order } from '@prisma/client';
-import { CreateOrderDto, OrderFilterType, OrderPaginationResponseType, UpdateOrderDto } from './dto/orders.dto';
+import { CreateOrderDto, OrderFilterType, OrderPaginationResponseType, OrderStatisticsDto, UpdateOrderDto } from './dto/orders.dto';
 import { VouchersService } from 'src/vouchers/vouchers.service';
 import { ApiTags } from '@nestjs/swagger';
 import { OrderStatus } from './dto/orders.dto';
@@ -75,4 +75,10 @@ export class OrdersController {
     return this.ordersService.updateStatus(id, body.status, user);
   }
 
+  @Post('statistics')
+  @UseGuards(JwtAuthGuard)
+  @ResponseMessage('Order statistics retrieved successfully')
+  async getStatistics(): Promise<OrderStatisticsDto> {
+    return this.ordersService.getStatistics();
+  }
 }

@@ -47,49 +47,69 @@ var common_1 = require("@nestjs/common");
 var cloudinary_config_1 = require("src/configs/cloudinary.config");
 var CloudinaryService = /** @class */ (function () {
     function CloudinaryService() {
-        // cloudinary.config({
-        //     cloud_name: process.env.CLOUDINARY_NAME,
-        //     api_key: process.env.CLOUDINARY_API_KEY,
-        //     api_secret: process.env.CLOUDINARY_API_SECRET,
-        // });
+        cloudinary_config_1["default"].config({
+            cloud_name: process.env.CLOUDINARY_NAME,
+            api_key: process.env.CLOUDINARY_API_KEY,
+            api_secret: process.env.CLOUDINARY_API_SECRET
+        });
     }
+    // async uploadImage(file: Express.Multer.File): Promise<any> {
+    //     if (!file || !file.path) {
+    //         throw new BadRequestException('Tệp tin trống hoặc bị thiếu');
+    //     }
+    //     try {
+    //         const result = await cloudinary.uploader.upload(file.path);
+    //         return result;
+    //     } catch (error) {
+    //         throw new BadRequestException('Lỗi khi tải ảnh lên');
+    //     }
+    // }
     CloudinaryService.prototype.uploadImage = function (file) {
         return __awaiter(this, void 0, Promise, function () {
-            var result, error_1;
             return __generator(this, function (_a) {
-                switch (_a.label) {
-                    case 0:
-                        if (!file || !file.path) {
-                            throw new common_1.BadRequestException('Tệp tin trống hoặc bị thiếu');
-                        }
-                        _a.label = 1;
-                    case 1:
-                        _a.trys.push([1, 3, , 4]);
-                        return [4 /*yield*/, cloudinary_config_1["default"].uploader.upload(file.path)];
-                    case 2:
-                        result = _a.sent();
-                        return [2 /*return*/, result];
-                    case 3:
-                        error_1 = _a.sent();
-                        throw new common_1.BadRequestException('Lỗi khi tải ảnh lên');
-                    case 4: return [2 /*return*/];
+                if (!file || !file.buffer) {
+                    throw new common_1.BadRequestException('Tệp tin trống hoặc bị thiếu');
                 }
+                try {
+                    return [2 /*return*/, new Promise(function (resolve, reject) {
+                            cloudinary_config_1["default"].uploader.upload_stream({ resource_type: 'image' }, function (error, result) {
+                                if (error) {
+                                    console.error('Upload error:', error); // Log chi tiết lỗi
+                                    return reject(new common_1.BadRequestException('Lỗi khi tải ảnh lên'));
+                                }
+                                resolve(result);
+                            }).end(file.buffer);
+                        })];
+                }
+                catch (error) {
+                    console.error('Error in uploadImage:', error); // Log lỗi chung
+                    throw new common_1.BadRequestException('Lỗi khi tải ảnh lên');
+                }
+                return [2 /*return*/];
             });
         });
     };
     CloudinaryService.prototype.uploadImages = function (files) {
         return __awaiter(this, void 0, Promise, function () {
-            var uploadPromises;
+            var uploadPromises, error_1;
             var _this = this;
             return __generator(this, function (_a) {
-                try {
-                    uploadPromises = files.map(function (file) { return _this.uploadImage(file); });
-                    return [2 /*return*/, Promise.all(uploadPromises)];
+                switch (_a.label) {
+                    case 0:
+                        if (!files || files.length === 0) {
+                            throw new common_1.BadRequestException('Ít nhất một hình ảnh là bắt buộc.');
+                        }
+                        _a.label = 1;
+                    case 1:
+                        _a.trys.push([1, 3, , 4]);
+                        uploadPromises = files.map(function (file) { return _this.uploadImage(file); });
+                        return [4 /*yield*/, Promise.all(uploadPromises)];
+                    case 2: return [2 /*return*/, _a.sent()];
+                    case 3:
+                        error_1 = _a.sent();
+                        throw new Error("Failed to upload images: " + error_1.message);
+                    case 4: return [2 /*return*/];
                 }
-                catch (error) {
-                    throw new Error("Failed to upload images: " + error.message);
-                }
-                return [2 /*return*/];
             });
         });
     };

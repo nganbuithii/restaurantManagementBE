@@ -65,11 +65,11 @@ export class UserController {
         if (!file) {
             throw new BadRequestException('File is required');
         }
-    
+
         console.log('File:', file);
         console.log('User:', req.user);
         console.log('Upload avatar');
-    
+
         try {
             const updatedUser = await this.userService.updateAvt(req.user.sub, file);
             return updatedUser;
@@ -78,12 +78,19 @@ export class UserController {
             throw new BadRequestException('Failed to update avatar');
         }
     }
-    
+
     @Delete(':id')
-  @UseGuards(JwtAuthGuard)
-  @HttpCode(HttpStatus.NO_CONTENT)
-  @ResponseMessage(" delete user by id")
-  deleteUser(@Param('id', ParseIntPipe) id: number, @CurrentUser() user: IUser): Promise<void> {
-    return this.userService.delete(id, user);
-  }
+    @UseGuards(JwtAuthGuard)
+    @HttpCode(HttpStatus.NO_CONTENT)
+    @ResponseMessage(" delete user by id")
+    deleteUser(@Param('id', ParseIntPipe) id: number, @CurrentUser() user: IUser): Promise<void> {
+        return this.userService.delete(id, user);
+    }
+
+
+    @Post('new-customers')
+    async getNewCustomers(@Query('month') month?: number, @Query('year') year?: number): Promise<{ count: number }> {
+        const count = await this.userService.countNewCustomers(month, year);
+        return { count };
+    }
 }

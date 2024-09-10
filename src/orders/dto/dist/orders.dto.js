@@ -6,7 +6,7 @@ var __decorate = (this && this.__decorate) || function (decorators, target, key,
     return c > 3 && r && Object.defineProperty(target, key, r), r;
 };
 exports.__esModule = true;
-exports.UpdateOrderDto = exports.CreateOrderDto = exports.OrderStatus = void 0;
+exports.OrderStatisticsDto = exports.UpdateOrderDto = exports.CreateOrderDto = exports.OrderStatus = void 0;
 var swagger_1 = require("@nestjs/swagger");
 var class_transformer_1 = require("class-transformer");
 var class_validator_1 = require("class-validator");
@@ -74,3 +74,9 @@ var UpdateOrderDto = /** @class */ (function () {
     return UpdateOrderDto;
 }());
 exports.UpdateOrderDto = UpdateOrderDto;
+var OrderStatisticsDto = /** @class */ (function () {
+    function OrderStatisticsDto() {
+    }
+    return OrderStatisticsDto;
+}());
+exports.OrderStatisticsDto = OrderStatisticsDto;

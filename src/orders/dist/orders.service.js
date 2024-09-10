@@ -242,6 +242,29 @@ var OrdersService = /** @class */ (function () {
             });
         });
     };
+    OrdersService.prototype.getStatistics = function () {
+        return __awaiter(this, void 0, Promise, function () {
+            var totalOrders, totalRevenue;
+            return __generator(this, function (_a) {
+                switch (_a.label) {
+                    case 0: return [4 /*yield*/, this.prisma.order.count()];
+                    case 1:
+                        totalOrders = _a.sent();
+                        return [4 /*yield*/, this.prisma.order.aggregate({
+                                _sum: {
+                                    totalPrice: true
+                                }
+                            })];
+                    case 2:
+                        totalRevenue = _a.sent();
+                        return [2 /*return*/, {
+                                totalOrders: totalOrders,
+                                totalRevenue: totalRevenue._sum.totalPrice || 0
+                            }];
+                }
+            });
+        });
+    };
     OrdersService = __decorate([
         common_1.Injectable()
     ], OrdersService);

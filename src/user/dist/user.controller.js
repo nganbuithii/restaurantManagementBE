@@ -104,6 +104,19 @@ var UserController = /** @class */ (function () {
     UserController.prototype.deleteUser = function (id, user) {
         return this.userService["delete"](id, user);
     };
+    UserController.prototype.getNewCustomers = function (month, year) {
+        return __awaiter(this, void 0, Promise, function () {
+            var count;
+            return __generator(this, function (_a) {
+                switch (_a.label) {
+                    case 0: return [4 /*yield*/, this.userService.countNewCustomers(month, year)];
+                    case 1:
+                        count = _a.sent();
+                        return [2 /*return*/, { count: count }];
+                }
+            });
+        });
+    };
     __decorate([
         common_1.Post(),
         permission_1.RequirePermissions('CREATE_USER'),
@@ -149,6 +162,10 @@ var UserController = /** @class */ (function () {
         customize_1.ResponseMessage(" delete user by id"),
         __param(0, common_1.Param('id', common_1.ParseIntPipe)), __param(1, customize_1.CurrentUser())
     ], UserController.prototype, "deleteUser");
+    __decorate([
+        common_1.Post('new-customers'),
+        __param(0, common_1.Query('month')), __param(1, common_1.Query('year'))
+    ], UserController.prototype, "getNewCustomers");
     UserController = __decorate([
         swagger_1.ApiTags("Users"),
         common_1.Controller('users')

@@ -73,3 +73,7 @@ export class UpdateOrderDto {
     @ApiProperty()
     discountPrice?: number;
 }
+export class OrderStatisticsDto {
+    totalOrders: number;
+    totalRevenue: number;
+  }

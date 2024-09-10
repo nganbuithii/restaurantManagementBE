@@ -6,6 +6,7 @@ import { User } from '@prisma/client';
 import { plainToClass } from 'class-transformer';
 import { CloudinaryService } from 'src/cloudinary/cloudinary.service';
 import { IUser } from 'interfaces/user.interface';
+import { startOfMonth, endOfMonth, parse } from 'date-fns';
 
 @Injectable()
 export class UserService {
@@ -315,5 +316,23 @@ export class UserService {
                 updatedAt: new Date(),
             },
         });
+    }
+
+    async countNewCustomers(month: number = new Date().getMonth() + 1, year: number = new Date().getFullYear()): Promise<number> {
+        // Cố định tháng hiện tại nếu không truyền tham số
+        const start = startOfMonth(parse(`${year}-${month}-01`, 'yyyy-M-d', new Date()));
+        const end = endOfMonth(start);
+
+        const count = await this.prismaService.user.count({
+            where: {
+                createdAt: {
+                    gte: start,
+                    lte: end,
+                },
+                // Nếu bạn có trường để phân loại khách hàng, ví dụ `role` hoặc `type`, thêm điều kiện ở đây
+                // role: 'CUSTOMER'
+            },
+        });
+        return count;
     }
 }

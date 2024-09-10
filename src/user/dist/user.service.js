@@ -69,6 +69,7 @@ var common_1 = require("@nestjs/common");
 var user_dto_1 = require("./dto/user.dto");
 var bcrypt_1 = require("bcrypt");
 var class_transformer_1 = require("class-transformer");
+var date_fns_1 = require("date-fns");
 var UserService = /** @class */ (function () {
     function UserService(prismaService, cloudinaryService) {
         this.prismaService = prismaService;
@@ -420,6 +421,31 @@ var UserService = /** @class */ (function () {
                     case 2:
                         _a.sent();
                         return [2 /*return*/];
+                }
+            });
+        });
+    };
+    UserService.prototype.countNewCustomers = function (month, year) {
+        if (month === void 0) { month = new Date().getMonth() + 1; }
+        if (year === void 0) { year = new Date().getFullYear(); }
+        return __awaiter(this, void 0, Promise, function () {
+            var start, end, count;
+            return __generator(this, function (_a) {
+                switch (_a.label) {
+                    case 0:
+                        start = date_fns_1.startOfMonth(date_fns_1.parse(year + "-" + month + "-01", 'yyyy-M-d', new Date()));
+                        end = date_fns_1.endOfMonth(start);
+                        return [4 /*yield*/, this.prismaService.user.count({
+                                where: {
+                                    createdAt: {
+                                        gte: start,
+                                        lte: end
+                                    }
+                                }
+                            })];
+                    case 1:
+                        count = _a.sent();
+                        return [2 /*return*/, count];
                 }
             });
         });

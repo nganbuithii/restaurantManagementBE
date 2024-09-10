@@ -1,7 +1,7 @@
 import { Order } from '@prisma/client';
 import { ForbiddenException, Injectable, NotFoundException } from '@nestjs/common';
 import { PrismaService } from 'src/prisma.service';
-import { CreateOrderDto, OrderFilterType, OrderPaginationResponseType, OrderStatus, UpdateOrderDto } from './dto/orders.dto';
+import { CreateOrderDto, OrderFilterType, OrderPaginationResponseType, OrderStatisticsDto, OrderStatus, UpdateOrderDto } from './dto/orders.dto';
 import { IUser } from 'interfaces/user.interface';
 @Injectable()
 export class OrdersService {
@@ -169,5 +169,21 @@ export class OrdersService {
       data: { status },
     });
   }
+  
+  async getStatistics(): Promise<OrderStatisticsDto> {
+    // Tính tổng số đơn hàng
+    const totalOrders = await this.prisma.order.count();
 
+    // Tính tổng doanh thu
+    const totalRevenue = await this.prisma.order.aggregate({
+      _sum: {
+        totalPrice: true,
+      },
+    });
+
+    return {
+      totalOrders,
+      totalRevenue: totalRevenue._sum.totalPrice || 0,
+    };
+  }
 }
