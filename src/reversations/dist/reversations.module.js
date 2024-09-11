@@ -14,6 +14,7 @@ var prisma_service_1 = require("src/prisma.service");
 var config_1 = require("@nestjs/config");
 var jwt_1 = require("@nestjs/jwt");
 var cloudinary_module_1 = require("src/cloudinary/cloudinary.module");
+var email_service_1 = require("src/email/email.service");
 var ReversationsModule = /** @class */ (function () {
     function ReversationsModule() {
     }
@@ -21,7 +22,7 @@ var ReversationsModule = /** @class */ (function () {
         common_1.Module({
             imports: [jwt_1.JwtModule, cloudinary_module_1.CloudinaryModule],
             controllers: [reversations_controller_1.ReversationsController],
-            providers: [reversations_service_1.ReversationsService, prisma_service_1.PrismaService, config_1.ConfigService]
+            providers: [reversations_service_1.ReversationsService, prisma_service_1.PrismaService, config_1.ConfigService, email_service_1.EmailService]
         })
     ], ReversationsModule);
     return ReversationsModule;

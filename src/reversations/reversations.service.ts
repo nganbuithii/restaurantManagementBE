@@ -3,10 +3,13 @@ import { CreateReservationDto, ReservationFilterType, ReservationPaginationRespo
 import { PrismaService } from 'src/prisma.service';
 import { IUser } from 'interfaces/user.interface';
 import { Reservation } from '@prisma/client';
+import { EmailService } from 'src/email/email.service';
 
 @Injectable()
 export class ReversationsService {
-    constructor(private readonly prisma: PrismaService) { }
+    constructor(private readonly prisma: PrismaService,
+        private emailService:EmailService
+    ) { }
 
     async create(createReservationDto: CreateReservationDto, user: IUser) {
         const { tableId, time, date, status } = createReservationDto;
@@ -63,6 +66,12 @@ export class ReversationsService {
 
 
         console.log('New Reservation Created:', newReservation);
+        await this.emailService.sendReservationConfirmation(user.email, {
+            date: newReservation.date,
+            time: newReservation.time,
+            tableId: newReservation.tableId,
+            status: newReservation.status,
+          });
 
         return newReservation;
     }

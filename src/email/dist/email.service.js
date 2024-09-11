@@ -76,6 +76,26 @@ var EmailService = /** @class */ (function () {
             });
         });
     };
+    EmailService.prototype.sendReservationConfirmation = function (to, reservationDetails) {
+        return __awaiter(this, void 0, Promise, function () {
+            var date, time, tableId, status;
+            return __generator(this, function (_a) {
+                switch (_a.label) {
+                    case 0:
+                        date = reservationDetails.date, time = reservationDetails.time, tableId = reservationDetails.tableId, status = reservationDetails.status;
+                        return [4 /*yield*/, this.transporter.sendMail({
+                                from: '"Nabity Restaurant" <noreply@nabity.com>',
+                                to: to,
+                                subject: 'Reservation Confirmation - Nabity Restaurant',
+                                html: "\n        <html>\n          <p>Dear Guest,</p>\n          <p>Your reservation has been confirmed!</p>\n          <p><strong>Date:</strong> " + date + "</p>\n          <p><strong>Time:</strong> " + time + "</p>\n          <p><strong>Table ID:</strong> " + tableId + "</p>\n          <p><strong>Status:</strong> " + status + "</p>\n          <p>Thank you for choosing Nabity Restaurant. We look forward to serving you.</p>\n          <p>Best Regards,</p>\n          <p>Nabity Restaurant Team</p>\n        </html>\n      "
+                            })];
+                    case 1:
+                        _a.sent();
+                        return [2 /*return*/];
+                }
+            });
+        });
+    };
     EmailService = __decorate([
         common_1.Injectable()
     ], EmailService);

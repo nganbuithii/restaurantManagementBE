@@ -56,8 +56,9 @@ exports.__esModule = true;
 exports.ReversationsService = void 0;
 var common_1 = require("@nestjs/common");
 var ReversationsService = /** @class */ (function () {
-    function ReversationsService(prisma) {
+    function ReversationsService(prisma, emailService) {
         this.prisma = prisma;
+        this.emailService = emailService;
     }
     ReversationsService.prototype.create = function (createReservationDto, user) {
         return __awaiter(this, void 0, void 0, function () {
@@ -115,6 +116,14 @@ var ReversationsService = /** @class */ (function () {
                     case 2:
                         newReservation = _a.sent();
                         console.log('New Reservation Created:', newReservation);
+                        return [4 /*yield*/, this.emailService.sendReservationConfirmation(user.email, {
+                                date: newReservation.date,
+                                time: newReservation.time,
+                                tableId: newReservation.tableId,
+                                status: newReservation.status
+                            })];
+                    case 3:
+                        _a.sent();
                         return [2 /*return*/, newReservation];
                 }
             });
