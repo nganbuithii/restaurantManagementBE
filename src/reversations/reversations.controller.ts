@@ -16,7 +16,7 @@ export class ReversationsController {
   @Post()
   @HttpCode(HttpStatus.CREATED)
   @UseGuards(JwtAuthGuard)
-  @ResponseMessage("create new menu item")
+  @ResponseMessage("create new reversation")
   createReversation(
     @Body() body: CreateReservationDto, 
   @CurrentUser() user: IUser,
@@ -32,12 +32,12 @@ export class ReversationsController {
     return this.reversationsService.getAll(params);
   }
 
-  @Get(':id')
-  @UseGuards(JwtAuthGuard)
-  @ResponseMessage(" get detail reservcation by id")
-  getDetail(@Param('id', ParseIntPipe) id: number): Promise<Reservation> {
-    return this.reversationsService.getDetail(id)
-  }
+  // @Get(':id')
+  // @UseGuards(JwtAuthGuard)
+  // @ResponseMessage(" get detail reservcation by id")
+  // getDetail(@Param('id', ParseIntPipe) id: number): Promise<Reservation> {
+  //   return this.reversationsService.getDetail(id)
+  // }
 
   @Patch(':id')
   @UseGuards(JwtAuthGuard)

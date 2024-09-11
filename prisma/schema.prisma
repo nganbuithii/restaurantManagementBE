@@ -20,13 +20,14 @@ model User {
   roleId    Int
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
-  isActive Boolean @default(true)
+  isActive  Boolean  @default(true)
 
-  employee  Employee?
-  customer  Customer?
-  feedbacks Feedback[]
-  orders    Order[]
-  slips     WarehouseSlip[]
+  employee     Employee?
+  customer     Customer?
+  feedbacks    Feedback[]
+  orders       Order[]
+  slips        WarehouseSlip[]
+  reservations Reservation[]
 }
 
 model Role {
@@ -63,15 +64,14 @@ model RolePermission {
 }
 
 model Employee {
-  id        Int             @id @default(autoincrement())
+  id        Int      @id @default(autoincrement())
   hireDate  DateTime
   salary    Float
   position  String
-  createdAt DateTime        @default(now())
-  updatedAt DateTime        @updatedAt
-  user      User            @relation(fields: [userId], references: [id])
-  userId    Int             @unique
-  
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+  user      User     @relation(fields: [userId], references: [id])
+  userId    Int      @unique
 }
 
 model Customer {
@@ -80,12 +80,11 @@ model Customer {
   points           Int               @default(0)
   customerVouchers CustomerVoucher[]
 
-  createdAt    DateTime      @default(now())
-  updatedAt    DateTime      @updatedAt
-  user         User          @relation(fields: [userId], references: [id])
-  userId       Int           @unique
-  reservations Reservation[]
-  vouchers     Voucher[]
+  createdAt DateTime  @default(now())
+  updatedAt DateTime  @updatedAt
+  user      User      @relation(fields: [userId], references: [id])
+  userId    Int       @unique
+  vouchers  Voucher[]
 
   @@index([userId]) // Tạo chỉ mục cho trường userId để tăng tốc độ tìm kiếm
 }
@@ -130,38 +129,42 @@ model Table {
   reservations Reservation[]
 }
 
-model Reservation {
-  id         Int      @id @default(autoincrement())
-  startTime  DateTime
-  endTime    DateTime
-  status     String
-  createdAt  DateTime @default(now())
-  updatedAt  DateTime @updatedAt
-  tableId    Int
-  table      Table    @relation(fields: [tableId], references: [id])
-  customerId Int
-  customer   Customer @relation(fields: [customerId], references: [id])
-}
+  model Reservation {
+    id        Int      @id @default(autoincrement())
+    time      String
+    date      DateTime
+    status    String   @default("PENDING")
+    createdAt DateTime @default(now())
+    updatedAt DateTime @updatedAt
+    tableId   Int
+    table     Table    @relation(fields: [tableId], references: [id])
+    userId    Int
+    user      User     @relation(fields: [userId], references: [id])
+
+      menuItems MenuItem[] @relation("ReservationMenuItems")
+
+  }
 
 model MenuItem {
-  id        Int      @id @default(autoincrement())
-  name      String
-  price     Float
-  description String?
-  isBestSeller Boolean @default(false)
+  id           Int      @id @default(autoincrement())
+  name         String
+  price        Float
+  description  String?
+  isBestSeller Boolean  @default(false)
   // status       String
-  isActive  Boolean  @default(true)
-  createdAt DateTime @default(now())
-  updatedAt DateTime @updatedAt
-  updatedBy Int?
-  deletedBy Int?
-  createdBy Int
+  isActive     Boolean  @default(true)
+  createdAt    DateTime @default(now())
+  updatedAt    DateTime @updatedAt
+  updatedBy    Int?
+  deletedBy    Int?
+  createdBy    Int
 
   images       FoodImage[]
   menuId       Int?
   menu         Menu?                @relation(fields: [menuId], references: [id])
   orderDetails OrderDetail[]
   ingredients  MenuItemIngredient[]
+  reservations Reservation[] @relation("ReservationMenuItems")
 }
 
 model FoodImage {
@@ -288,14 +291,12 @@ model WarehouseSlip {
   isActive   Boolean               @default(true)
   createdAt  DateTime              @default(now())
   updatedAt  DateTime              @updatedAt
-  userId Int?
-  user   User?            @relation(fields: [userId], references: [id])
+  userId     Int?
+  user       User?                 @relation(fields: [userId], references: [id])
   supplierId Int
   supplier   Supplier              @relation(fields: [supplierId], references: [id])
   details    WarehouseSlipDetail[]
-
 }
-
 
 model WarehouseSlipDetail {
   id              Int           @id @default(autoincrement())

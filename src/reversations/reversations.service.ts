@@ -9,82 +9,108 @@ export class ReversationsService {
     constructor(private readonly prisma: PrismaService) { }
 
     async create(createReservationDto: CreateReservationDto, user: IUser) {
-        const { tableId, startTime, endTime } = createReservationDto;
+        const { tableId, time, date, status } = createReservationDto;
 
-        // Kiểm tra xem bàn có tồn tại và còn hoạt động không
-        const table = await this.prisma.table.findUnique({
-            where: { id: tableId },
-            select: { isActive: true, reservations: true },
-        });
+        const reservationDate = new Date(date); 
+        const reservationDateTime = new Date(`${reservationDate.toISOString().split('T')[0]}T${time}:00`);
 
-        if (!table || !table.isActive) {
-            throw new BadRequestException('Table is not available');
-        }
+        console.log('ISO Date:', reservationDate.toISOString().split('T')[0]);
+        console.log('Reservation DateTime:', reservationDateTime.toISOString());
 
-        // Kiểm tra xem bàn có bị trùng thời gian đặt không
-        const overlappingReservation = table.reservations.find(reservation =>
-            (startTime < reservation.endTime && endTime > reservation.startTime)
-        );
-
-        if (overlappingReservation) {
-            throw new BadRequestException('Table is already reserved for the selected time');
-        }
-
-        // Tạo đặt chỗ mới
-        const newReservation = await this.prisma.reservation.create({
-            data: {
-                ...createReservationDto,
-                // customerId: user.sub,
+        // Kiểm tra xem có đặt chồng lên nhau không
+        const existingReservations = await this.prisma.reservation.findMany({
+            where: {
+                tableId: tableId,
+                date: {
+                    gte: new Date(`${reservationDate.toISOString().split('T')[0]}T00:00:00Z`), // Ngày bắt đầu
+                    lt: new Date(`${reservationDate.toISOString().split('T')[0]}T23:59:59Z`), // Ngày kết thúc
+                },
+                status: {
+                    not: "CANCELLED",
+                },
+            },
+            select: {
+                time: true,
+                date: true,
             },
         });
+
+        console.log('Existing Reservations:', existingReservations);
+
+        // Kiểm tra các lịch hẹn hiện tại
+        for (const reservation of existingReservations) {
+            const existingDateTime = new Date(`${reservation.date.toISOString().split('T')[0]}T${reservation.time}:00`);
+            console.log('Comparing with Existing Reservation DateTime:', existingDateTime.toISOString());
+            if (reservationDateTime.getTime() === existingDateTime.getTime()) {
+                console.error('Table is already reserved for the selected time');
+                throw new BadRequestException('Table is already reserved for the selected time');
+            }
+        }
+
+        const newReservation = await this.prisma.reservation.create({
+            data: {
+                time: time,
+                date: new Date(date).toISOString(),
+                status: status || 'PENDING',
+                user: {
+                    connect: { id: user.sub },
+                },
+                table: {
+                    connect: { id: tableId },
+                },
+            },
+        });
+
+
+        console.log('New Reservation Created:', newReservation);
 
         return newReservation;
     }
 
+
+
     async getAll(params: ReservationFilterType): Promise<ReservationPaginationResponseType> {
         const { page = 1, items_per_page = 4, search } = params;
         const skip = (page - 1) * items_per_page;
-
-        // Xây dựng điều kiện tìm kiếm
+    
         const where = search
             ? {
                 OR: [
                     { status: { contains: search } },
-                    { customer: { user: { fullName: { contains: search } } } },
+                    {
+                        user: {
+                            fullName: {
+                                contains: search,
+                            },
+                        },
+                    },
                     { table: { number: { equals: parseInt(search) || -1 } } },
                 ],
             }
             : {};
-
-        // Tính tổng số bản ghi
+    
         const total = await this.prisma.reservation.count({ where });
-
-        // Lấy danh sách các đặt chỗ
+    
         const reservations = await this.prisma.reservation.findMany({
             where,
             skip,
             take: items_per_page,
             include: {
                 table: true,
-                customer: {
-                    include: {
-                        user: true,
-                    },
-                },
+                user: true, 
             },
             orderBy: { createdAt: 'desc' },
         });
-
-        // Chuyển đổi dữ liệu theo định dạng mong đợi
-        const data = reservations.map(reservation => ({
+    
+        const data = reservations.map((reservation) => ({
             id: reservation.id,
-            startTime: reservation.startTime,
-            endTime: reservation.endTime,
+            time: reservation.time,
+            date: reservation.date, 
             status: reservation.status,
             tableId: reservation.table.id,
-            customerId: reservation.customer.id,
+            userId: reservation.user.id,
         }));
-
+    
         return {
             data,
             total,
@@ -92,52 +118,52 @@ export class ReversationsService {
             itemsPerPage: items_per_page,
         };
     }
+    
+
 
     async getDetail(id: number): Promise<any> {
+        // Truy vấn thông tin đặt chỗ từ cơ sở dữ liệu
         const reservation = await this.prisma.reservation.findUnique({
             where: { id },
             include: {
-                table: true,
-                customer: {
-                    include: {
-                        user: true,
-                    },
-                },
+                table: true,  // Bao gồm thông tin của bàn
+                user: true,   // Bao gồm thông tin của người dùng
             },
         });
-
+    
+        // Kiểm tra xem đặt chỗ có tồn tại không
         if (!reservation) {
             throw new NotFoundException(`Reservation with ID ${id} not found`);
         }
-
+    
+        // Chuyển đổi dữ liệu để phù hợp với định dạng mong muốn
         const data = {
             id: reservation.id,
-            startTime: reservation.startTime,
-            endTime: reservation.endTime,
+            time: reservation.time,
+            date: reservation.date,
             status: reservation.status,
             createdAt: reservation.createdAt,
             updatedAt: reservation.updatedAt,
             tableId: reservation.tableId,
-            customerId: reservation.customerId,
+            userId: reservation.userId, // Chỉnh sửa từ customerId thành userId
             table: {
                 id: reservation.table.id,
                 number: reservation.table.number,
                 seats: reservation.table.seats,
                 status: reservation.table.status,
             },
-            customer: {
-                id: reservation.customer.id,
-                user: {
-                    fullName: reservation.customer.user.fullName,
-                    phone: reservation.customer.user.phone,
-                    username: reservation.customer.user.username,
-                    avatar: reservation.customer.user.avatar,
-                },
+            user: {
+                id: reservation.user.id,
+                fullName: reservation.user.fullName,
+                phone: reservation.user.phone,
+                username: reservation.user.username,
+                avatar: reservation.user.avatar,
             },
         };
-
+    
         return { data };
     }
+    
     async update(id: number, data: UpdateReservationDto, user: IUser): Promise<Reservation> {
         const reservation = await this.prisma.reservation.findUnique({
             where: { id },

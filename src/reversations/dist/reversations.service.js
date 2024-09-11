@@ -61,31 +61,60 @@ var ReversationsService = /** @class */ (function () {
     }
     ReversationsService.prototype.create = function (createReservationDto, user) {
         return __awaiter(this, void 0, void 0, function () {
-            var tableId, startTime, endTime, table, overlappingReservation, newReservation;
+            var tableId, time, date, status, reservationDate, reservationDateTime, existingReservations, _i, existingReservations_1, reservation, existingDateTime, newReservation;
             return __generator(this, function (_a) {
                 switch (_a.label) {
                     case 0:
-                        tableId = createReservationDto.tableId, startTime = createReservationDto.startTime, endTime = createReservationDto.endTime;
-                        return [4 /*yield*/, this.prisma.table.findUnique({
-                                where: { id: tableId },
-                                select: { isActive: true, reservations: true }
+                        tableId = createReservationDto.tableId, time = createReservationDto.time, date = createReservationDto.date, status = createReservationDto.status;
+                        reservationDate = new Date(date);
+                        reservationDateTime = new Date(reservationDate.toISOString().split('T')[0] + "T" + time + ":00");
+                        console.log('ISO Date:', reservationDate.toISOString().split('T')[0]);
+                        console.log('Reservation DateTime:', reservationDateTime.toISOString());
+                        return [4 /*yield*/, this.prisma.reservation.findMany({
+                                where: {
+                                    tableId: tableId,
+                                    date: {
+                                        gte: new Date(reservationDate.toISOString().split('T')[0] + "T00:00:00Z"),
+                                        lt: new Date(reservationDate.toISOString().split('T')[0] + "T23:59:59Z")
+                                    },
+                                    status: {
+                                        not: "CANCELLED"
+                                    }
+                                },
+                                select: {
+                                    time: true,
+                                    date: true
+                                }
                             })];
                     case 1:
-                        table = _a.sent();
-                        if (!table || !table.isActive) {
-                            throw new common_1.BadRequestException('Table is not available');
-                        }
-                        overlappingReservation = table.reservations.find(function (reservation) {
-                            return (startTime < reservation.endTime && endTime > reservation.startTime);
-                        });
-                        if (overlappingReservation) {
-                            throw new common_1.BadRequestException('Table is already reserved for the selected time');
+                        existingReservations = _a.sent();
+                        console.log('Existing Reservations:', existingReservations);
+                        // Kiểm tra các lịch hẹn hiện tại
+                        for (_i = 0, existingReservations_1 = existingReservations; _i < existingReservations_1.length; _i++) {
+                            reservation = existingReservations_1[_i];
+                            existingDateTime = new Date(reservation.date.toISOString().split('T')[0] + "T" + reservation.time + ":00");
+                            console.log('Comparing with Existing Reservation DateTime:', existingDateTime.toISOString());
+                            if (reservationDateTime.getTime() === existingDateTime.getTime()) {
+                                console.error('Table is already reserved for the selected time');
+                                throw new common_1.BadRequestException('Table is already reserved for the selected time');
+                            }
                         }
                         return [4 /*yield*/, this.prisma.reservation.create({
-                                data: __assign({}, createReservationDto)
+                                data: {
+                                    time: time,
+                                    date: new Date(date).toISOString(),
+                                    status: status || 'PENDING',
+                                    user: {
+                                        connect: { id: user.sub }
+                                    },
+                                    table: {
+                                        connect: { id: tableId }
+                                    }
+                                }
                             })];
                     case 2:
                         newReservation = _a.sent();
+                        console.log('New Reservation Created:', newReservation);
                         return [2 /*return*/, newReservation];
                 }
             });
@@ -103,7 +132,13 @@ var ReversationsService = /** @class */ (function () {
                             ? {
                                 OR: [
                                     { status: { contains: search } },
-                                    { customer: { user: { fullName: { contains: search } } } },
+                                    {
+                                        user: {
+                                            fullName: {
+                                                contains: search
+                                            }
+                                        }
+                                    },
                                     { table: { number: { equals: parseInt(search) || -1 } } },
                                 ]
                             }
@@ -117,11 +152,7 @@ var ReversationsService = /** @class */ (function () {
                                 take: items_per_page,
                                 include: {
                                     table: true,
-                                    customer: {
-                                        include: {
-                                            user: true
-                                        }
-                                    }
+                                    user: true
                                 },
                                 orderBy: { createdAt: 'desc' }
                             })];
@@ -129,11 +160,11 @@ var ReversationsService = /** @class */ (function () {
                         reservations = _c.sent();
                         data = reservations.map(function (reservation) { return ({
                             id: reservation.id,
-                            startTime: reservation.startTime,
-                            endTime: reservation.endTime,
+                            time: reservation.time,
+                            date: reservation.date,
                             status: reservation.status,
                             tableId: reservation.table.id,
-                            customerId: reservation.customer.id
+                            userId: reservation.user.id
                         }); });
                         return [2 /*return*/, {
                                 data: data,
@@ -154,41 +185,36 @@ var ReversationsService = /** @class */ (function () {
                             where: { id: id },
                             include: {
                                 table: true,
-                                customer: {
-                                    include: {
-                                        user: true
-                                    }
-                                }
+                                user: true
                             }
                         })];
                     case 1:
                         reservation = _a.sent();
+                        // Kiểm tra xem đặt chỗ có tồn tại không
                         if (!reservation) {
                             throw new common_1.NotFoundException("Reservation with ID " + id + " not found");
                         }
                         data = {
                             id: reservation.id,
-                            startTime: reservation.startTime,
-                            endTime: reservation.endTime,
+                            time: reservation.time,
+                            date: reservation.date,
                             status: reservation.status,
                             createdAt: reservation.createdAt,
                             updatedAt: reservation.updatedAt,
                             tableId: reservation.tableId,
-                            customerId: reservation.customerId,
+                            userId: reservation.userId,
                             table: {
                                 id: reservation.table.id,
                                 number: reservation.table.number,
                                 seats: reservation.table.seats,
                                 status: reservation.table.status
                             },
-                            customer: {
-                                id: reservation.customer.id,
-                                user: {
-                                    fullName: reservation.customer.user.fullName,
-                                    phone: reservation.customer.user.phone,
-                                    username: reservation.customer.user.username,
-                                    avatar: reservation.customer.user.avatar
-                                }
+                            user: {
+                                id: reservation.user.id,
+                                fullName: reservation.user.fullName,
+                                phone: reservation.user.phone,
+                                username: reservation.user.username,
+                                avatar: reservation.user.avatar
                             }
                         };
                         return [2 /*return*/, { data: data }];

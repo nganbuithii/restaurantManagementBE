@@ -24,9 +24,12 @@ var ReversationsController = /** @class */ (function () {
     ReversationsController.prototype.getAll = function (params) {
         return this.reversationsService.getAll(params);
     };
-    ReversationsController.prototype.getDetail = function (id) {
-        return this.reversationsService.getDetail(id);
-    };
+    // @Get(':id')
+    // @UseGuards(JwtAuthGuard)
+    // @ResponseMessage(" get detail reservcation by id")
+    // getDetail(@Param('id', ParseIntPipe) id: number): Promise<Reservation> {
+    //   return this.reversationsService.getDetail(id)
+    // }
     ReversationsController.prototype.update = function (id, data, user) {
         return this.reversationsService.update(id, data, user);
     };
@@ -37,7 +40,7 @@ var ReversationsController = /** @class */ (function () {
         common_1.Post(),
         common_1.HttpCode(common_1.HttpStatus.CREATED),
         common_1.UseGuards(jwt_auth_guard_1.JwtAuthGuard),
-        customize_1.ResponseMessage("create new menu item"),
+        customize_1.ResponseMessage("create new reversation"),
         __param(0, common_1.Body()),
         __param(1, customize_1.CurrentUser())
     ], ReversationsController.prototype, "createReversation");
@@ -47,12 +50,6 @@ var ReversationsController = /** @class */ (function () {
         customize_1.ResponseMessage("get all menu item with pagination"),
         __param(0, common_1.Query())
     ], ReversationsController.prototype, "getAll");
-    __decorate([
-        common_1.Get(':id'),
-        common_1.UseGuards(jwt_auth_guard_1.JwtAuthGuard),
-        customize_1.ResponseMessage(" get detail reservcation by id"),
-        __param(0, common_1.Param('id', common_1.ParseIntPipe))
-    ], ReversationsController.prototype, "getDetail");
     __decorate([
         common_1.Patch(':id'),
         common_1.UseGuards(jwt_auth_guard_1.JwtAuthGuard),
