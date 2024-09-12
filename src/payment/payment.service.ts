@@ -4,11 +4,15 @@ import * as crypto from 'crypto';
 import * as querystring from 'querystring';
 import moment from 'moment';
 import { CreatePaymentDto } from './dto/payment.dto';
+import { VnpayService } from 'nestjs-vnpay';
 
 @Injectable()
 export class PaymentService {
-    constructor(private configService: ConfigService) {}
+    constructor(private configService: ConfigService,private readonly vnpayService: VnpayService) {}
 
+    async getBankList() {
+      return this.vnpayService.getBankList();
+    }
     async createVnpayPaymentUrl(createPaymentDto: CreatePaymentDto): Promise<string> {
         const { orderId, amount, orderInfo } = createPaymentDto;
     

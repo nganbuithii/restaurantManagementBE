@@ -265,6 +265,74 @@ var OrdersService = /** @class */ (function () {
             });
         });
     };
+    OrdersService.prototype.getRevenueStatistics = function (filterData) {
+        return __awaiter(this, void 0, void 0, function () {
+            var currentDate, startDate, endDate, orders, revenueByMonth, result;
+            return __generator(this, function (_a) {
+                switch (_a.label) {
+                    case 0:
+                        currentDate = new Date();
+                        if (filterData.year && filterData.month) {
+                            startDate = new Date(filterData.year, filterData.month - 1, 1);
+                            endDate = new Date(filterData.year, filterData.month, 0);
+                        }
+                        else if (filterData.year) {
+                            startDate = new Date(filterData.year, 0, 1);
+                            endDate = new Date(filterData.year, 11, 31);
+                        }
+                        else {
+                            startDate = new Date(currentDate.getFullYear(), currentDate.getMonth() - 11, 1);
+                            endDate = currentDate;
+                        }
+                        return [4 /*yield*/, this.prisma.order.findMany({
+                                where: {
+                                    createdAt: {
+                                        gte: startDate,
+                                        lte: endDate
+                                    },
+                                    status: 'COMPLETED'
+                                },
+                                select: {
+                                    createdAt: true,
+                                    totalPrice: true,
+                                    discountPrice: true
+                                }
+                            })];
+                    case 1:
+                        orders = _a.sent();
+                        revenueByMonth = new Map();
+                        orders.forEach(function (order) {
+                            var monthYear = order.createdAt.getFullYear() + "-" + (order.createdAt.getMonth() + 1);
+                            var currentRevenue = revenueByMonth.get(monthYear) || { total: 0, discount: 0 };
+                            revenueByMonth.set(monthYear, {
+                                total: currentRevenue.total + order.totalPrice,
+                                discount: currentRevenue.discount + order.discountPrice
+                            });
+                        });
+                        result = Array.from(revenueByMonth, function (_a) {
+                            var monthYear = _a[0], revenue = _a[1];
+                            return ({
+                                monthYear: monthYear,
+                                totalRevenue: revenue.total,
+                                discountAmount: revenue.discount,
+                                netRevenue: revenue.total - revenue.discount
+                            });
+                        });
+                        // Sắp xếp kết quả theo thời gian giảm dần
+                        result.sort(function (a, b) {
+                            var _a = a.monthYear.split('-').map(Number), yearA = _a[0], monthA = _a[1];
+                            var _b = b.monthYear.split('-').map(Number), yearB = _b[0], monthB = _b[1];
+                            return yearB - yearA || monthB - monthA;
+                        });
+                        return [2 /*return*/, {
+                                startDate: startDate,
+                                endDate: endDate,
+                                data: result
+                            }];
+                }
+            });
+        });
+    };
     OrdersService = __decorate([
         common_1.Injectable()
     ], OrdersService);

@@ -27,23 +27,33 @@ import { InventoryModule } from './inventory/inventory.module';
 import { PrismaService } from './prisma.service';
 import { PaymentModule } from './payment/payment.module';
 import { ChatModule } from './chat/chat.module';
-
+import { VnpayModule } from 'nestjs-vnpay';
+import { ignoreLogger } from 'vnpay';
 
 @Module({
   imports: [
     ConfigModule.forRoot(),
+    VnpayModule.registerAsync({
+      imports: [ConfigModule],
+      useFactory: async (configService: ConfigService) => ({
+          secureSecret: configService.get<string>('VNPAY_SECURE_SECRET'),
+          tmnCode: configService.get<string>('VNPAY_TMN_CODE'),
+          loggerFn: ignoreLogger,
+      }),
+      inject: [ConfigService],
+  }),
     JwtModule.registerAsync({
       imports: [ConfigModule],
       useFactory: async (configService: ConfigService) => ({
         secret: configService.get<string>('JWT_SECRET'),
-        signOptions: { expiresIn: '60m' },
+        signOptions: { expiresIn: '3660m' },
       }),
       inject: [ConfigService],
     }),
     
     ConfigModule,
     UserModule,
-    AuthModule, RoleModule, PermissionModule, MenuItemModule, CloudinaryModule, IngredientModule, MenuModule, TableModule, ReversationsModule, OrdersModule, FeeckbacksModule, VouchersModule, SuppliersModule, WarehouseSlipsModule, EmailModule, InventoryModule, PaymentModule, ChatModule,  
+    AuthModule, RoleModule, PermissionModule, MenuItemModule, CloudinaryModule, IngredientModule, MenuModule, TableModule, ReversationsModule, OrdersModule, FeeckbacksModule, VouchersModule, SuppliersModule, WarehouseSlipsModule, EmailModule, InventoryModule, PaymentModule, ChatModule,
   ],
   controllers: [AppController],
   providers: [

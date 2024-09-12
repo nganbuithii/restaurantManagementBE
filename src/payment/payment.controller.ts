@@ -4,12 +4,29 @@ import { PaymentService } from './payment.service';
 import { CreatePaymentDto } from './dto/payment.dto';
 @Controller('payment')
 export class PaymentController {
-    constructor(private readonly paymentService: PaymentService) {}
+    constructor(private readonly paymentService: PaymentService) { }
+
+    @Get('banks')
+    async getBankList() {
+        try {
+            const banks = await this.paymentService.getBankList();
+            return {
+                success: true,
+                data: banks
+            };
+        } catch (error) {
+            return {
+                success: false,
+                message: 'Không thể lấy danh sách ngân hàng',
+                error: error.message
+            };
+        }
+    }
 
     @Post('create_vnpay_url')
     async createVnpayUrl(@Body() createPaymentDto: CreatePaymentDto) {
-      const paymentUrl = await this.paymentService.createVnpayPaymentUrl(createPaymentDto);
-      return { paymentUrl };
+        const paymentUrl = await this.paymentService.createVnpayPaymentUrl(createPaymentDto);
+        return { paymentUrl };
     }
 
     @Get('vnpay_return')

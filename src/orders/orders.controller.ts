@@ -6,7 +6,7 @@ import { IUser } from 'interfaces/user.interface';
 import { Order } from '@prisma/client';
 import { CreateOrderDto, OrderFilterType, OrderPaginationResponseType, OrderStatisticsDto, UpdateOrderDto } from './dto/orders.dto';
 import { VouchersService } from 'src/vouchers/vouchers.service';
-import { ApiTags } from '@nestjs/swagger';
+import { ApiBody, ApiTags } from '@nestjs/swagger';
 import { OrderStatus } from './dto/orders.dto';
 
 @ApiTags("Orders")
@@ -80,5 +80,22 @@ export class OrdersController {
   @ResponseMessage('Order statistics retrieved successfully')
   async getStatistics(): Promise<OrderStatisticsDto> {
     return this.ordersService.getStatistics();
+  }
+  @Post('revenue-statistics')
+  @UseGuards(JwtAuthGuard)
+  @ResponseMessage("Get revenue statistics")
+  @ApiBody({ 
+    schema: {
+      type: 'object',
+      properties: {
+        year: { type: 'number', nullable: true },
+        month: { type: 'number', nullable: true }
+      }
+    }
+  })
+  async getRevenueStatistics(
+    @Body() filterData: { year?: number; month?: number }
+  ) {
+    return this.ordersService.getRevenueStatistics(filterData);
   }
 }

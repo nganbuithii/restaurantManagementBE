@@ -51,6 +51,32 @@ var PaymentController = /** @class */ (function () {
     function PaymentController(paymentService) {
         this.paymentService = paymentService;
     }
+    PaymentController.prototype.getBankList = function () {
+        return __awaiter(this, void 0, void 0, function () {
+            var banks, error_1;
+            return __generator(this, function (_a) {
+                switch (_a.label) {
+                    case 0:
+                        _a.trys.push([0, 2, , 3]);
+                        return [4 /*yield*/, this.paymentService.getBankList()];
+                    case 1:
+                        banks = _a.sent();
+                        return [2 /*return*/, {
+                                success: true,
+                                data: banks
+                            }];
+                    case 2:
+                        error_1 = _a.sent();
+                        return [2 /*return*/, {
+                                success: false,
+                                message: 'Không thể lấy danh sách ngân hàng',
+                                error: error_1.message
+                            }];
+                    case 3: return [2 /*return*/];
+                }
+            });
+        });
+    };
     PaymentController.prototype.createVnpayUrl = function (createPaymentDto) {
         return __awaiter(this, void 0, void 0, function () {
             var paymentUrl;
@@ -113,6 +139,9 @@ var PaymentController = /** @class */ (function () {
             });
         });
     };
+    __decorate([
+        common_1.Get('banks')
+    ], PaymentController.prototype, "getBankList");
     __decorate([
         common_1.Post('create_vnpay_url'),
         __param(0, common_1.Body())

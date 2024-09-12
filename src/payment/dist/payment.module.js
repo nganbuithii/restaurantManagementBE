@@ -42,45 +42,19 @@ var __generator = (this && this.__generator) || function (thisArg, body) {
     }
 };
 exports.__esModule = true;
-exports.AppModule = void 0;
+exports.PaymentModule = void 0;
 var common_1 = require("@nestjs/common");
-var app_controller_1 = require("./app.controller");
-var app_service_1 = require("./app.service");
-var auth_module_1 = require("./auth/auth.module");
-var role_module_1 = require("./role/role.module");
-var core_1 = require("@nestjs/core");
-var user_module_1 = require("./user/user.module");
+var payment_controller_1 = require("./payment.controller");
+var payment_service_1 = require("./payment.service");
 var config_1 = require("@nestjs/config");
-var jwt_1 = require("@nestjs/jwt");
-var permission_module_1 = require("./permission/permission.module");
-var menu_item_module_1 = require("./menu-item/menu-item.module");
-var jwt_auth_guard_1 = require("./auth/jwt-auth.guard");
-var cloudinary_service_1 = require("./cloudinary/cloudinary.service");
-var cloudinary_module_1 = require("./cloudinary/cloudinary.module");
-var ingredient_module_1 = require("./ingredient/ingredient.module");
-var menu_module_1 = require("./menu/menu.module");
-var table_module_1 = require("./table/table.module");
-var reversations_module_1 = require("./reversations/reversations.module");
-var orders_module_1 = require("./orders/orders.module");
-var feedbacks_module_1 = require("./feeckbacks/feedbacks.module");
-var vouchers_module_1 = require("./vouchers/vouchers.module");
-var suppliers_module_1 = require("./suppliers/suppliers.module");
-var warehouse_slips_module_1 = require("./warehouse-slips/warehouse-slips.module");
-var email_module_1 = require("./email/email.module");
-var otp_service_1 = require("./otp/otp.service");
-var inventory_module_1 = require("./inventory/inventory.module");
-var prisma_service_1 = require("./prisma.service");
-var payment_module_1 = require("./payment/payment.module");
-var chat_module_1 = require("./chat/chat.module");
 var nestjs_vnpay_1 = require("nestjs-vnpay");
 var vnpay_1 = require("vnpay");
-var AppModule = /** @class */ (function () {
-    function AppModule() {
+var PaymentModule = /** @class */ (function () {
+    function PaymentModule() {
     }
-    AppModule = __decorate([
+    PaymentModule = __decorate([
         common_1.Module({
             imports: [
-                config_1.ConfigModule.forRoot(),
                 nestjs_vnpay_1.VnpayModule.registerAsync({
                     imports: [config_1.ConfigModule],
                     useFactory: function (configService) { return __awaiter(void 0, void 0, void 0, function () {
@@ -94,36 +68,12 @@ var AppModule = /** @class */ (function () {
                     }); },
                     inject: [config_1.ConfigService]
                 }),
-                jwt_1.JwtModule.registerAsync({
-                    imports: [config_1.ConfigModule],
-                    useFactory: function (configService) { return __awaiter(void 0, void 0, void 0, function () {
-                        return __generator(this, function (_a) {
-                            return [2 /*return*/, ({
-                                    secret: configService.get('JWT_SECRET'),
-                                    signOptions: { expiresIn: '3660m' }
-                                })];
-                        });
-                    }); },
-                    inject: [config_1.ConfigService]
-                }),
-                config_1.ConfigModule,
-                user_module_1.UserModule,
-                auth_module_1.AuthModule, role_module_1.RoleModule, permission_module_1.PermissionModule, menu_item_module_1.MenuItemModule, cloudinary_module_1.CloudinaryModule, ingredient_module_1.IngredientModule, menu_module_1.MenuModule, table_module_1.TableModule, reversations_module_1.ReversationsModule, orders_module_1.OrdersModule, feedbacks_module_1.FeeckbacksModule, vouchers_module_1.VouchersModule, suppliers_module_1.SuppliersModule, warehouse_slips_module_1.WarehouseSlipsModule, email_module_1.EmailModule, inventory_module_1.InventoryModule, payment_module_1.PaymentModule, chat_module_1.ChatModule,
             ],
-            controllers: [app_controller_1.AppController],
-            providers: [
-                jwt_auth_guard_1.JwtAuthGuard,
-                app_service_1.AppService,
-                {
-                    provide: core_1.APP_PIPE,
-                    useClass: common_1.ValidationPipe
-                },
-                cloudinary_service_1.CloudinaryService,
-                otp_service_1.OtpService,
-                prisma_service_1.PrismaService
-            ]
+            controllers: [payment_controller_1.PaymentController],
+            providers: [payment_service_1.PaymentService, config_1.ConfigService],
+            exports: [payment_service_1.PaymentService]
         })
-    ], AppModule);
-    return AppModule;
+    ], PaymentModule);
+    return PaymentModule;
 }());
-exports.AppModule = AppModule;
+exports.PaymentModule = PaymentModule;

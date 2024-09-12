@@ -48,9 +48,17 @@ var crypto = require("crypto");
 var querystring = require("querystring");
 var moment_1 = require("moment");
 var PaymentService = /** @class */ (function () {
-    function PaymentService(configService) {
+    function PaymentService(configService, vnpayService) {
         this.configService = configService;
+        this.vnpayService = vnpayService;
     }
+    PaymentService.prototype.getBankList = function () {
+        return __awaiter(this, void 0, void 0, function () {
+            return __generator(this, function (_a) {
+                return [2 /*return*/, this.vnpayService.getBankList()];
+            });
+        });
+    };
     PaymentService.prototype.createVnpayPaymentUrl = function (createPaymentDto) {
         return __awaiter(this, void 0, Promise, function () {
             var orderId, amount, orderInfo, tmnCode, secretKey, vnpUrl, returnUrl, date, createDate, generatedOrderId, vnpParams, sortedParams, signData, hmac, signed;

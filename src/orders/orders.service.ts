@@ -171,7 +171,6 @@ export class OrdersService {
   }
   
   async getStatistics(): Promise<OrderStatisticsDto> {
-    // Tính tổng số đơn hàng
     const totalOrders = await this.prisma.order.count();
 
     // Tính tổng doanh thu
@@ -184,6 +183,70 @@ export class OrdersService {
     return {
       totalOrders,
       totalRevenue: totalRevenue._sum.totalPrice || 0,
+    };
+  }
+
+
+  async getRevenueStatistics(filterData: { year?: number; month?: number }) {
+    const currentDate = new Date();
+    let startDate: Date;
+    let endDate: Date;
+
+    if (filterData.year && filterData.month) {
+      startDate = new Date(filterData.year, filterData.month - 1, 1);
+      endDate = new Date(filterData.year, filterData.month, 0);
+    } else if (filterData.year) {
+      startDate = new Date(filterData.year, 0, 1);
+      endDate = new Date(filterData.year, 11, 31);
+    } else {
+      startDate = new Date(currentDate.getFullYear(), currentDate.getMonth() - 11, 1);
+      endDate = currentDate;
+    }
+
+    const orders = await this.prisma.order.findMany({
+      where: {
+        createdAt: {
+          gte: startDate,
+          lte: endDate,
+        },
+        status: 'COMPLETED',
+      },
+      select: {
+        createdAt: true,
+        totalPrice: true,
+        discountPrice: true,
+      },
+    });
+
+    const revenueByMonth = new Map();
+
+    orders.forEach(order => {
+      const monthYear = `${order.createdAt.getFullYear()}-${order.createdAt.getMonth() + 1}`;
+      const currentRevenue = revenueByMonth.get(monthYear) || { total: 0, discount: 0 };
+      revenueByMonth.set(monthYear, {
+        total: currentRevenue.total + order.totalPrice,
+        discount: currentRevenue.discount + order.discountPrice,
+      });
+    });
+
+    const result = Array.from(revenueByMonth, ([monthYear, revenue]) => ({
+      monthYear,
+      totalRevenue: revenue.total,
+      discountAmount: revenue.discount,
+      netRevenue: revenue.total - revenue.discount,
+    }));
+
+    // Sắp xếp kết quả theo thời gian giảm dần
+    result.sort((a, b) => {
+      const [yearA, monthA] = a.monthYear.split('-').map(Number);
+      const [yearB, monthB] = b.monthYear.split('-').map(Number);
+      return yearB - yearA || monthB - monthA;
+    });
+
+    return {
+      startDate,
+      endDate,
+      data: result,
     };
   }
 }

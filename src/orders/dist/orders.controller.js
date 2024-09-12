@@ -88,6 +88,13 @@ var OrdersController = /** @class */ (function () {
             });
         });
     };
+    OrdersController.prototype.getRevenueStatistics = function (filterData) {
+        return __awaiter(this, void 0, void 0, function () {
+            return __generator(this, function (_a) {
+                return [2 /*return*/, this.ordersService.getRevenueStatistics(filterData)];
+            });
+        });
+    };
     __decorate([
         common_1.Post(),
         common_1.HttpCode(common_1.HttpStatus.CREATED),
@@ -136,6 +143,21 @@ var OrdersController = /** @class */ (function () {
         common_1.UseGuards(jwt_auth_guard_1.JwtAuthGuard),
         customize_1.ResponseMessage('Order statistics retrieved successfully')
     ], OrdersController.prototype, "getStatistics");
+    __decorate([
+        common_1.Post('revenue-statistics'),
+        common_1.UseGuards(jwt_auth_guard_1.JwtAuthGuard),
+        customize_1.ResponseMessage("Get revenue statistics"),
+        swagger_1.ApiBody({
+            schema: {
+                type: 'object',
+                properties: {
+                    year: { type: 'number', nullable: true },
+                    month: { type: 'number', nullable: true }
+                }
+            }
+        }),
+        __param(0, common_1.Body())
+    ], OrdersController.prototype, "getRevenueStatistics");
     OrdersController = __decorate([
         swagger_1.ApiTags("Orders"),
         common_1.Controller('orders')
