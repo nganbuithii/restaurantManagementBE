@@ -25,6 +25,7 @@ import { EmailModule } from './email/email.module';
 import { OtpService } from './otp/otp.service';
 import { InventoryModule } from './inventory/inventory.module';
 import { PrismaService } from './prisma.service';
+import { PaymentModule } from './payment/payment.module';
 
 
 @Module({
@@ -41,7 +42,7 @@ import { PrismaService } from './prisma.service';
     
     ConfigModule,
     UserModule,
-    AuthModule, RoleModule, PermissionModule, MenuItemModule, CloudinaryModule, IngredientModule, MenuModule, TableModule, ReversationsModule, OrdersModule, FeeckbacksModule, VouchersModule, SuppliersModule, WarehouseSlipsModule, EmailModule, InventoryModule,  
+    AuthModule, RoleModule, PermissionModule, MenuItemModule, CloudinaryModule, IngredientModule, MenuModule, TableModule, ReversationsModule, OrdersModule, FeeckbacksModule, VouchersModule, SuppliersModule, WarehouseSlipsModule, EmailModule, InventoryModule, PaymentModule,  
   ],
   controllers: [AppController],
   providers: [

@@ -104,6 +104,9 @@ var FeeckbacksService = /** @class */ (function () {
                                     where: where,
                                     skip: skip,
                                     take: items_per_page,
+                                    orderBy: {
+                                        id: 'desc'
+                                    },
                                     include: {
                                         user: {
                                             select: {

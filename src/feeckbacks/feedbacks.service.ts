@@ -45,6 +45,9 @@ export class FeeckbacksService {
                 where,
                 skip,
                 take: items_per_page,
+                orderBy: {
+                  id: 'desc', 
+              },
                 include: {
                     user: {
                         select: {
