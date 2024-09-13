@@ -1,55 +1,39 @@
-import { Controller, Get, Post, Query, Body, Res, Req } from '@nestjs/common';
-import { Response, Request } from 'express';
+import { Controller, Post, Get, Body, Query, Res, UseGuards } from '@nestjs/common';
+import { Response } from 'express';
 import { PaymentService } from './payment.service';
-import { CreatePaymentDto } from './dto/payment.dto';
+import { OrdersService } from 'src/orders/orders.service';
+import { JwtAuthGuard } from 'src/auth/jwt-auth.guard';
+import { IUser } from 'interfaces/user.interface';
+import { OrderStatus } from 'src/orders/dto/orders.dto';
+import { CurrentUser } from 'decorators/customize';
+
 @Controller('payment')
 export class PaymentController {
-    constructor(private readonly paymentService: PaymentService) { }
+  constructor(private readonly paymentService: PaymentService, private readonly orderService: OrdersService) { }
 
-    @Get('banks')
-    async getBankList() {
-        try {
-            const banks = await this.paymentService.getBankList();
-            return {
-                success: true,
-                data: banks
-            };
-        } catch (error) {
-            return {
-                success: false,
-                message: 'Không thể lấy danh sách ngân hàng',
-                error: error.message
-            };
-        }
-    }
+  @Post('create_payment_url')
+  async createPaymentUrl(@Body() body: { orderId: string; amount: number; bankCode?: string }, @Res() res: Response) {
+    const { orderId, amount, bankCode } = body;
+    const paymentUrl = await this.paymentService.createPaymentUrl(orderId, amount, bankCode);
+    res.json({ paymentUrl });
+  }
 
-    @Post('create_vnpay_url')
-    async createVnpayUrl(@Body() createPaymentDto: CreatePaymentDto) {
-        const paymentUrl = await this.paymentService.createVnpayPaymentUrl(createPaymentDto);
-        return { paymentUrl };
-    }
+  @Post('vnpay_data')
+  async logVnpayData(@Body() body: { vnp_PayDate: string; vnp_TransactionStatus: string; vnp_TxnRef: string; vnp_ResponseCode: string }, @CurrentUser() user: IUser) {
+    const { vnp_PayDate, vnp_TransactionStatus, vnp_TxnRef, vnp_ResponseCode } = body;
 
-    @Get('vnpay_return')
-    async handleReturnUrl(@Query() vnpParams: any, @Res() res: Response) {
-        const isValidSignature = await this.paymentService.verifyReturnUrl(vnpParams);
-        if (isValidSignature) {
-            // Xử lý khi thanh toán thành công
-            // Cập nhật trạng thái đơn hàng trong DB
-            res.render('success', { code: vnpParams['vnp_ResponseCode'] });
-        } else {
-            res.render('error', { code: '97' });
-        }
-    }
+    return this.paymentService.handlePaymentReturn(body, user)
+  }
 
-    @Post('querydr')
-    async queryTransaction(@Body() body: any, @Res() res: Response) {
-        const result = await this.paymentService.queryTransaction(body.orderId, body.transDate);
-        res.json(result);
-    }
+  @Post('querydr')
+  async querydr(@Body() body: { orderId: string; transDate: string }) {
+    const { orderId, transDate } = body;
+    return this.paymentService.queryTransaction(orderId, transDate);
+  }
 
-    @Post('refund')
-    async refundTransaction(@Body() body: any, @Res() res: Response) {
-        const result = await this.paymentService.refundTransaction(body);
-        res.json(result);
-    }
+  @Post('refund')
+  async refund(@Body() body: { orderId: string; transDate: string; amount: number; transType: string; user: string }) {
+    const { orderId, transDate, amount, transType, user } = body;
+    return this.paymentService.refundTransaction({ orderId, transDate, amount, transType, user });
+  }
 }

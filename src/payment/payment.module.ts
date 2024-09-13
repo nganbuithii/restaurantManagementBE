@@ -4,6 +4,9 @@ import { PaymentService } from './payment.service';
 import { ConfigModule, ConfigService } from '@nestjs/config';
 import { VnpayModule } from 'nestjs-vnpay';
 import { ignoreLogger } from 'vnpay';
+import { JwtModule } from '@nestjs/jwt';
+import { OrdersService } from 'src/orders/orders.service';
+import { PrismaService } from 'src/prisma.service';
 
 @Module({
   imports: [
@@ -15,10 +18,12 @@ import { ignoreLogger } from 'vnpay';
         loggerFn: ignoreLogger,
       }),
       inject: [ConfigService],
+      
     }),
+    JwtModule
   ],
   controllers: [PaymentController],
-  providers: [PaymentService, ConfigService],
+  providers: [PaymentService, ConfigService, OrdersService, PrismaService],
   exports: [PaymentService],
 })
 export class PaymentModule {}

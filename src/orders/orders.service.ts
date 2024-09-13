@@ -173,7 +173,7 @@ export class OrdersService {
   async getStatistics(): Promise<OrderStatisticsDto> {
     const totalOrders = await this.prisma.order.count();
 
-    // Tính tổng doanh thu
+    // Tính tng doanh thu
     const totalRevenue = await this.prisma.order.aggregate({
       _sum: {
         totalPrice: true,

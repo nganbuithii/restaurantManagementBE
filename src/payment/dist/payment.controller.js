@@ -47,117 +47,71 @@ var __generator = (this && this.__generator) || function (thisArg, body) {
 exports.__esModule = true;
 exports.PaymentController = void 0;
 var common_1 = require("@nestjs/common");
+var customize_1 = require("decorators/customize");
 var PaymentController = /** @class */ (function () {
-    function PaymentController(paymentService) {
+    function PaymentController(paymentService, orderService) {
         this.paymentService = paymentService;
+        this.orderService = orderService;
     }
-    PaymentController.prototype.getBankList = function () {
+    PaymentController.prototype.createPaymentUrl = function (body, res) {
         return __awaiter(this, void 0, void 0, function () {
-            var banks, error_1;
+            var orderId, amount, bankCode, paymentUrl;
             return __generator(this, function (_a) {
                 switch (_a.label) {
                     case 0:
-                        _a.trys.push([0, 2, , 3]);
-                        return [4 /*yield*/, this.paymentService.getBankList()];
-                    case 1:
-                        banks = _a.sent();
-                        return [2 /*return*/, {
-                                success: true,
-                                data: banks
-                            }];
-                    case 2:
-                        error_1 = _a.sent();
-                        return [2 /*return*/, {
-                                success: false,
-                                message: 'Không thể lấy danh sách ngân hàng',
-                                error: error_1.message
-                            }];
-                    case 3: return [2 /*return*/];
-                }
-            });
-        });
-    };
-    PaymentController.prototype.createVnpayUrl = function (createPaymentDto) {
-        return __awaiter(this, void 0, void 0, function () {
-            var paymentUrl;
-            return __generator(this, function (_a) {
-                switch (_a.label) {
-                    case 0: return [4 /*yield*/, this.paymentService.createVnpayPaymentUrl(createPaymentDto)];
+                        orderId = body.orderId, amount = body.amount, bankCode = body.bankCode;
+                        return [4 /*yield*/, this.paymentService.createPaymentUrl(orderId, amount, bankCode)];
                     case 1:
                         paymentUrl = _a.sent();
-                        return [2 /*return*/, { paymentUrl: paymentUrl }];
-                }
-            });
-        });
-    };
-    PaymentController.prototype.handleReturnUrl = function (vnpParams, res) {
-        return __awaiter(this, void 0, void 0, function () {
-            var isValidSignature;
-            return __generator(this, function (_a) {
-                switch (_a.label) {
-                    case 0: return [4 /*yield*/, this.paymentService.verifyReturnUrl(vnpParams)];
-                    case 1:
-                        isValidSignature = _a.sent();
-                        if (isValidSignature) {
-                            // Xử lý khi thanh toán thành công
-                            // Cập nhật trạng thái đơn hàng trong DB
-                            res.render('success', { code: vnpParams['vnp_ResponseCode'] });
-                        }
-                        else {
-                            res.render('error', { code: '97' });
-                        }
+                        res.json({ paymentUrl: paymentUrl });
                         return [2 /*return*/];
                 }
             });
         });
     };
-    PaymentController.prototype.queryTransaction = function (body, res) {
+    PaymentController.prototype.logVnpayData = function (body, user) {
         return __awaiter(this, void 0, void 0, function () {
-            var result;
+            var vnp_PayDate, vnp_TransactionStatus, vnp_TxnRef, vnp_ResponseCode;
             return __generator(this, function (_a) {
-                switch (_a.label) {
-                    case 0: return [4 /*yield*/, this.paymentService.queryTransaction(body.orderId, body.transDate)];
-                    case 1:
-                        result = _a.sent();
-                        res.json(result);
-                        return [2 /*return*/];
-                }
+                vnp_PayDate = body.vnp_PayDate, vnp_TransactionStatus = body.vnp_TransactionStatus, vnp_TxnRef = body.vnp_TxnRef, vnp_ResponseCode = body.vnp_ResponseCode;
+                return [2 /*return*/, this.paymentService.handlePaymentReturn(body, user)];
             });
         });
     };
-    PaymentController.prototype.refundTransaction = function (body, res) {
+    PaymentController.prototype.querydr = function (body) {
         return __awaiter(this, void 0, void 0, function () {
-            var result;
+            var orderId, transDate;
             return __generator(this, function (_a) {
-                switch (_a.label) {
-                    case 0: return [4 /*yield*/, this.paymentService.refundTransaction(body)];
-                    case 1:
-                        result = _a.sent();
-                        res.json(result);
-                        return [2 /*return*/];
-                }
+                orderId = body.orderId, transDate = body.transDate;
+                return [2 /*return*/, this.paymentService.queryTransaction(orderId, transDate)];
+            });
+        });
+    };
+    PaymentController.prototype.refund = function (body) {
+        return __awaiter(this, void 0, void 0, function () {
+            var orderId, transDate, amount, transType, user;
+            return __generator(this, function (_a) {
+                orderId = body.orderId, transDate = body.transDate, amount = body.amount, transType = body.transType, user = body.user;
+                return [2 /*return*/, this.paymentService.refundTransaction({ orderId: orderId, transDate: transDate, amount: amount, transType: transType, user: user })];
             });
         });
     };
     __decorate([
-        common_1.Get('banks')
-    ], PaymentController.prototype, "getBankList");
+        common_1.Post('create_payment_url'),
+        __param(0, common_1.Body()), __param(1, common_1.Res())
+    ], PaymentController.prototype, "createPaymentUrl");
     __decorate([
-        common_1.Post('create_vnpay_url'),
-        __param(0, common_1.Body())
-    ], PaymentController.prototype, "createVnpayUrl");
-    __decorate([
-        common_1.Get('vnpay_return'),
-        __param(0, common_1.Query()), __param(1, common_1.Res())
-    ], PaymentController.prototype, "handleReturnUrl");
+        common_1.Post('vnpay_data'),
+        __param(0, common_1.Body()), __param(1, customize_1.CurrentUser())
+    ], PaymentController.prototype, "logVnpayData");
     __decorate([
         common_1.Post('querydr'),
-        __param(0, common_1.Body()), __param(1, common_1.Res())
-    ], PaymentController.prototype, "queryTransaction");
+        __param(0, common_1.Body())
+    ], PaymentController.prototype, "querydr");
     __decorate([
         common_1.Post('refund'),
-        __param(0, common_1.Body()), __param(1, common_1.Res())
-    ], PaymentController.prototype, "refundTransaction");
+        __param(0, common_1.Body())
+    ], PaymentController.prototype, "refund");
     PaymentController = __decorate([
         common_1.Controller('payment')
     ], PaymentController);

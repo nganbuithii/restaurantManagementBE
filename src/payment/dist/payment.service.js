@@ -45,78 +45,113 @@ exports.__esModule = true;
 exports.PaymentService = void 0;
 var common_1 = require("@nestjs/common");
 var crypto = require("crypto");
-var querystring = require("querystring");
+var querystring = require("qs");
 var moment_1 = require("moment");
+var orders_dto_1 = require("src/orders/dto/orders.dto");
 var PaymentService = /** @class */ (function () {
-    function PaymentService(configService, vnpayService) {
+    function PaymentService(configService, orderService) {
         this.configService = configService;
-        this.vnpayService = vnpayService;
+        this.orderService = orderService;
     }
-    PaymentService.prototype.getBankList = function () {
+    PaymentService.prototype.createPaymentUrl = function (orderId, amount, bankCode) {
+        var tmnCode = this.configService.get('VNPAY_TMN_CODE');
+        var secretKey = this.configService.get('VNP_HASH_SECRET');
+        var returnUrl = this.configService.get('VNP_RETURN_URL');
+        console.log("hash key", secretKey);
+        var createDate = moment_1["default"]().format('YYYYMMDDHHmmss');
+        var expireDate = moment_1["default"]().add(15, 'minutes').format('YYYYMMDDHHmmss');
+        var vnp_Params = {
+            vnp_Version: '2.1.0',
+            vnp_Command: 'pay',
+            vnp_TmnCode: tmnCode,
+            vnp_Locale: 'vn',
+            vnp_CurrCode: 'VND',
+            vnp_TxnRef: orderId,
+            vnp_OrderInfo: "Thanh toan cho ma GD:" + orderId,
+            vnp_OrderType: 'other',
+            vnp_Amount: amount * 100,
+            vnp_ReturnUrl: returnUrl,
+            vnp_IpAddr: '127.0.0.1',
+            vnp_CreateDate: createDate
+        };
+        if (bankCode) {
+            vnp_Params['vnp_BankCode'] = bankCode;
+        }
+        console.log("poarams", vnp_Params);
+        var redirectUrl = new URL('https://sandbox.vnpayment.vn/paymentv2/vpcpay.html');
+        Object.entries(vnp_Params)
+            .sort(function (_a, _b) {
+            var key1 = _a[0];
+            var key2 = _b[0];
+            return key1.localeCompare(key2);
+        })
+            .forEach(function (_a) {
+            var key = _a[0], value = _a[1];
+            // Skip empty value
+            if (!value || value === "" || value === undefined || value === null) {
+                return;
+            }
+            redirectUrl.searchParams.append(key, value.toString());
+        });
+        var hmac = crypto.createHmac("sha512", secretKey);
+        var signed = hmac
+            .update(Buffer.from(redirectUrl.searchParams.toString(), 'utf-8'))
+            .digest("hex");
+        redirectUrl.searchParams.append("vnp_SecureHash", signed);
+        return redirectUrl.href;
+    };
+    PaymentService.prototype.verifyPayment = function (query, secretKey) {
+        return __awaiter(this, void 0, Promise, function () {
+            var hashData, secureHash;
+            return __generator(this, function (_a) {
+                hashData = Object.keys(query)
+                    .filter(function (key) { return key.startsWith('vnp_') && key !== 'vnp_SecureHash'; })
+                    .map(function (key) { return key + "=" + query[key]; })
+                    .join('&');
+                secureHash = crypto.createHmac('sha256', secretKey)
+                    .update(hashData)
+                    .digest('hex')
+                    .toUpperCase();
+                return [2 /*return*/, secureHash === query.vnp_SecureHash];
+            });
+        });
+    };
+    PaymentService.prototype.handlePaymentReturn = function (vnpayData, user) {
         return __awaiter(this, void 0, void 0, function () {
+            var vnp_PayDate, vnp_TransactionStatus, vnp_TxnRef, vnp_ResponseCode, order;
             return __generator(this, function (_a) {
-                return [2 /*return*/, this.vnpayService.getBankList()];
-            });
-        });
-    };
-    PaymentService.prototype.createVnpayPaymentUrl = function (createPaymentDto) {
-        return __awaiter(this, void 0, Promise, function () {
-            var orderId, amount, orderInfo, tmnCode, secretKey, vnpUrl, returnUrl, date, createDate, generatedOrderId, vnpParams, sortedParams, signData, hmac, signed;
-            return __generator(this, function (_a) {
-                orderId = createPaymentDto.orderId, amount = createPaymentDto.amount, orderInfo = createPaymentDto.orderInfo;
-                tmnCode = this.configService.get('VNP_TMN_CODE');
-                secretKey = this.configService.get('VNP_HASH_SECRET');
-                console.log("KEYYYYY", secretKey);
-                vnpUrl = this.configService.get('VNP_URL');
-                returnUrl = this.configService.get('VNP_RETURN_URL');
-                date = new Date();
-                createDate = moment_1["default"](date).format('YYYYMMDDHHmmss');
-                generatedOrderId = moment_1["default"](date).format('HHmmss');
-                vnpParams = {
-                    vnp_Version: '2.1.0',
-                    vnp_Command: 'pay',
-                    vnp_TmnCode: tmnCode,
-                    vnp_Locale: 'vn',
-                    vnp_CurrCode: 'VND',
-                    vnp_TxnRef: orderId,
-                    vnp_OrderInfo: orderInfo,
-                    vnp_OrderType: 'other',
-                    vnp_Amount: amount * 100,
-                    vnp_ReturnUrl: returnUrl,
-                    vnp_IpAddr: '127.0.0.1',
-                    vnp_CreateDate: createDate
-                };
-                sortedParams = this.sortObject(vnpParams);
-                signData = querystring.stringify(sortedParams);
-                hmac = crypto.createHmac('sha512', secretKey);
-                signed = hmac.update(Buffer.from(signData, 'utf-8')).digest('hex');
-                vnpParams['vnp_SecureHash'] = signed;
-                return [2 /*return*/, vnpUrl + "?" + querystring.stringify(vnpParams)];
-            });
-        });
-    };
-    PaymentService.prototype.verifyReturnUrl = function (vnpParams) {
-        return __awaiter(this, void 0, Promise, function () {
-            var secretKey, secureHash, signData, hmac, signed;
-            return __generator(this, function (_a) {
-                secretKey = this.configService.get('VNP_HASH_SECRET');
-                secureHash = vnpParams['vnp_SecureHash'];
-                delete vnpParams['vnp_SecureHash'];
-                delete vnpParams['vnp_SecureHashType'];
-                vnpParams = this.sortObject(vnpParams);
-                signData = querystring.stringify(vnpParams);
-                hmac = crypto.createHmac("sha512", secretKey);
-                signed = hmac.update(Buffer.from(signData, 'utf-8')).digest("hex");
-                return [2 /*return*/, secureHash === signed];
+                switch (_a.label) {
+                    case 0:
+                        vnp_PayDate = vnpayData.vnp_PayDate, vnp_TransactionStatus = vnpayData.vnp_TransactionStatus, vnp_TxnRef = vnpayData.vnp_TxnRef, vnp_ResponseCode = vnpayData.vnp_ResponseCode;
+                        console.log("Processing payment return...");
+                        console.log("vnp_PayDate:", vnp_PayDate);
+                        console.log("vnp_TransactionStatus:", vnp_TransactionStatus);
+                        console.log("vnp_TransactionNo:", vnp_TxnRef);
+                        console.log("vnp_ResponseCode:", vnp_ResponseCode);
+                        if (!(vnp_ResponseCode === '00' && vnp_TransactionStatus === '00')) return [3 /*break*/, 2];
+                        return [4 /*yield*/, this.orderService.updateStatus(Number(vnp_TxnRef), orders_dto_1.OrderStatus.COMPLETED, user)];
+                    case 1:
+                        order = _a.sent();
+                        if (order) {
+                            return [2 /*return*/, {
+                                    message: 'Payment processed successfully!',
+                                    orderId: vnp_TxnRef,
+                                    status: orders_dto_1.OrderStatus.COMPLETED
+                                }];
+                        }
+                        else {
+                            throw new Error('Order not found or could not be updated.');
+                        }
+                        return [3 /*break*/, 3];
+                    case 2: throw new Error('Payment failed or was not successful.');
+                    case 3: return [2 /*return*/];
+                }
             });
         });
     };
     PaymentService.prototype.queryTransaction = function (orderId, transDate) {
         return __awaiter(this, void 0, Promise, function () {
             return __generator(this, function (_a) {
-                // Implement VNPay transaction query logic here
-                // This will depend on VNPay's API for querying transactions
-                // You'll need to make an HTTP request to VNPay's query API
                 throw new Error('Method not implemented.');
             });
         });
@@ -124,27 +159,32 @@ var PaymentService = /** @class */ (function () {
     PaymentService.prototype.refundTransaction = function (refundData) {
         return __awaiter(this, void 0, Promise, function () {
             return __generator(this, function (_a) {
-                // Implement VNPay refund logic here
-                // This will depend on VNPay's API for refunding transactions
-                // You'll need to make an HTTP request to VNPay's refund API
                 throw new Error('Method not implemented.');
             });
         });
     };
+    PaymentService.prototype.verifyReturnUrl = function (params, secureHash) {
+        var sortedParams = this.sortObject(params);
+        var signData = querystring.stringify(sortedParams);
+        var calculatedHash = this.generateSecureHash(signData);
+        return calculatedHash === secureHash;
+    };
     PaymentService.prototype.sortObject = function (obj) {
         var sorted = {};
-        var str = [];
-        var key;
-        for (key in obj) {
-            if (obj.hasOwnProperty(key)) {
-                str.push(encodeURIComponent(key));
+        var str = Object.keys(obj).sort();
+        str.forEach(function (key) {
+            if (obj[key] !== undefined && obj[key] !== null) {
+                sorted[key] = obj[key].toString();
             }
-        }
-        str.sort();
-        for (key = 0; key < str.length; key++) {
-            sorted[str[key]] = encodeURIComponent(obj[str[key]]).replace(/%20/g, "+");
-        }
+        });
         return sorted;
+    };
+    PaymentService.prototype.formatDateTime = function (date) {
+        return moment_1["default"](date).format('YYYYMMDDHHmmss');
+    };
+    PaymentService.prototype.generateSecureHash = function (data) {
+        var hmac = crypto.createHmac('sha512', process.env.VNP_HASH_SECRET);
+        return hmac.update(Buffer.from(data, 'utf-8')).digest('hex');
     };
     PaymentService = __decorate([
         common_1.Injectable()

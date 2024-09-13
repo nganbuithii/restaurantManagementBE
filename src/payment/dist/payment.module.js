@@ -49,6 +49,9 @@ var payment_service_1 = require("./payment.service");
 var config_1 = require("@nestjs/config");
 var nestjs_vnpay_1 = require("nestjs-vnpay");
 var vnpay_1 = require("vnpay");
+var jwt_1 = require("@nestjs/jwt");
+var orders_service_1 = require("src/orders/orders.service");
+var prisma_service_1 = require("src/prisma.service");
 var PaymentModule = /** @class */ (function () {
     function PaymentModule() {
     }
@@ -68,9 +71,10 @@ var PaymentModule = /** @class */ (function () {
                     }); },
                     inject: [config_1.ConfigService]
                 }),
+                jwt_1.JwtModule
             ],
             controllers: [payment_controller_1.PaymentController],
-            providers: [payment_service_1.PaymentService, config_1.ConfigService],
+            providers: [payment_service_1.PaymentService, config_1.ConfigService, orders_service_1.OrdersService, prisma_service_1.PrismaService],
             exports: [payment_service_1.PaymentService]
         })
     ], PaymentModule);
