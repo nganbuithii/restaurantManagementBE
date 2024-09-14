@@ -1,5 +1,3 @@
-// src/chat/chat.controller.ts
-
 import { Controller, Get, Post, Body } from '@nestjs/common';
 import { ChatService } from './chat.service';
 
@@ -15,11 +13,10 @@ export class ChatController {
     @Post()
     async sendMessage(@Body() body: { message: string }) {
         console.log('Received message:', body.message);
-        const { answer, isAI } = this.chatService.processMessage(body.message);
+        const { answer, isAI } = await this.chatService.processMessage(body.message);
         console.log('Processed answer:', answer, 'isAI:', isAI);
         const userMessage = this.chatService.addMessage(body.message, 'user');
         const botMessage = this.chatService.addMessage(answer, isAI ? 'ai' : 'support');
         return { userMessage, botMessage, isAI }; 
     }
-    
 }

@@ -1,5 +1,4 @@
 "use strict";
-// src/chat/chat.controller.ts
 var __decorate = (this && this.__decorate) || function (decorators, target, key, desc) {
     var c = arguments.length, r = c < 3 ? target : desc === null ? desc = Object.getOwnPropertyDescriptor(target, key) : desc, d;
     if (typeof Reflect === "object" && typeof Reflect.decorate === "function") r = Reflect.decorate(decorators, target, key, desc);
@@ -59,12 +58,17 @@ var ChatController = /** @class */ (function () {
         return __awaiter(this, void 0, void 0, function () {
             var _a, answer, isAI, userMessage, botMessage;
             return __generator(this, function (_b) {
-                console.log('Received message:', body.message);
-                _a = this.chatService.processMessage(body.message), answer = _a.answer, isAI = _a.isAI;
-                console.log('Processed answer:', answer, 'isAI:', isAI);
-                userMessage = this.chatService.addMessage(body.message, 'user');
-                botMessage = this.chatService.addMessage(answer, isAI ? 'ai' : 'support');
-                return [2 /*return*/, { userMessage: userMessage, botMessage: botMessage, isAI: isAI }];
+                switch (_b.label) {
+                    case 0:
+                        console.log('Received message:', body.message);
+                        return [4 /*yield*/, this.chatService.processMessage(body.message)];
+                    case 1:
+                        _a = _b.sent(), answer = _a.answer, isAI = _a.isAI;
+                        console.log('Processed answer:', answer, 'isAI:', isAI);
+                        userMessage = this.chatService.addMessage(body.message, 'user');
+                        botMessage = this.chatService.addMessage(answer, isAI ? 'ai' : 'support');
+                        return [2 /*return*/, { userMessage: userMessage, botMessage: botMessage, isAI: isAI }];
+                }
             });
         });
     };
