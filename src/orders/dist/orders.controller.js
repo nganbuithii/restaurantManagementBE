@@ -95,6 +95,19 @@ var OrdersController = /** @class */ (function () {
             });
         });
     };
+    OrdersController.prototype.getOrdersByUserId = function (user) {
+        return __awaiter(this, void 0, void 0, function () {
+            var orders;
+            return __generator(this, function (_a) {
+                switch (_a.label) {
+                    case 0: return [4 /*yield*/, this.ordersService.getOrdersByUserId(user)];
+                    case 1:
+                        orders = _a.sent();
+                        return [2 /*return*/, { orders: orders }];
+                }
+            });
+        });
+    };
     __decorate([
         common_1.Post(),
         common_1.HttpCode(common_1.HttpStatus.CREATED),
@@ -158,6 +171,11 @@ var OrdersController = /** @class */ (function () {
         }),
         __param(0, common_1.Body())
     ], OrdersController.prototype, "getRevenueStatistics");
+    __decorate([
+        common_1.UseGuards(jwt_auth_guard_1.JwtAuthGuard),
+        common_1.Post('/me'),
+        __param(0, customize_1.CurrentUser())
+    ], OrdersController.prototype, "getOrdersByUserId");
     OrdersController = __decorate([
         swagger_1.ApiTags("Orders"),
         common_1.Controller('orders')

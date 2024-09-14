@@ -71,7 +71,6 @@ var FeeckbacksService = /** @class */ (function () {
                         return [4 /*yield*/, this.classifyText(content)];
                     case 1:
                         label = _a.sent();
-                        console.log("LABEL CỦA FEED BACK", label);
                         return [4 /*yield*/, this.prisma.feedback.create({
                                 data: {
                                     content: content,

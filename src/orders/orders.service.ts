@@ -1,3 +1,4 @@
+import { UserDto } from './../user/dto/user.dto';
 import { Order } from '@prisma/client';
 import { ForbiddenException, Injectable, NotFoundException } from '@nestjs/common';
 import { PrismaService } from 'src/prisma.service';
@@ -248,5 +249,20 @@ export class OrdersService {
       endDate,
       data: result,
     };
+  }
+
+  async getOrdersByUserId(user:IUser): Promise<Order[]> {
+    return this.prisma.order.findMany({
+      where: {
+        userId: user.sub,
+      },
+      include: {
+        details: true,
+        usedVoucher: true,
+      },
+      orderBy: {
+        createdAt: 'desc',
+      },
+    });
   }
 }

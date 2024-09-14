@@ -12,7 +12,6 @@ export class FeeckbacksService {
     async create(createFeedbackDto: CreateFeedbackDto, user: IUser): Promise<Feedback> {
         const { content, rating, isActive } = createFeedbackDto;
         let label = await this.classifyText(content);
-        console.log("LABEL CỦA FEED BACK", label)
         const feedback = await this.prisma.feedback.create({
           data: {
             content,

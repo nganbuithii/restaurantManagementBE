@@ -98,4 +98,11 @@ export class OrdersController {
   ) {
     return this.ordersService.getRevenueStatistics(filterData);
   }
+
+  @UseGuards(JwtAuthGuard)
+  @Post('/me')
+  async getOrdersByUserId(@CurrentUser() user:IUser) {
+    const orders = await this.ordersService.getOrdersByUserId(user);
+    return { orders };
+  }
 }

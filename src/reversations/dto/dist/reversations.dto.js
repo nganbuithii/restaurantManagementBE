@@ -75,6 +75,16 @@ var UpdateReservationDto = /** @class */ (function () {
         swagger_1.ApiProperty(),
         class_validator_1.IsNotEmpty({ message: 'Status cannot be empty' })
     ], UpdateReservationDto.prototype, "status");
+    __decorate([
+        class_validator_1.IsInt(),
+        class_validator_1.IsOptional(),
+        swagger_1.ApiProperty()
+    ], UpdateReservationDto.prototype, "tableId");
+    __decorate([
+        class_validator_1.IsInt(),
+        class_validator_1.IsOptional(),
+        swagger_1.ApiProperty()
+    ], UpdateReservationDto.prototype, "orderId");
     return UpdateReservationDto;
 }());
 exports.UpdateReservationDto = UpdateReservationDto;

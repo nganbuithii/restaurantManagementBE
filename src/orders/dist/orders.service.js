@@ -333,6 +333,24 @@ var OrdersService = /** @class */ (function () {
             });
         });
     };
+    OrdersService.prototype.getOrdersByUserId = function (user) {
+        return __awaiter(this, void 0, Promise, function () {
+            return __generator(this, function (_a) {
+                return [2 /*return*/, this.prisma.order.findMany({
+                        where: {
+                            userId: user.sub
+                        },
+                        include: {
+                            details: true,
+                            usedVoucher: true
+                        },
+                        orderBy: {
+                            createdAt: 'desc'
+                        }
+                    })];
+            });
+        });
+    };
     OrdersService = __decorate([
         common_1.Injectable()
     ], OrdersService);

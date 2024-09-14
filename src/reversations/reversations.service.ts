@@ -58,9 +58,7 @@ export class ReversationsService {
                 user: {
                     connect: { id: user.sub },
                 },
-                table: {
-                    connect: { id: tableId },
-                },
+            
             },
         });
 
@@ -69,7 +67,6 @@ export class ReversationsService {
         await this.emailService.sendReservationConfirmation(user.email, {
             date: newReservation.date,
             time: newReservation.time,
-            tableId: newReservation.tableId,
             status: newReservation.status,
           });
 
@@ -105,7 +102,6 @@ export class ReversationsService {
             skip,
             take: items_per_page,
             include: {
-                table: true,
                 user: true, 
             },
             orderBy: { createdAt: 'desc' },
@@ -116,7 +112,6 @@ export class ReversationsService {
             time: reservation.time,
             date: reservation.date, 
             status: reservation.status,
-            tableId: reservation.table.id,
             userId: reservation.user.id,
         }));
     
@@ -135,8 +130,7 @@ export class ReversationsService {
         const reservation = await this.prisma.reservation.findUnique({
             where: { id },
             include: {
-                table: true,  // Bao gồm thông tin của bàn
-                user: true,   // Bao gồm thông tin của người dùng
+                user: true,  
             },
         });
     
@@ -145,7 +139,6 @@ export class ReversationsService {
             throw new NotFoundException(`Reservation with ID ${id} not found`);
         }
     
-        // Chuyển đổi dữ liệu để phù hợp với định dạng mong muốn
         const data = {
             id: reservation.id,
             time: reservation.time,
@@ -153,14 +146,7 @@ export class ReversationsService {
             status: reservation.status,
             createdAt: reservation.createdAt,
             updatedAt: reservation.updatedAt,
-            tableId: reservation.tableId,
-            userId: reservation.userId, // Chỉnh sửa từ customerId thành userId
-            table: {
-                id: reservation.table.id,
-                number: reservation.table.number,
-                seats: reservation.table.seats,
-                status: reservation.table.status,
-            },
+            userId: reservation.userId, 
             user: {
                 id: reservation.user.id,
                 fullName: reservation.user.fullName,

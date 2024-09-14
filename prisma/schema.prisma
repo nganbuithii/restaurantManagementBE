@@ -102,7 +102,8 @@ model Order {
   details   OrderDetail[]
 
   usedVoucherId Int?
-  usedVoucher   Voucher? @relation(fields: [usedVoucherId], references: [id])
+  usedVoucher   Voucher?     @relation(fields: [usedVoucherId], references: [id])
+  reservation   Reservation?
 }
 
 model OrderDetail {
@@ -126,24 +127,24 @@ model Table {
   updatedAt    DateTime      @updatedAt
   updatedBy    Int?
   deletedBy    Int?
-  reservations Reservation[]
+  // reservations Reservation[]
 }
 
-  model Reservation {
-    id        Int      @id @default(autoincrement())
-    time      String
-    date      DateTime
-    status    String   @default("PENDING")
-    createdAt DateTime @default(now())
-    updatedAt DateTime @updatedAt
-    tableId   Int
-    table     Table    @relation(fields: [tableId], references: [id])
-    userId    Int
-    user      User     @relation(fields: [userId], references: [id])
+model Reservation {
+  id        Int      @id @default(autoincrement())
+  time      String
+  date      DateTime
+  status    String   @default("PENDING")
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+  userId    Int
+  user      User     @relation(fields: [userId], references: [id])
 
-      menuItems MenuItem[] @relation("ReservationMenuItems")
-
-  }
+  menuItems MenuItem[] @relation("ReservationMenuItems")
+  orderId   Int? @unique
+  order     Order?     @relation(fields: [orderId], references: [id])
+  tableId   Int?
+}
 
 model MenuItem {
   id           Int      @id @default(autoincrement())
@@ -164,7 +165,7 @@ model MenuItem {
   menu         Menu?                @relation(fields: [menuId], references: [id])
   orderDetails OrderDetail[]
   ingredients  MenuItemIngredient[]
-  reservations Reservation[] @relation("ReservationMenuItems")
+  reservations Reservation[]        @relation("ReservationMenuItems")
 }
 
 model FoodImage {
@@ -283,7 +284,7 @@ model Feedback {
   parentId Int?
   parent   Feedback?  @relation("FeedbackReplies", fields: [parentId], references: [id])
   replies  Feedback[] @relation("FeedbackReplies")
-  label String?
+  label    String?
 }
 
 model WarehouseSlip {

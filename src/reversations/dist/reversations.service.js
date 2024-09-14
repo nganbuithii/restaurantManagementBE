@@ -107,9 +107,6 @@ var ReversationsService = /** @class */ (function () {
                                     status: status || 'PENDING',
                                     user: {
                                         connect: { id: user.sub }
-                                    },
-                                    table: {
-                                        connect: { id: tableId }
                                     }
                                 }
                             })];
@@ -119,7 +116,6 @@ var ReversationsService = /** @class */ (function () {
                         return [4 /*yield*/, this.emailService.sendReservationConfirmation(user.email, {
                                 date: newReservation.date,
                                 time: newReservation.time,
-                                tableId: newReservation.tableId,
                                 status: newReservation.status
                             })];
                     case 3:
@@ -160,7 +156,6 @@ var ReversationsService = /** @class */ (function () {
                                 skip: skip,
                                 take: items_per_page,
                                 include: {
-                                    table: true,
                                     user: true
                                 },
                                 orderBy: { createdAt: 'desc' }
@@ -172,7 +167,6 @@ var ReversationsService = /** @class */ (function () {
                             time: reservation.time,
                             date: reservation.date,
                             status: reservation.status,
-                            tableId: reservation.table.id,
                             userId: reservation.user.id
                         }); });
                         return [2 /*return*/, {
@@ -193,7 +187,6 @@ var ReversationsService = /** @class */ (function () {
                     case 0: return [4 /*yield*/, this.prisma.reservation.findUnique({
                             where: { id: id },
                             include: {
-                                table: true,
                                 user: true
                             }
                         })];
@@ -210,14 +203,7 @@ var ReversationsService = /** @class */ (function () {
                             status: reservation.status,
                             createdAt: reservation.createdAt,
                             updatedAt: reservation.updatedAt,
-                            tableId: reservation.tableId,
                             userId: reservation.userId,
-                            table: {
-                                id: reservation.table.id,
-                                number: reservation.table.number,
-                                seats: reservation.table.seats,
-                                status: reservation.table.status
-                            },
                             user: {
                                 id: reservation.user.id,
                                 fullName: reservation.user.fullName,

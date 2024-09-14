@@ -50,7 +50,6 @@ export interface ReservationFilterType {
         time: string; 
         date: Date;   
         status: string;
-        tableId: number;
         userId: number; 
     }[];
     total: number;
@@ -79,9 +78,15 @@ export class UpdateReservationDto {
     @IsNotEmpty({ message: 'Status cannot be empty' })
     status: string;
 
-    // @IsInt()
-    // @IsNotEmpty({ message: 'Table ID cannot be empty' })
-    // tableId: number;
+    @IsInt()
+    @IsOptional()
+    @ApiProperty()
+    tableId: number;
+
+    @IsInt()
+    @IsOptional()
+    @ApiProperty()
+    orderId: number;
 
     // @IsNotEmpty({ message: 'Customer ID cannot be empty' })
     // customerId: number;
