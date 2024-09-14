@@ -3,20 +3,23 @@ import { PrismaService } from 'src/prisma.service';
 import { CreateFeedbackDto, CreateFeedbackReplyDto, FeedbackFilterType, FeedbackPaginationResponseType, UpdateFeedbackDto } from './dto/feecback.dto';
 import { IUser } from 'interfaces/user.interface';
 import { Feedback } from '@prisma/client';
-
+import { ConfigService } from '@nestjs/config';
+import axios from 'axios';
 @Injectable()
 export class FeeckbacksService {
-    constructor(private prisma: PrismaService) {}
+    constructor(private prisma: PrismaService, private configService:ConfigService) {}
 
     async create(createFeedbackDto: CreateFeedbackDto, user: IUser): Promise<Feedback> {
         const { content, rating, isActive } = createFeedbackDto;
-    
+        let label = await this.classifyText(content);
+        console.log("LABEL CỦA FEED BACK", label)
         const feedback = await this.prisma.feedback.create({
           data: {
             content,
             rating: rating ?? 5,
             isActive: isActive ?? true, 
             userId: user.sub, 
+            label
           },
         });
     
@@ -166,4 +169,30 @@ export class FeeckbacksService {
           },
         });
       }
+
+      private async classifyText(text: string): Promise<string> {
+        const apiUrl = this.configService.get<string>('CLASSIFICATION_API_URL');
+        const apiToken = this.configService.get<string>('CLASSIFICATION_API_TOKEN');
+
+        try {
+            const response = await axios.post(apiUrl, 
+                { text }, 
+                {
+                    headers: {
+                        'Authorization': `Token ${apiToken}`,
+                        'Content-Type': 'application/json'
+                    }
+                }
+            );
+
+            const scoredLabels = response.data.scored_labels;
+            if (scoredLabels && scoredLabels.length > 0) {
+                return scoredLabels[0].label;
+            }
+            throw new Error('No label returned from classification API');
+          } catch (error) {
+              console.error('Error classifying text:', error);
+              throw error;
+          }
+    }
 }

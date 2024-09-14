@@ -283,6 +283,7 @@ model Feedback {
   parentId Int?
   parent   Feedback?  @relation("FeedbackReplies", fields: [parentId], references: [id])
   replies  Feedback[] @relation("FeedbackReplies")
+  label String?
 }
 
 model WarehouseSlip {

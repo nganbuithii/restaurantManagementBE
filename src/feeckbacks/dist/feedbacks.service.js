@@ -55,26 +55,33 @@ var __generator = (this && this.__generator) || function (thisArg, body) {
 exports.__esModule = true;
 exports.FeeckbacksService = void 0;
 var common_1 = require("@nestjs/common");
+var axios_1 = require("axios");
 var FeeckbacksService = /** @class */ (function () {
-    function FeeckbacksService(prisma) {
+    function FeeckbacksService(prisma, configService) {
         this.prisma = prisma;
+        this.configService = configService;
     }
     FeeckbacksService.prototype.create = function (createFeedbackDto, user) {
         return __awaiter(this, void 0, Promise, function () {
-            var content, rating, isActive, feedback;
+            var content, rating, isActive, label, feedback;
             return __generator(this, function (_a) {
                 switch (_a.label) {
                     case 0:
                         content = createFeedbackDto.content, rating = createFeedbackDto.rating, isActive = createFeedbackDto.isActive;
+                        return [4 /*yield*/, this.classifyText(content)];
+                    case 1:
+                        label = _a.sent();
+                        console.log("LABEL CỦA FEED BACK", label);
                         return [4 /*yield*/, this.prisma.feedback.create({
                                 data: {
                                     content: content,
                                     rating: rating !== null && rating !== void 0 ? rating : 5,
                                     isActive: isActive !== null && isActive !== void 0 ? isActive : true,
-                                    userId: user.sub
+                                    userId: user.sub,
+                                    label: label
                                 }
                             })];
-                    case 1:
+                    case 2:
                         feedback = _a.sent();
                         return [2 /*return*/, feedback];
                 }
@@ -244,6 +251,39 @@ var FeeckbacksService = /** @class */ (function () {
                                     parentId: id
                                 }
                             })];
+                }
+            });
+        });
+    };
+    FeeckbacksService.prototype.classifyText = function (text) {
+        return __awaiter(this, void 0, Promise, function () {
+            var apiUrl, apiToken, response, scoredLabels, error_1;
+            return __generator(this, function (_a) {
+                switch (_a.label) {
+                    case 0:
+                        apiUrl = this.configService.get('CLASSIFICATION_API_URL');
+                        apiToken = this.configService.get('CLASSIFICATION_API_TOKEN');
+                        _a.label = 1;
+                    case 1:
+                        _a.trys.push([1, 3, , 4]);
+                        return [4 /*yield*/, axios_1["default"].post(apiUrl, { text: text }, {
+                                headers: {
+                                    'Authorization': "Token " + apiToken,
+                                    'Content-Type': 'application/json'
+                                }
+                            })];
+                    case 2:
+                        response = _a.sent();
+                        scoredLabels = response.data.scored_labels;
+                        if (scoredLabels && scoredLabels.length > 0) {
+                            return [2 /*return*/, scoredLabels[0].label];
+                        }
+                        throw new Error('No label returned from classification API');
+                    case 3:
+                        error_1 = _a.sent();
+                        console.error('Error classifying text:', error_1);
+                        throw error_1;
+                    case 4: return [2 /*return*/];
                 }
             });
         });
