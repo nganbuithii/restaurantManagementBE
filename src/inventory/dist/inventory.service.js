@@ -55,9 +55,11 @@ var __generator = (this && this.__generator) || function (thisArg, body) {
 exports.__esModule = true;
 exports.InventoryService = void 0;
 var common_1 = require("@nestjs/common");
+var schedule_1 = require("@nestjs/schedule");
 var InventoryService = /** @class */ (function () {
-    function InventoryService(prismaService) {
+    function InventoryService(prismaService, emailService) {
         this.prismaService = prismaService;
+        this.emailService = emailService;
     }
     InventoryService.prototype.getAll = function (params) {
         return __awaiter(this, void 0, Promise, function () {
@@ -103,6 +105,41 @@ var InventoryService = /** @class */ (function () {
             });
         });
     };
+    InventoryService.prototype.checkInventoryLevels = function () {
+        return __awaiter(this, void 0, void 0, function () {
+            var inventoryItems, lowStockItems, emailContent;
+            return __generator(this, function (_a) {
+                switch (_a.label) {
+                    case 0: return [4 /*yield*/, this.prismaService.inventory.findMany({
+                            include: {
+                                ingredient: true
+                            }
+                        })];
+                    case 1:
+                        inventoryItems = _a.sent();
+                        lowStockItems = inventoryItems.filter(function (item) {
+                            var ingredient = item.ingredient;
+                            // console.log("ingredient", ingredient)
+                            return ingredient && ingredient.minThreshold !== null && item.quantity < ingredient.minThreshold;
+                        });
+                        if (!(lowStockItems.length > 0)) return [3 /*break*/, 3];
+                        emailContent = lowStockItems.map(function (item) { return "\n                Ingredients:  " + item.ingredient.name + "\n                Current quantity:  " + item.quantity + "\n                 Minimum Threshold:  " + item.ingredient.minThreshold + "\n            "; }).join('\n\n');
+                        return [4 /*yield*/, this.emailService.sendEmail('', 'Low Inventory Warning', "The following ingredients are below the minimum threshold:\n\n" + emailContent)];
+                    case 2:
+                        _a.sent();
+                        return [3 /*break*/, 5];
+                    case 3: return [4 /*yield*/, this.emailService.sendEmail('', 'Notification of Adequate Stock of Raw Materials', 'Currently your inventory still has enough materials and no materials are below the minimum threshold.')];
+                    case 4:
+                        _a.sent();
+                        _a.label = 5;
+                    case 5: return [2 /*return*/];
+                }
+            });
+        });
+    };
+    __decorate([
+        schedule_1.Cron(schedule_1.CronExpression.EVERY_5_HOURS)
+    ], InventoryService.prototype, "checkInventoryLevels");
     InventoryService = __decorate([
         common_1.Injectable()
     ], InventoryService);

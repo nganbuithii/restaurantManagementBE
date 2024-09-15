@@ -100,9 +100,18 @@ var FeeckbacksService = /** @class */ (function () {
                         take = items_per_page;
                         where = search
                             ? {
-                                content: {
-                                    contains: search
-                                }
+                                OR: [
+                                    {
+                                        content: {
+                                            contains: search
+                                        }
+                                    },
+                                    {
+                                        label: {
+                                            contains: search
+                                        }
+                                    },
+                                ]
                             }
                             : {};
                         return [4 /*yield*/, Promise.all([

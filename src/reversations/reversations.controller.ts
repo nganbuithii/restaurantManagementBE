@@ -32,12 +32,12 @@ export class ReversationsController {
     return this.reversationsService.getAll(params);
   }
 
-  // @Get(':id')
-  // @UseGuards(JwtAuthGuard)
-  // @ResponseMessage(" get detail reservcation by id")
-  // getDetail(@Param('id', ParseIntPipe) id: number): Promise<Reservation> {
-  //   return this.reversationsService.getDetail(id)
-  // }
+  @Get(':id')
+  @UseGuards(JwtAuthGuard)
+  @ResponseMessage(" get detail reservcation by id")
+  getDetail(@Param('id', ParseIntPipe) id: number): Promise<Reservation> {
+    return this.reversationsService.getDetail(id)
+  }
 
   @Patch(':id')
   @UseGuards(JwtAuthGuard)
@@ -57,4 +57,13 @@ export class ReversationsController {
       return this.reversationsService.changeStatus(id, status, user);
     }
     
+
+    @Post('/me')
+    @UseGuards(JwtAuthGuard)
+    @ResponseMessage('get all reservations of a user')
+    getAllReservationsByUser(
+     @CurrentUser() user:IUser
+    ): Promise<Reservation[]> {
+      return this.reversationsService.getAllByUserId(user);
+    }
 }

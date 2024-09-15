@@ -85,8 +85,11 @@ export class PaymentService {
     console.log("vnp_ResponseCode:", vnp_ResponseCode);
 
     if (vnp_ResponseCode === '00' && vnp_TransactionStatus === '00') {
+      console.log("test 1")
       const order = await this.orderService.updateStatus(Number(vnp_TxnRef),OrderStatus.COMPLETED,user);
+      console.log("test 2")
       if (order) {
+        console.log("test 3")
         return {
           message: 'Payment processed successfully!',
           orderId: vnp_TxnRef,

@@ -8,13 +8,13 @@ import { EmailService } from 'src/email/email.service';
 @Injectable()
 export class ReversationsService {
     constructor(private readonly prisma: PrismaService,
-        private emailService:EmailService
+        private emailService: EmailService
     ) { }
 
     async create(createReservationDto: CreateReservationDto, user: IUser) {
         const { tableId, time, date, status } = createReservationDto;
 
-        const reservationDate = new Date(date); 
+        const reservationDate = new Date(date);
         const reservationDateTime = new Date(`${reservationDate.toISOString().split('T')[0]}T${time}:00`);
 
         console.log('ISO Date:', reservationDate.toISOString().split('T')[0]);
@@ -58,7 +58,7 @@ export class ReversationsService {
                 user: {
                     connect: { id: user.sub },
                 },
-            
+
             },
         });
 
@@ -68,7 +68,7 @@ export class ReversationsService {
             date: newReservation.date,
             time: newReservation.time,
             status: newReservation.status,
-          });
+        });
 
         return newReservation;
     }
@@ -78,7 +78,7 @@ export class ReversationsService {
     async getAll(params: ReservationFilterType): Promise<ReservationPaginationResponseType> {
         const { page = 1, items_per_page = 4, search } = params;
         const skip = (page - 1) * items_per_page;
-    
+
         const where = search
             ? {
                 OR: [
@@ -94,51 +94,45 @@ export class ReversationsService {
                 ],
             }
             : {};
-    
+
         const total = await this.prisma.reservation.count({ where });
-    
+
         const reservations = await this.prisma.reservation.findMany({
             where,
             skip,
             take: items_per_page,
             include: {
-                user: true, 
+                user: {
+                    select: {
+                        id: true,
+                        fullName: true,
+                        username: true,
+                    },
+                },
             },
             orderBy: { createdAt: 'desc' },
         });
-    
-        const data = reservations.map((reservation) => ({
-            id: reservation.id,
-            time: reservation.time,
-            date: reservation.date, 
-            status: reservation.status,
-            userId: reservation.user.id,
-        }));
-    
+
         return {
-            data,
+            data: reservations,
             total,
             currentPage: page,
             itemsPerPage: items_per_page,
         };
     }
-    
-
 
     async getDetail(id: number): Promise<any> {
-        // Truy vấn thông tin đặt chỗ từ cơ sở dữ liệu
         const reservation = await this.prisma.reservation.findUnique({
             where: { id },
             include: {
-                user: true,  
+                user: true,
             },
         });
-    
-        // Kiểm tra xem đặt chỗ có tồn tại không
+
         if (!reservation) {
             throw new NotFoundException(`Reservation with ID ${id} not found`);
         }
-    
+
         const data = {
             id: reservation.id,
             time: reservation.time,
@@ -146,7 +140,7 @@ export class ReversationsService {
             status: reservation.status,
             createdAt: reservation.createdAt,
             updatedAt: reservation.updatedAt,
-            userId: reservation.userId, 
+            userId: reservation.userId,
             user: {
                 id: reservation.user.id,
                 fullName: reservation.user.fullName,
@@ -155,10 +149,10 @@ export class ReversationsService {
                 avatar: reservation.user.avatar,
             },
         };
-    
+
         return { data };
     }
-    
+
     async update(id: number, data: UpdateReservationDto, user: IUser): Promise<Reservation> {
         const reservation = await this.prisma.reservation.findUnique({
             where: { id },
@@ -167,7 +161,7 @@ export class ReversationsService {
         if (!reservation) {
             throw new NotFoundException('Reservation not found');
         }
-
+        console.log("Data sent for updating reservation:", data);
         const updatedReservation = await this.prisma.reservation.update({
             where: { id },
             data: {
@@ -192,5 +186,14 @@ export class ReversationsService {
             data: { status }
         });
     }
-
+    async getAllByUserId(user: IUser): Promise<Reservation[]> {
+        return this.prisma.reservation.findMany({
+            where: {
+                userId: user.sub,
+            },
+            orderBy: {
+                createdAt: 'desc',
+            },
+        });
+    }
 }

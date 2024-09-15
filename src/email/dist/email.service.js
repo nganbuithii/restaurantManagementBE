@@ -96,6 +96,23 @@ var EmailService = /** @class */ (function () {
             });
         });
     };
+    EmailService.prototype.sendEmail = function (to, subject, content) {
+        return __awaiter(this, void 0, Promise, function () {
+            return __generator(this, function (_a) {
+                switch (_a.label) {
+                    case 0: return [4 /*yield*/, this.transporter.sendMail({
+                            from: '"Nabity Restaurant" <noreply@nabity.com>',
+                            to: 'ngantailieu2311@gmail.com,',
+                            subject: subject,
+                            html: content
+                        })];
+                    case 1:
+                        _a.sent();
+                        return [2 /*return*/];
+                }
+            });
+        });
+    };
     EmailService = __decorate([
         common_1.Injectable()
     ], EmailService);

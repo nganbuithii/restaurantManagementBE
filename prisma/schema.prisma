@@ -118,15 +118,15 @@ model OrderDetail {
 }
 
 model Table {
-  id           Int           @id @default(autoincrement())
-  number       Int           @unique
-  seats        Int
-  isActive     Boolean       @default(true)
-  status       Int           @default(1)
-  createdAt    DateTime      @default(now())
-  updatedAt    DateTime      @updatedAt
-  updatedBy    Int?
-  deletedBy    Int?
+  id        Int      @id @default(autoincrement())
+  number    Int      @unique
+  seats     Int
+  isActive  Boolean  @default(true)
+  status    Int      @default(1)
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+  updatedBy Int?
+  deletedBy Int?
   // reservations Reservation[]
 }
 
@@ -141,7 +141,7 @@ model Reservation {
   user      User     @relation(fields: [userId], references: [id])
 
   menuItems MenuItem[] @relation("ReservationMenuItems")
-  orderId   Int? @unique
+  orderId   Int?       @unique
   order     Order?     @relation(fields: [orderId], references: [id])
   tableId   Int?
 }
@@ -204,18 +204,19 @@ model Supplier {
 }
 
 model Ingredient {
-  id          Int      @id @default(autoincrement())
-  name        String
-  unit        String
-  productDate DateTime
-  price       Float
-  isActive    Boolean  @default(true)
-  status      String
-  createdAt   DateTime @default(now())
-  updatedAt   DateTime @updatedAt
-  createdBy   Int?
-  deletedBy   Int?
-  updatedBy   Int?
+  id           Int      @id @default(autoincrement())
+  name         String
+  unit         String
+  productDate  DateTime
+  price        Float
+  isActive     Boolean  @default(true)
+  status       String
+  createdAt    DateTime @default(now())
+  updatedAt    DateTime @updatedAt
+  createdBy    Int?
+  deletedBy    Int?
+  updatedBy    Int?
+  minThreshold Float?
 
   menuItems   MenuItemIngredient[]
   slipDetails WarehouseSlipDetail[]

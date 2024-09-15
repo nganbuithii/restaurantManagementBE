@@ -24,17 +24,17 @@ var ReversationsController = /** @class */ (function () {
     ReversationsController.prototype.getAll = function (params) {
         return this.reversationsService.getAll(params);
     };
-    // @Get(':id')
-    // @UseGuards(JwtAuthGuard)
-    // @ResponseMessage(" get detail reservcation by id")
-    // getDetail(@Param('id', ParseIntPipe) id: number): Promise<Reservation> {
-    //   return this.reversationsService.getDetail(id)
-    // }
+    ReversationsController.prototype.getDetail = function (id) {
+        return this.reversationsService.getDetail(id);
+    };
     ReversationsController.prototype.update = function (id, data, user) {
         return this.reversationsService.update(id, data, user);
     };
     ReversationsController.prototype.changeReservationStatus = function (id, status, user) {
         return this.reversationsService.changeStatus(id, status, user);
+    };
+    ReversationsController.prototype.getAllReservationsByUser = function (user) {
+        return this.reversationsService.getAllByUserId(user);
     };
     __decorate([
         common_1.Post(),
@@ -51,6 +51,12 @@ var ReversationsController = /** @class */ (function () {
         __param(0, common_1.Query())
     ], ReversationsController.prototype, "getAll");
     __decorate([
+        common_1.Get(':id'),
+        common_1.UseGuards(jwt_auth_guard_1.JwtAuthGuard),
+        customize_1.ResponseMessage(" get detail reservcation by id"),
+        __param(0, common_1.Param('id', common_1.ParseIntPipe))
+    ], ReversationsController.prototype, "getDetail");
+    __decorate([
         common_1.Patch(':id'),
         common_1.UseGuards(jwt_auth_guard_1.JwtAuthGuard),
         customize_1.ResponseMessage(" update menu item by id"),
@@ -64,6 +70,12 @@ var ReversationsController = /** @class */ (function () {
         __param(1, common_1.Body('status')),
         __param(2, customize_1.CurrentUser())
     ], ReversationsController.prototype, "changeReservationStatus");
+    __decorate([
+        common_1.Post('/me'),
+        common_1.UseGuards(jwt_auth_guard_1.JwtAuthGuard),
+        customize_1.ResponseMessage('get all reservations of a user'),
+        __param(0, customize_1.CurrentUser())
+    ], ReversationsController.prototype, "getAllReservationsByUser");
     ReversationsController = __decorate([
         swagger_1.ApiTags("Reservation"),
         common_1.Controller('reversations')

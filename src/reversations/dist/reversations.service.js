@@ -127,7 +127,7 @@ var ReversationsService = /** @class */ (function () {
     };
     ReversationsService.prototype.getAll = function (params) {
         return __awaiter(this, void 0, Promise, function () {
-            var _a, page, _b, items_per_page, search, skip, where, total, reservations, data;
+            var _a, page, _b, items_per_page, search, skip, where, total, reservations;
             return __generator(this, function (_c) {
                 switch (_c.label) {
                     case 0:
@@ -156,21 +156,20 @@ var ReversationsService = /** @class */ (function () {
                                 skip: skip,
                                 take: items_per_page,
                                 include: {
-                                    user: true
+                                    user: {
+                                        select: {
+                                            id: true,
+                                            fullName: true,
+                                            username: true
+                                        }
+                                    }
                                 },
                                 orderBy: { createdAt: 'desc' }
                             })];
                     case 2:
                         reservations = _c.sent();
-                        data = reservations.map(function (reservation) { return ({
-                            id: reservation.id,
-                            time: reservation.time,
-                            date: reservation.date,
-                            status: reservation.status,
-                            userId: reservation.user.id
-                        }); });
                         return [2 /*return*/, {
-                                data: data,
+                                data: reservations,
                                 total: total,
                                 currentPage: page,
                                 itemsPerPage: items_per_page
@@ -192,7 +191,6 @@ var ReversationsService = /** @class */ (function () {
                         })];
                     case 1:
                         reservation = _a.sent();
-                        // Kiểm tra xem đặt chỗ có tồn tại không
                         if (!reservation) {
                             throw new common_1.NotFoundException("Reservation with ID " + id + " not found");
                         }
@@ -230,6 +228,7 @@ var ReversationsService = /** @class */ (function () {
                         if (!reservation) {
                             throw new common_1.NotFoundException('Reservation not found');
                         }
+                        console.log("Data sent for updating reservation:", data);
                         return [4 /*yield*/, this.prisma.reservation.update({
                                 where: { id: id },
                                 data: __assign(__assign({}, data), { updatedAt: new Date() })
@@ -257,6 +256,20 @@ var ReversationsService = /** @class */ (function () {
                                 data: { status: status }
                             })];
                 }
+            });
+        });
+    };
+    ReversationsService.prototype.getAllByUserId = function (user) {
+        return __awaiter(this, void 0, Promise, function () {
+            return __generator(this, function (_a) {
+                return [2 /*return*/, this.prisma.reservation.findMany({
+                        where: {
+                            userId: user.sub
+                        },
+                        orderBy: {
+                            createdAt: 'desc'
+                        }
+                    })];
             });
         });
     };

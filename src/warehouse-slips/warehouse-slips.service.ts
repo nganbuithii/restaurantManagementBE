@@ -143,11 +143,6 @@ export class WarehouseSlipsService {
     
         return warehouseSlip;
     }
-    
-    
-    
-    
-
 
     async delete(id: number, user: IUser): Promise<void> {
         const warehouseSlip = await this.prisma.warehouseSlip.findUnique({

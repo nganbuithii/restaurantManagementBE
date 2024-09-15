@@ -129,10 +129,13 @@ var PaymentService = /** @class */ (function () {
                         console.log("vnp_TransactionNo:", vnp_TxnRef);
                         console.log("vnp_ResponseCode:", vnp_ResponseCode);
                         if (!(vnp_ResponseCode === '00' && vnp_TransactionStatus === '00')) return [3 /*break*/, 2];
+                        console.log("test 1");
                         return [4 /*yield*/, this.orderService.updateStatus(Number(vnp_TxnRef), orders_dto_1.OrderStatus.COMPLETED, user)];
                     case 1:
                         order = _a.sent();
+                        console.log("test 2");
                         if (order) {
+                            console.log("test 3");
                             return [2 /*return*/, {
                                     message: 'Payment processed successfully!',
                                     orderId: vnp_TxnRef,

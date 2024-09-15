@@ -51,4 +51,13 @@ export class EmailService {
       `,
     });
   }
+
+  async sendEmail(to: string, subject: string, content: string): Promise<void> {
+    await this.transporter.sendMail({
+      from: '"Nabity Restaurant" <noreply@nabity.com>',
+      to: 'ngantailieu2311@gmail.com,',
+      subject: subject,
+      html: content,
+    });
+  }
 }
