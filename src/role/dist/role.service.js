@@ -128,7 +128,14 @@ var RoleService = /** @class */ (function () {
                             include: {
                                 permissions: {
                                     include: {
-                                        permission: true
+                                        permission: {
+                                            select: {
+                                                id: true,
+                                                apiPath: true,
+                                                method: true,
+                                                module: true
+                                            }
+                                        }
                                     }
                                 }
                             }
@@ -144,26 +151,55 @@ var RoleService = /** @class */ (function () {
             });
         });
     };
-    RoleService.prototype.update = function (id, name) {
+    RoleService.prototype.update = function (id, updateRoleDto) {
         return __awaiter(this, void 0, Promise, function () {
-            var role;
+            var name, permissionIds, role, rolePermissions;
             return __generator(this, function (_a) {
                 switch (_a.label) {
-                    case 0: return [4 /*yield*/, this.prismaService.role.findUnique({
-                            where: { id: id }
-                        })];
+                    case 0:
+                        name = updateRoleDto.name, permissionIds = updateRoleDto.permissionIds;
+                        return [4 /*yield*/, this.prismaService.role.findUnique({
+                                where: { id: id }
+                            })];
                     case 1:
                         role = _a.sent();
                         if (!role) {
                             throw new common_1.NotFoundException("Role with ID " + id + " not found");
                         }
-                        return [2 /*return*/, this.prismaService.role.update({
-                                where: { id: id },
-                                data: {
-                                    name: name,
-                                    updatedAt: new Date()
-                                }
+                        // Xóa tất cả quyền hiện tại của role
+                        return [4 /*yield*/, this.prismaService.rolePermission.deleteMany({
+                                where: { roleId: id }
                             })];
+                    case 2:
+                        // Xóa tất cả quyền hiện tại của role
+                        _a.sent();
+                        if (!(permissionIds.length > 0)) return [3 /*break*/, 4];
+                        rolePermissions = permissionIds.map(function (permissionId) { return ({
+                            roleId: id,
+                            permissionId: permissionId
+                        }); });
+                        return [4 /*yield*/, this.prismaService.rolePermission.createMany({
+                                data: rolePermissions
+                            })];
+                    case 3:
+                        _a.sent();
+                        _a.label = 4;
+                    case 4: 
+                    // Cập nhật thông tin vai trò
+                    return [2 /*return*/, this.prismaService.role.update({
+                            where: { id: id },
+                            data: {
+                                name: name,
+                                updatedAt: new Date()
+                            },
+                            include: {
+                                permissions: {
+                                    include: {
+                                        permission: true
+                                    }
+                                }
+                            }
+                        })];
                 }
             });
         });
@@ -232,6 +268,28 @@ var RoleService = /** @class */ (function () {
                                         }
                                     }
                                 }
+                            })];
+                }
+            });
+        });
+    };
+    RoleService.prototype.changeStatus = function (id) {
+        return __awaiter(this, void 0, Promise, function () {
+            var role, newStatus;
+            return __generator(this, function (_a) {
+                switch (_a.label) {
+                    case 0: return [4 /*yield*/, this.prismaService.role.findUnique({
+                            where: { id: id }
+                        })];
+                    case 1:
+                        role = _a.sent();
+                        if (!role) {
+                            throw new common_1.NotFoundException("Role with ID " + id + " not found");
+                        }
+                        newStatus = !role.isActive;
+                        return [2 /*return*/, this.prismaService.role.update({
+                                where: { id: id },
+                                data: { isActive: newStatus }
                             })];
                 }
             });

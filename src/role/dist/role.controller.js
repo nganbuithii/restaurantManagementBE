@@ -63,14 +63,21 @@ var RoleController = /** @class */ (function () {
     RoleController.prototype.getDetail = function (id) {
         return this.roleService.getById(Number(id));
     };
-    RoleController.prototype.update = function (id, name) {
-        return this.roleService.update(Number(id), name);
+    RoleController.prototype.update = function (id, updateRoleDto) {
+        return this.roleService.update(Number(id), updateRoleDto);
     };
     RoleController.prototype.assignPermissionsToRole = function (roleId, body) {
         return __awaiter(this, void 0, void 0, function () {
             return __generator(this, function (_a) {
                 console.log('Received body:', body);
                 return [2 /*return*/, this.roleService.updateRolePermissions(roleId, body.permissionIds)];
+            });
+        });
+    };
+    RoleController.prototype.changeStatus = function (id) {
+        return __awaiter(this, void 0, Promise, function () {
+            return __generator(this, function (_a) {
+                return [2 /*return*/, this.roleService.changeStatus(id)];
             });
         });
     };
@@ -85,11 +92,13 @@ var RoleController = /** @class */ (function () {
     ], RoleController.prototype, "getAll");
     __decorate([
         common_1.Get(':id'),
+        common_1.UseGuards(jwt_auth_guard_1.JwtAuthGuard),
         __param(0, common_1.Param('id'))
     ], RoleController.prototype, "getDetail");
     __decorate([
         common_1.Patch(':id'),
-        __param(0, common_1.Param('id')), __param(1, common_1.Body('name'))
+        common_1.UseGuards(jwt_auth_guard_1.JwtAuthGuard),
+        __param(0, common_1.Param('id')), __param(1, common_1.Body())
     ], RoleController.prototype, "update");
     __decorate([
         common_1.Post(':roleId/permissions'),
@@ -97,6 +106,11 @@ var RoleController = /** @class */ (function () {
         __param(0, common_1.Param('roleId', common_1.ParseIntPipe)),
         __param(1, common_1.Body())
     ], RoleController.prototype, "assignPermissionsToRole");
+    __decorate([
+        common_1.Post(':id/status'),
+        common_1.UseGuards(jwt_auth_guard_1.JwtAuthGuard),
+        __param(0, common_1.Param('id', common_1.ParseIntPipe))
+    ], RoleController.prototype, "changeStatus");
     RoleController = __decorate([
         swagger_1.ApiTags("Roles"),
         common_1.Controller('role')

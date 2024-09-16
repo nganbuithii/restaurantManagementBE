@@ -1,7 +1,7 @@
 import { BadRequestException, HttpException, HttpStatus, Injectable, NotFoundException } from '@nestjs/common';
 import { Role, User } from '@prisma/client';
 import { PrismaService } from 'src/prisma.service';
-import { CreateRoleDto } from './dto/role.dto';
+import { CreateRoleDto, UpdateRoleDto } from './dto/role.dto';
 
 @Injectable()
 export class RoleService {
@@ -67,7 +67,14 @@ export class RoleService {
             include: {
                 permissions: {
                     include: {
-                        permission: true,  
+                        permission: {
+                            select: {
+                                id: true,
+                                apiPath: true,
+                                method: true,
+                                module: true,
+                            },
+                        },
                     },
                 },
             },
@@ -87,7 +94,9 @@ export class RoleService {
     }
 
 
-    async update(id: number, name: string): Promise<Role> {
+    async update(id: number, updateRoleDto: UpdateRoleDto): Promise<Role> {
+        const { name, permissionIds } = updateRoleDto;
+
         const role = await this.prismaService.role.findUnique({
             where: { id },
         });
@@ -96,15 +105,39 @@ export class RoleService {
             throw new NotFoundException(`Role with ID ${id} not found`);
         }
 
+        // Xóa tất cả quyền hiện tại của role
+        await this.prismaService.rolePermission.deleteMany({
+            where: { roleId: id },
+        });
+
+        // Thêm quyền mới cho role
+        if (permissionIds.length > 0) {
+            const rolePermissions = permissionIds.map(permissionId => ({
+                roleId: id,
+                permissionId,
+            }));
+
+            await this.prismaService.rolePermission.createMany({
+                data: rolePermissions,
+            });
+        }
+
+        // Cập nhật thông tin vai trò
         return this.prismaService.role.update({
             where: { id },
             data: {
                 name,
-                updatedAt: new Date(), 
+                updatedAt: new Date(),
+            },
+            include: {
+                permissions: {
+                    include: {
+                        permission: true,
+                    },
+                },
             },
         });
     }
-
 
     async assignPermissionsToRole(roleId: number, permissionIds: number[]) {
         await this.prismaService.rolePermission.deleteMany({
@@ -159,4 +192,20 @@ export class RoleService {
         });
     }
 
+    async changeStatus(id: number): Promise<Role> {
+        const role = await this.prismaService.role.findUnique({
+            where: { id },
+        });
+
+        if (!role) {
+            throw new NotFoundException(`Role with ID ${id} not found`);
+        }
+
+        const newStatus = !role.isActive;
+
+        return this.prismaService.role.update({
+            where: { id },
+            data: { isActive: newStatus },
+        });
+    }
 }    

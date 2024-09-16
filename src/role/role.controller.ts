@@ -1,7 +1,7 @@
-import { Body, Controller, Get, Param, ParseIntPipe, Patch, Post, Query, UseGuards, } from '@nestjs/common';
+import { Body, Controller, Delete, Get, Param, ParseIntPipe, Patch, Post, Query, UseGuards, } from '@nestjs/common';
 import { RoleService } from './role.service';
 import { Role } from '@prisma/client';
-import { CreateRoleDto, UpdateRolePermissionsDto } from './dto/role.dto';
+import { CreateRoleDto, UpdateRoleDto, UpdateRolePermissionsDto } from './dto/role.dto';
 import { ApiTags } from '@nestjs/swagger';
 import { RequirePermissions } from 'decorators/permission';
 import { JwtAuthGuard } from 'src/auth/jwt-auth.guard';
@@ -22,13 +22,15 @@ export class RoleController {
     }
 
     @Get(':id')
+    @UseGuards(JwtAuthGuard)
     getDetail(@Param('id') id: string): Promise<Role> {
         return this.roleService.getById(Number(id));
     }
 
     @Patch(':id')
-    update(@Param('id') id: string, @Body('name') name: string): Promise<Role> {
-        return this.roleService.update(Number(id), name);
+    @UseGuards(JwtAuthGuard)
+    update(@Param('id') id: string, @Body() updateRoleDto: UpdateRoleDto): Promise<Role> {
+        return this.roleService.update(Number(id),updateRoleDto);
     }
 
 
@@ -40,6 +42,12 @@ export class RoleController {
     ) {
         console.log('Received body:', body);
         return this.roleService.updateRolePermissions(roleId, body.permissionIds);
+    }
+
+    @Post(':id/status')
+    @UseGuards(JwtAuthGuard)
+    async changeStatus(@Param('id', ParseIntPipe) id: number): Promise<Role> {
+        return this.roleService.changeStatus(id);
     }
 
 }

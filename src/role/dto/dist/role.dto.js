@@ -6,7 +6,7 @@ var __decorate = (this && this.__decorate) || function (decorators, target, key,
     return c > 3 && r && Object.defineProperty(target, key, r), r;
 };
 exports.__esModule = true;
-exports.UpdateRolePermissionsDto = exports.CreateRoleDto = void 0;
+exports.UpdateRoleDto = exports.UpdateRolePermissionsDto = exports.CreateRoleDto = void 0;
 var class_validator_1 = require("class-validator");
 var class_validator_2 = require("class-validator");
 var CreateRoleDto = /** @class */ (function () {
@@ -34,3 +34,18 @@ var UpdateRolePermissionsDto = /** @class */ (function () {
     return UpdateRolePermissionsDto;
 }());
 exports.UpdateRolePermissionsDto = UpdateRolePermissionsDto;
+var UpdateRoleDto = /** @class */ (function () {
+    function UpdateRoleDto() {
+    }
+    __decorate([
+        class_validator_2.IsArray(),
+        class_validator_2.ArrayNotEmpty(),
+        class_validator_2.IsNumber({}, { each: true }),
+        class_validator_1.IsOptional()
+    ], UpdateRoleDto.prototype, "permissionIds");
+    __decorate([
+        class_validator_1.IsOptional()
+    ], UpdateRoleDto.prototype, "name");
+    return UpdateRoleDto;
+}());
+exports.UpdateRoleDto = UpdateRoleDto;
