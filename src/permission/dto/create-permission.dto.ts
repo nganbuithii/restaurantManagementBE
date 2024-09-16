@@ -3,15 +3,21 @@ import { Permission } from "@prisma/client"
 import { IsNotEmpty, IsString } from "class-validator"
 
 export class CreatePermissionDto {
+
     @ApiProperty()
     @IsNotEmpty({ message: "action can not empty " })
     @IsString()
-    action: string
+    apiPath :string
 
     @ApiProperty()
     @IsNotEmpty({ message: "resource can not empty " })
     @IsString()
-    resource    :string 
+    method    :string 
+
+    @ApiProperty()
+    @IsNotEmpty({ message: "resource can not empty " })
+    @IsString()
+    module    :string 
 
     @ApiProperty()
     @IsNotEmpty({ message: "description can not empty" })

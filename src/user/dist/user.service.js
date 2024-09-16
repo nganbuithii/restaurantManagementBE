@@ -317,7 +317,6 @@ var UserService = /** @class */ (function () {
             return __generator(this, function (_a) {
                 switch (_a.label) {
                     case 0:
-                        // Kiểm tra xem id có hợp lệ không
                         if (!id) {
                             throw new common_1.BadRequestException('Invalid user ID');
                         }
@@ -400,16 +399,20 @@ var UserService = /** @class */ (function () {
     };
     UserService.prototype["delete"] = function (id, user) {
         return __awaiter(this, void 0, Promise, function () {
-            var u;
+            var userToDelete;
             return __generator(this, function (_a) {
                 switch (_a.label) {
                     case 0: return [4 /*yield*/, this.prismaService.user.findUnique({
-                            where: { id: id }
+                            where: { id: id },
+                            include: { role: true }
                         })];
                     case 1:
-                        u = _a.sent();
-                        if (!u) {
-                            throw new common_1.NotFoundException("user with id " + id + " not found");
+                        userToDelete = _a.sent();
+                        if (!userToDelete) {
+                            throw new common_1.NotFoundException("User with ID " + id + " not found");
+                        }
+                        if (userToDelete.role.name === 'ADMIN') {
+                            throw new common_1.BadRequestException('Cannot delete users with ADMIN role');
                         }
                         return [4 /*yield*/, this.prismaService.user.update({
                                 where: { id: id },

@@ -50,13 +50,13 @@ var PermissionService = /** @class */ (function () {
     }
     PermissionService.prototype.create = function (createPermissionDto) {
         return __awaiter(this, void 0, void 0, function () {
-            var action, description, resource, existingPermission, permission;
+            var apiPath, method, module, description, existingPermission, permission;
             return __generator(this, function (_a) {
                 switch (_a.label) {
                     case 0:
-                        action = createPermissionDto.action, description = createPermissionDto.description, resource = createPermissionDto.resource;
+                        apiPath = createPermissionDto.apiPath, method = createPermissionDto.method, module = createPermissionDto.module, description = createPermissionDto.description;
                         return [4 /*yield*/, this.prismaService.permission.findFirst({
-                                where: { action: action, resource: resource }
+                                where: { apiPath: apiPath, method: method, module: module }
                             })];
                     case 1:
                         existingPermission = _a.sent();
@@ -65,8 +65,9 @@ var PermissionService = /** @class */ (function () {
                         }
                         return [4 /*yield*/, this.prismaService.permission.create({
                                 data: {
-                                    action: action,
-                                    resource: resource,
+                                    apiPath: apiPath,
+                                    method: method,
+                                    module: module,
                                     description: description
                                 }
                             })];
@@ -94,7 +95,7 @@ var PermissionService = /** @class */ (function () {
                                     deletedAt: null,
                                     OR: [
                                         {
-                                            action: {
+                                            apiPath: {
                                                 contains: search
                                             }
                                         },
@@ -113,7 +114,7 @@ var PermissionService = /** @class */ (function () {
                         permissions = _a.sent();
                         return [4 /*yield*/, this.prismaService.permission.count({
                                 where: {
-                                    action: {
+                                    apiPath: {
                                         contains: search
                                     }
                                 }
@@ -152,16 +153,16 @@ var PermissionService = /** @class */ (function () {
         });
     };
     PermissionService.prototype.update = function (id, data) {
-        var _a, _b;
+        var _a, _b, _c, _d;
         return __awaiter(this, void 0, Promise, function () {
             var permission, updatedPermission;
-            return __generator(this, function (_c) {
-                switch (_c.label) {
+            return __generator(this, function (_e) {
+                switch (_e.label) {
                     case 0: return [4 /*yield*/, this.prismaService.permission.findUnique({
                             where: { id: id }
                         })];
                     case 1:
-                        permission = _c.sent();
+                        permission = _e.sent();
                         if (!permission) {
                             throw new common_1.NotFoundException({
                                 statusCode: common_1.HttpStatus.NOT_FOUND,
@@ -171,12 +172,14 @@ var PermissionService = /** @class */ (function () {
                         return [4 /*yield*/, this.prismaService.permission.update({
                                 where: { id: id },
                                 data: {
-                                    action: (_a = data.action) !== null && _a !== void 0 ? _a : permission.action,
-                                    description: (_b = data.description) !== null && _b !== void 0 ? _b : permission.description
+                                    apiPath: (_a = data.apiPath) !== null && _a !== void 0 ? _a : permission.apiPath,
+                                    method: (_b = data.method) !== null && _b !== void 0 ? _b : permission.method,
+                                    module: (_c = data.module) !== null && _c !== void 0 ? _c : permission.module,
+                                    description: (_d = data.description) !== null && _d !== void 0 ? _d : permission.description
                                 }
                             })];
                     case 2:
-                        updatedPermission = _c.sent();
+                        updatedPermission = _e.sent();
                         return [2 /*return*/, updatedPermission];
                 }
             });
@@ -226,7 +229,7 @@ var PermissionService = /** @class */ (function () {
                         })];
                     case 1:
                         roleWithPermissions = _a.sent();
-                        return [2 /*return*/, roleWithPermissions.permissions.map(function (rp) { return rp.permission.action; })];
+                        return [2 /*return*/, roleWithPermissions.permissions.map(function (rp) { return rp.permission.apiPath; })];
                 }
             });
         });

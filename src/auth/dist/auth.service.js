@@ -206,10 +206,11 @@ var AuthService = /** @class */ (function () {
                         })];
                     case 1:
                         userWithPermissions = _a.sent();
-                        // Trả về danh sách các quyền, mỗi quyền chứa action và resource
+                        // Trả về danh sách các quyền, mỗi quyền chứa apiPath, method, và module
                         return [2 /*return*/, userWithPermissions.role.permissions.map(function (rp) { return ({
-                                action: rp.permission.action,
-                                resource: rp.permission.resource
+                                apiPath: rp.permission.apiPath,
+                                method: rp.permission.method,
+                                module: rp.permission.module
                             }); })];
                 }
             });

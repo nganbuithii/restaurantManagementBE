@@ -73,8 +73,18 @@ var PermissionsGuard = /** @class */ (function () {
                         if (!userRole || !userRole.isActive) {
                             throw new common_1.ForbiddenException('Role not found or inactive');
                         }
-                        userPermissions = userRole.permissions.map(function (rp) { return rp.permission.action; });
-                        hasPermission = requiredPermissions.every(function (permission) { return userPermissions.includes(permission); });
+                        userPermissions = userRole.permissions.map(function (rp) { return ({
+                            apiPath: rp.permission.apiPath,
+                            method: rp.permission.method,
+                            module: rp.permission.module
+                        }); });
+                        hasPermission = requiredPermissions.every(function (reqPerm) {
+                            return userPermissions.some(function (userPerm) {
+                                return userPerm.apiPath === reqPerm.apiPath &&
+                                    userPerm.method === reqPerm.method &&
+                                    userPerm.module === reqPerm.module;
+                            });
+                        });
                         if (!hasPermission) {
                             throw new common_1.ForbiddenException('Insufficient permissions');
                         }

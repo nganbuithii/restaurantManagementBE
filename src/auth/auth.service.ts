@@ -142,7 +142,7 @@ export class AuthService {
     };
 
 
-    private async getPermissionsForUser(userId: number): Promise<{ action: string; resource: string }[]> {
+    private async getPermissionsForUser(userId: number): Promise<{ apiPath: string; method: string; module: string }[]> {
         const userWithPermissions = await this.prismaService.user.findUnique({
             where: { id: userId },
             include: {
@@ -150,20 +150,22 @@ export class AuthService {
                     include: {
                         permissions: {
                             include: {
-                                permission: true
-                            }
-                        }
-                    }
-                }
-            }
+                                permission: true,
+                            },
+                        },
+                    },
+                },
+            },
         });
-
-        // Trả về danh sách các quyền, mỗi quyền chứa action và resource
+    
+        // Trả về danh sách các quyền, mỗi quyền chứa apiPath, method, và module
         return userWithPermissions.role.permissions.map(rp => ({
-            action: rp.permission.action,
-            resource: rp.permission.resource
+            apiPath: rp.permission.apiPath,
+            method: rp.permission.method,
+            module: rp.permission.module,
         }));
     }
+    
 
     async validateUser(username: string, password: string): Promise<any> {
         const user = await this.userService.findOne(username);

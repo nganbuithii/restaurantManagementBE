@@ -42,15 +42,18 @@ model Role {
 
 model Permission {
   id          Int              @id @default(autoincrement())
-  action      String //ví dụ: CREATE, READ, UPDATE, DELETE)
-  resource    String // (ví dụ: USER, VOUCHER, FEEDBACK)
+  apiPath String?
+  method String?
+  module String?
+  // action      String //ví dụ: CREATE, READ, UPDATE, DELETE)
+  // resource    String // (ví dụ: USER, VOUCHER, FEEDBACK)
   description String?
   createdAt   DateTime         @default(now())
   updatedAt   DateTime         @updatedAt
   deletedAt   DateTime?
   roles       RolePermission[]
 
-  @@unique([action, resource])
+  // @@unique([action, resource])
 }
 
 model RolePermission {

@@ -1,4 +1,4 @@
-import { BadRequestException, Injectable, NotFoundException } from '@nestjs/common';
+import { BadRequestException, HttpException, HttpStatus, Injectable, NotFoundException } from '@nestjs/common';
 import { Role, User } from '@prisma/client';
 import { PrismaService } from 'src/prisma.service';
 import { CreateRoleDto } from './dto/role.dto';
@@ -17,20 +17,44 @@ export class RoleService {
         });
     }
 
-    async create(body: CreateRoleDto): Promise<Role> {
-        // Kiểm tra xem role có tồn tại hay không
+    async create(createRoleDto: CreateRoleDto) {
+        const { name, permissionIds } = createRoleDto;
+
         const existingRole = await this.prismaService.role.findUnique({
-            where: { name: body.name },
+            where: { name },
         });
 
         if (existingRole) {
-            throw new BadRequestException('Role with this name already exists');
+            throw new HttpException(
+                { message: 'Role already exists' },
+                HttpStatus.BAD_REQUEST,
+            );
         }
 
-        // Tạo role mới nếu không bị trùng
-        return this.prismaService.role.create({
-            data: body,
+        const permissions = await this.prismaService.permission.findMany({
+            where: { id: { in: permissionIds } },
         });
+
+        if (permissions.length !== permissionIds.length) {
+            throw new HttpException(
+                { message: 'Some permissions do not exist' },
+                HttpStatus.BAD_REQUEST,
+            );
+        }
+
+        const newRole = await this.prismaService.role.create({
+            data: {
+                name,
+                permissions: {
+                    create: permissionIds.map((permissionId) => ({
+                        permission: { connect: { id: permissionId } },
+                    })),
+                },
+            },
+            include: { permissions: true }, 
+        });
+
+        return newRole;
     }
 
     async getAll(): Promise<Role[]> {
@@ -43,7 +67,7 @@ export class RoleService {
             include: {
                 permissions: {
                     include: {
-                        permission: true,  // Bao gồm chi tiết của permission
+                        permission: true,  
                     },
                 },
             },
@@ -76,19 +100,17 @@ export class RoleService {
             where: { id },
             data: {
                 name,
-                updatedAt: new Date(), // Cập nhật ngày updatedAt
+                updatedAt: new Date(), 
             },
         });
     }
 
 
     async assignPermissionsToRole(roleId: number, permissionIds: number[]) {
-        // Xóa tất cả các quyền hiện tại của role
         await this.prismaService.rolePermission.deleteMany({
             where: { roleId },
         });
 
-        // Tạo mới các quyền cho role
         const rolePermissions = permissionIds.map(permissionId => ({
             roleId,
             permissionId,
@@ -104,16 +126,15 @@ export class RoleService {
         });
     }
     async updateRolePermissions(roleId: number, newPermissionIds: any) {
-        // Kiểm tra xem newPermissionIds có phải là một mảng không
         if (!Array.isArray(newPermissionIds)) {
             throw new BadRequestException('Permissions should be an array of numbers');
         }
-    
+
         // Xóa tất cả quyền hiện tại của role
         await this.prismaService.rolePermission.deleteMany({
             where: { roleId },
         });
-    
+
         // Thêm các quyền mới
         const createPromises = newPermissionIds.map(permissionId =>
             this.prismaService.rolePermission.create({
@@ -123,10 +144,9 @@ export class RoleService {
                 },
             })
         );
-    
+
         await Promise.all(createPromises);
-    
-        // Trả về role với danh sách quyền mới
+
         return this.prismaService.role.findUnique({
             where: { id: roleId },
             include: {
@@ -138,5 +158,5 @@ export class RoleService {
             },
         });
     }
-    
+
 }    

@@ -119,7 +119,7 @@ export class UserService {
                     {
                         role: {
                             name: {
-                                contains: search,  // Tìm kiếm theo tên vai trò
+                                contains: search,  
                             },
                         },
                     },
@@ -233,12 +233,10 @@ export class UserService {
 
 
     async updateAvt(id: number, file: Express.Multer.File): Promise<any> {
-        // Kiểm tra xem id có hợp lệ không
         if (!id) {
             throw new BadRequestException('Invalid user ID');
         }
 
-        // Kiểm tra xem người dùng có tồn tại không
         const user = await this.prismaService.user.findUnique({
             where: { id },
         });
@@ -249,13 +247,11 @@ export class UserService {
         // Upload hình ảnh lên Cloudinary
         const result = await this.cloudinaryService.uploadImage(file);
 
-        // Cập nhật đường link avatar trong cơ sở dữ liệu
         const updatedUser = await this.prismaService.user.update({
             where: { id },
-            data: { avatar: result.secure_url }, // Lưu đường link avatar
+            data: { avatar: result.secure_url },
         });
 
-        // Loại bỏ thuộc tính password
         const { password, ...userData } = updatedUser;
 
         return userData;
@@ -301,12 +297,17 @@ export class UserService {
 
 
     async delete(id: number, user: IUser): Promise<void> {
-        const u = await this.prismaService.user.findUnique({
+        const userToDelete = await this.prismaService.user.findUnique({
             where: { id },
+            include: { role: true },
         });
 
-        if (!u) {
-            throw new NotFoundException(`user with id ${id} not found`);
+        if (!userToDelete) {
+            throw new NotFoundException(`User with ID ${id} not found`);
+        }
+
+        if (userToDelete.role.name === 'ADMIN') {
+            throw new BadRequestException('Cannot delete users with ADMIN role');
         }
 
         await this.prismaService.user.update({
@@ -319,7 +320,6 @@ export class UserService {
     }
 
     async countNewCustomers(month: number = new Date().getMonth() + 1, year: number = new Date().getFullYear()): Promise<number> {
-        // Cố định tháng hiện tại nếu không truyền tham số
         const start = startOfMonth(parse(`${year}-${month}-01`, 'yyyy-M-d', new Date()));
         const end = endOfMonth(start);
 
@@ -329,8 +329,7 @@ export class UserService {
                     gte: start,
                     lte: end,
                 },
-                // Nếu bạn có trường để phân loại khách hàng, ví dụ `role` hoặc `type`, thêm điều kiện ở đây
-                // role: 'CUSTOMER'
+                
             },
         });
         return count;

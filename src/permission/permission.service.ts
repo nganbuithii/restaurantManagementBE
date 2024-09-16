@@ -1,18 +1,18 @@
 import { HttpException, HttpStatus, Injectable, NotFoundException } from '@nestjs/common';
 import { CreatePermissionDto, PermissionFilterType, PermissionPaginationResponseType } from './dto/create-permission.dto';
-import { UpdatePermissionDto } from './dto/update-permission.dto';
-import { IUser } from 'interfaces/user.interface';
 import { PrismaService } from 'src/prisma.service';
 import { Permission } from '@prisma/client';
+
 @Injectable()
 export class PermissionService {
   constructor(private prismaService: PrismaService) { }
+
   async create(createPermissionDto: CreatePermissionDto) {
-    const { action, description, resource } = createPermissionDto;
+    const { apiPath, method, module, description } = createPermissionDto;
 
     // Kiểm tra xem quyền đã tồn tại hay chưa
     const existingPermission = await this.prismaService.permission.findFirst({
-      where: { action, resource },
+      where: { apiPath, method, module },
     });
 
     if (existingPermission) {
@@ -25,8 +25,9 @@ export class PermissionService {
     // Tạo quyền mới
     const permission = await this.prismaService.permission.create({
       data: {
-        action,
-        resource,
+        apiPath,
+        method,
+        module,
         description,
       },
     });
@@ -35,7 +36,7 @@ export class PermissionService {
   }
 
   async getAll(filters: PermissionFilterType): Promise<PermissionPaginationResponseType> {
-    const items_per_page = Number(process.env.ITEMS_PER_PAGE) ; 
+    const items_per_page = Number(process.env.ITEMS_PER_PAGE);
     const page = Number(filters.page) || 1;
     const search = filters.search || "";
 
@@ -44,11 +45,10 @@ export class PermissionService {
       take: items_per_page,
       skip,
       where: {
-
         deletedAt: null,  // Chỉ lấy các bản ghi chưa bị xóa
         OR: [
           {
-            action: {
+            apiPath: {
               contains: search,
             },
           },
@@ -66,7 +66,7 @@ export class PermissionService {
 
     const total = await this.prismaService.permission.count({
       where: {
-        action: {
+        apiPath: {
           contains: search,
         },
       },
@@ -95,8 +95,7 @@ export class PermissionService {
     return permission;
   }
 
-
-  async update(id: number, data: { action?: string; description?: string }): Promise<Permission> {
+  async update(id: number, data: { apiPath?: string; method?: string; module?: string; description?: string }): Promise<Permission> {
     const permission = await this.prismaService.permission.findUnique({
       where: { id },
     });
@@ -111,14 +110,15 @@ export class PermissionService {
     const updatedPermission = await this.prismaService.permission.update({
       where: { id },
       data: {
-        action: data.action ?? permission.action,
+        apiPath: data.apiPath ?? permission.apiPath,
+        method: data.method ?? permission.method,
+        module: data.module ?? permission.module,
         description: data.description ?? permission.description,
       },
     });
 
     return updatedPermission;
   }
-
 
   async remove(id: number): Promise<void> {
     const permission = await this.prismaService.permission.findUnique({
@@ -138,20 +138,19 @@ export class PermissionService {
     });
   }
 
-
   async getRolePermissions(roleId: number): Promise<string[]> {
     const roleWithPermissions = await this.prismaService.role.findUnique({
       where: { id: roleId },
       include: {
         permissions: {
           include: {
-            permission: true
-          }
-        }
-      }
+            permission: true,
+          },
+        },
+      },
     });
 
-    return roleWithPermissions.permissions.map(rp => rp.permission.action);
+    return roleWithPermissions.permissions.map(rp => rp.permission.apiPath);
   }
 
   async hasPermission(roleId: number, requiredPermission: string): Promise<boolean> {

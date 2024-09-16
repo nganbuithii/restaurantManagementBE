@@ -15,6 +15,11 @@ var CreateRoleDto = /** @class */ (function () {
     __decorate([
         class_validator_1.IsNotEmpty({ message: 'Role name can not empty' })
     ], CreateRoleDto.prototype, "name");
+    __decorate([
+        class_validator_2.IsArray(),
+        class_validator_2.ArrayNotEmpty({ message: 'Permission IDs cannot be empty' }),
+        class_validator_2.IsNumber({}, { each: true, message: 'Each permission ID must be a number' })
+    ], CreateRoleDto.prototype, "permissionIds");
     return CreateRoleDto;
 }());
 exports.CreateRoleDto = CreateRoleDto;

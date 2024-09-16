@@ -70,23 +70,43 @@ var RoleService = /** @class */ (function () {
             });
         });
     };
-    RoleService.prototype.create = function (body) {
-        return __awaiter(this, void 0, Promise, function () {
-            var existingRole;
+    RoleService.prototype.create = function (createRoleDto) {
+        return __awaiter(this, void 0, void 0, function () {
+            var name, permissionIds, existingRole, permissions, newRole;
             return __generator(this, function (_a) {
                 switch (_a.label) {
-                    case 0: return [4 /*yield*/, this.prismaService.role.findUnique({
-                            where: { name: body.name }
-                        })];
+                    case 0:
+                        name = createRoleDto.name, permissionIds = createRoleDto.permissionIds;
+                        return [4 /*yield*/, this.prismaService.role.findUnique({
+                                where: { name: name }
+                            })];
                     case 1:
                         existingRole = _a.sent();
                         if (existingRole) {
-                            throw new common_1.BadRequestException('Role with this name already exists');
+                            throw new common_1.HttpException({ message: 'Role already exists' }, common_1.HttpStatus.BAD_REQUEST);
                         }
-                        // Tạo role mới nếu không bị trùng
-                        return [2 /*return*/, this.prismaService.role.create({
-                                data: body
+                        return [4 /*yield*/, this.prismaService.permission.findMany({
+                                where: { id: { "in": permissionIds } }
                             })];
+                    case 2:
+                        permissions = _a.sent();
+                        if (permissions.length !== permissionIds.length) {
+                            throw new common_1.HttpException({ message: 'Some permissions do not exist' }, common_1.HttpStatus.BAD_REQUEST);
+                        }
+                        return [4 /*yield*/, this.prismaService.role.create({
+                                data: {
+                                    name: name,
+                                    permissions: {
+                                        create: permissionIds.map(function (permissionId) { return ({
+                                            permission: { connect: { id: permissionId } }
+                                        }); })
+                                    }
+                                },
+                                include: { permissions: true }
+                            })];
+                    case 3:
+                        newRole = _a.sent();
+                        return [2 /*return*/, newRole];
                 }
             });
         });
@@ -153,13 +173,10 @@ var RoleService = /** @class */ (function () {
             var rolePermissions;
             return __generator(this, function (_a) {
                 switch (_a.label) {
-                    case 0: 
-                    // Xóa tất cả các quyền hiện tại của role
-                    return [4 /*yield*/, this.prismaService.rolePermission.deleteMany({
+                    case 0: return [4 /*yield*/, this.prismaService.rolePermission.deleteMany({
                             where: { roleId: roleId }
                         })];
                     case 1:
-                        // Xóa tất cả các quyền hiện tại của role
                         _a.sent();
                         rolePermissions = permissionIds.map(function (permissionId) { return ({
                             roleId: roleId,
@@ -185,7 +202,6 @@ var RoleService = /** @class */ (function () {
             return __generator(this, function (_a) {
                 switch (_a.label) {
                     case 0:
-                        // Kiểm tra xem newPermissionIds có phải là một mảng không
                         if (!Array.isArray(newPermissionIds)) {
                             throw new common_1.BadRequestException('Permissions should be an array of numbers');
                         }
@@ -207,7 +223,6 @@ var RoleService = /** @class */ (function () {
                         return [4 /*yield*/, Promise.all(createPromises)];
                     case 2:
                         _a.sent();
-                        // Trả về role với danh sách quyền mới
                         return [2 /*return*/, this.prismaService.role.findUnique({
                                 where: { id: roleId },
                                 include: {
