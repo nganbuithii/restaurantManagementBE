@@ -4,6 +4,7 @@ import { ResponseInterceptor } from 'interceptors/response.interceptor';
 import { Reflector } from '@nestjs/core';
 import { DocumentBuilder, SwaggerModule } from '@nestjs/swagger';
 import { UserInterceptor } from 'interceptors/user.interceptor';
+import { VersioningType } from '@nestjs/common';
 
 async function bootstrap() {
   const app = await NestFactory.create(AppModule);
@@ -38,6 +39,13 @@ async function bootstrap() {
   SwaggerModule.setup('api', app, document);
   app.useGlobalInterceptors(new ResponseInterceptor(new Reflector()));
   app.useGlobalInterceptors(new UserInterceptor());
+
+  //consfig version
+  app.setGlobalPrefix('api')
+  app.enableVersioning({
+    type: VersioningType.URI,
+    defaultVersion: ['1','2']
+  });
 
   await app.listen(process.env.PORT);
 }

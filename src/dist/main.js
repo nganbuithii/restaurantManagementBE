@@ -42,6 +42,7 @@ var response_interceptor_1 = require("interceptors/response.interceptor");
 var core_2 = require("@nestjs/core");
 var swagger_1 = require("@nestjs/swagger");
 var user_interceptor_1 = require("interceptors/user.interceptor");
+var common_1 = require("@nestjs/common");
 function bootstrap() {
     return __awaiter(this, void 0, void 0, function () {
         var app, config, document;
@@ -80,6 +81,12 @@ function bootstrap() {
                     swagger_1.SwaggerModule.setup('api', app, document);
                     app.useGlobalInterceptors(new response_interceptor_1.ResponseInterceptor(new core_2.Reflector()));
                     app.useGlobalInterceptors(new user_interceptor_1.UserInterceptor());
+                    //consfig version
+                    app.setGlobalPrefix('api');
+                    app.enableVersioning({
+                        type: common_1.VersioningType.URI,
+                        defaultVersion: ['1', '2']
+                    });
                     return [4 /*yield*/, app.listen(process.env.PORT)];
                 case 2:
                     _a.sent();
