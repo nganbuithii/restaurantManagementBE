@@ -63,4 +63,10 @@ export class FeeckbacksController {
   ): Promise<Feedback> {
     return this.s.replyToFeedback(id, replyDto, user);
   }
+
+  @Post('statistics')
+  @UseGuards(JwtAuthGuard)
+  async getFeedbackStatistics() {
+    return this.s.getFeedbackStatistics();
+  }
 }

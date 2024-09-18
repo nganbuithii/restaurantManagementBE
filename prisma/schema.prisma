@@ -45,13 +45,12 @@ model Permission {
   apiPath String?
   method String?
   module String?
-  // action      String //ví dụ: CREATE, READ, UPDATE, DELETE)
-  // resource    String // (ví dụ: USER, VOUCHER, FEEDBACK)
   description String?
   createdAt   DateTime         @default(now())
   updatedAt   DateTime         @updatedAt
   deletedAt   DateTime?
   roles       RolePermission[]
+  isActive Boolean @default(true)
 
   // @@unique([action, resource])
 }

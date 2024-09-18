@@ -134,7 +134,7 @@ export class PermissionService {
 
     await this.prismaService.permission.update({
       where: { id },
-      data: { deletedAt: new Date() },
+      data: { deletedAt: new Date(), isActive:false },
     });
   }
 
@@ -156,5 +156,16 @@ export class PermissionService {
   async hasPermission(roleId: number, requiredPermission: string): Promise<boolean> {
     const permissions = await this.getRolePermissions(roleId);
     return permissions.includes(requiredPermission);
+  }
+
+  async getAllPermissions(): Promise<Permission[]> {
+    return this.prismaService.permission.findMany({
+      where: {
+        isActive:true,
+      },
+      orderBy: {
+        createdAt: "desc",
+      },
+    });
   }
 }

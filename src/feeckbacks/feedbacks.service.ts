@@ -203,4 +203,64 @@ export class FeeckbacksService {
       throw error;
     }
   }
+
+
+  async getFeedbackStatistics(): Promise<any> {
+    // Tổng hợp các chỉ số tổng quan
+    const feedbackStats = await this.prisma.feedback.aggregate({
+      _count: {
+        id: true, // Tổng số đánh giá
+      },
+      _avg: {
+        rating: true, // Điểm trung bình của đánh giá
+      },
+      _sum: {
+        rating: true, // Tổng điểm đánh giá
+      },
+      where: {
+        isActive: true, // Nếu cần điều kiện
+      },
+    });
+
+    const totalFeedbacks = feedbackStats._count.id;
+    const averageRating = feedbackStats._avg.rating || 0;
+    const totalRating = feedbackStats._sum.rating || 0;
+
+    // Thống kê theo label
+    const labelStats = await this.prisma.feedback.groupBy({
+      by: ['label'],
+      _count: {
+        id: true, // Số lượng đánh giá theo label
+      },
+      _avg: {
+        rating: true, // Điểm trung bình theo label
+      },
+      _sum: {
+        rating: true, // Tổng điểm theo label
+      },
+      where: {
+        isActive: true, // Nếu cần điều kiện
+      },
+    });
+
+    // Tính toán điểm tích cực và tiêu cực
+    const totalPositive = labelStats.find((item) => item.label === 'POSITIVE')?._count.id || 0;
+    const totalNegative = labelStats.find((item) => item.label === 'NEGATIVE')?._count.id || 0;
+
+    return {
+      totalFeedbacks,
+      averageRating,
+      totalRating,
+      labelStats: labelStats.map((stat) => ({
+        label: stat.label,
+        totalFeedbacks: stat._count.id,
+        averageRating: stat._avg.rating || 0,
+        totalRating: stat._sum.rating || 0,
+      })),
+      totalPositive,
+      totalNegative,
+    };
+  }
+
+
 }

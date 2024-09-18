@@ -76,6 +76,13 @@ var FeeckbacksController = /** @class */ (function () {
             });
         });
     };
+    FeeckbacksController.prototype.getFeedbackStatistics = function () {
+        return __awaiter(this, void 0, void 0, function () {
+            return __generator(this, function (_a) {
+                return [2 /*return*/, this.s.getFeedbackStatistics()];
+            });
+        });
+    };
     __decorate([
         common_1.Post(),
         common_1.HttpCode(common_1.HttpStatus.CREATED),
@@ -118,6 +125,10 @@ var FeeckbacksController = /** @class */ (function () {
         __param(1, common_1.Body()),
         __param(2, customize_1.CurrentUser())
     ], FeeckbacksController.prototype, "replyToFeedback");
+    __decorate([
+        common_1.Post('statistics'),
+        common_1.UseGuards(jwt_auth_guard_1.JwtAuthGuard)
+    ], FeeckbacksController.prototype, "getFeedbackStatistics");
     FeeckbacksController = __decorate([
         swagger_1.ApiTags("Feedbacks"),
         common_1.Controller('feedbacks')

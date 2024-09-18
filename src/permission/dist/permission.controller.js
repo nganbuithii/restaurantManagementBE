@@ -82,6 +82,13 @@ var PermissionController = /** @class */ (function () {
             });
         });
     };
+    PermissionController.prototype.getAllPermissions = function () {
+        return __awaiter(this, void 0, Promise, function () {
+            return __generator(this, function (_a) {
+                return [2 /*return*/, this.permissionService.getAllPermissions()];
+            });
+        });
+    };
     __decorate([
         common_1.Post(),
         customize_1.ResponseMessage("create permission"),
@@ -112,6 +119,9 @@ var PermissionController = /** @class */ (function () {
         common_1.HttpCode(common_1.HttpStatus.NO_CONTENT),
         __param(0, common_1.Param('id', common_1.ParseIntPipe))
     ], PermissionController.prototype, "remove");
+    __decorate([
+        common_1.Post('all')
+    ], PermissionController.prototype, "getAllPermissions");
     PermissionController = __decorate([
         swagger_1.ApiTags("Permissions"),
         common_1.Controller('permission')

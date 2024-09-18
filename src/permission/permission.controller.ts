@@ -49,5 +49,8 @@ export class PermissionController {
   async remove(@Param('id', ParseIntPipe) id: number): Promise<void> {
     await this.permissionService.remove(id);
   }
-
+  @Post('all')
+  async getAllPermissions(): Promise<Permission[]> {
+    return this.permissionService.getAllPermissions();
+  }
 }

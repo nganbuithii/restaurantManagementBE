@@ -296,6 +296,67 @@ var FeeckbacksService = /** @class */ (function () {
             });
         });
     };
+    FeeckbacksService.prototype.getFeedbackStatistics = function () {
+        var _a, _b;
+        return __awaiter(this, void 0, Promise, function () {
+            var feedbackStats, totalFeedbacks, averageRating, totalRating, labelStats, totalPositive, totalNegative;
+            return __generator(this, function (_c) {
+                switch (_c.label) {
+                    case 0: return [4 /*yield*/, this.prisma.feedback.aggregate({
+                            _count: {
+                                id: true
+                            },
+                            _avg: {
+                                rating: true
+                            },
+                            _sum: {
+                                rating: true
+                            },
+                            where: {
+                                isActive: true
+                            }
+                        })];
+                    case 1:
+                        feedbackStats = _c.sent();
+                        totalFeedbacks = feedbackStats._count.id;
+                        averageRating = feedbackStats._avg.rating || 0;
+                        totalRating = feedbackStats._sum.rating || 0;
+                        return [4 /*yield*/, this.prisma.feedback.groupBy({
+                                by: ['label'],
+                                _count: {
+                                    id: true
+                                },
+                                _avg: {
+                                    rating: true
+                                },
+                                _sum: {
+                                    rating: true
+                                },
+                                where: {
+                                    isActive: true
+                                }
+                            })];
+                    case 2:
+                        labelStats = _c.sent();
+                        totalPositive = ((_a = labelStats.find(function (item) { return item.label === 'POSITIVE'; })) === null || _a === void 0 ? void 0 : _a._count.id) || 0;
+                        totalNegative = ((_b = labelStats.find(function (item) { return item.label === 'NEGATIVE'; })) === null || _b === void 0 ? void 0 : _b._count.id) || 0;
+                        return [2 /*return*/, {
+                                totalFeedbacks: totalFeedbacks,
+                                averageRating: averageRating,
+                                totalRating: totalRating,
+                                labelStats: labelStats.map(function (stat) { return ({
+                                    label: stat.label,
+                                    totalFeedbacks: stat._count.id,
+                                    averageRating: stat._avg.rating || 0,
+                                    totalRating: stat._sum.rating || 0
+                                }); }),
+                                totalPositive: totalPositive,
+                                totalNegative: totalNegative
+                            }];
+                }
+            });
+        });
+    };
     FeeckbacksService = __decorate([
         common_1.Injectable()
     ], FeeckbacksService);

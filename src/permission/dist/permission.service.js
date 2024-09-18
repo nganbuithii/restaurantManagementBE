@@ -203,7 +203,7 @@ var PermissionService = /** @class */ (function () {
                         }
                         return [4 /*yield*/, this.prismaService.permission.update({
                                 where: { id: id },
-                                data: { deletedAt: new Date() }
+                                data: { deletedAt: new Date(), isActive: false }
                             })];
                     case 2:
                         _a.sent();
@@ -244,6 +244,20 @@ var PermissionService = /** @class */ (function () {
                         permissions = _a.sent();
                         return [2 /*return*/, permissions.includes(requiredPermission)];
                 }
+            });
+        });
+    };
+    PermissionService.prototype.getAllPermissions = function () {
+        return __awaiter(this, void 0, Promise, function () {
+            return __generator(this, function (_a) {
+                return [2 /*return*/, this.prismaService.permission.findMany({
+                        where: {
+                            isActive: true
+                        },
+                        orderBy: {
+                            createdAt: "desc"
+                        }
+                    })];
             });
         });
     };

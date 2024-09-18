@@ -84,8 +84,7 @@ function bootstrap() {
                     //consfig version
                     app.setGlobalPrefix('api');
                     app.enableVersioning({
-                        type: common_1.VersioningType.URI,
-                        defaultVersion: ['1', '2']
+                        type: common_1.VersioningType.URI
                     });
                     return [4 /*yield*/, app.listen(process.env.PORT)];
                 case 2:
