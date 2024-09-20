@@ -7,18 +7,19 @@ import { CurrentUser, ResponseMessage } from 'decorators/customize';
 import { IUser } from 'interfaces/user.interface';
 import { ApiTags } from '@nestjs/swagger';
 import { RequirePermissions } from 'decorators/permission';
-import { PermissionGuard } from 'src/auth/permissions.guard';
+
 
 
 @ApiTags("Vouchers")
 @Controller('vouchers')
 export class VouchersController {
-  constructor(private readonly vouchersService: VouchersService) { }
+  constructor(private readonly vouchersService: VouchersService,
+    
+  ) { }
 
   @Post()
   @HttpCode(HttpStatus.CREATED)
   @RequirePermissions('CREATE_VOUCHER')
-  // @UseGuards(JwtAuthGuard, PermissionGuard)
   @UseGuards(JwtAuthGuard)
   @ResponseMessage("create new voucher successfully")
   createVoucher(

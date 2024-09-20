@@ -57,8 +57,9 @@ exports.VouchersService = void 0;
 var common_1 = require("@nestjs/common");
 var voucher_helper_1 = require("helper/voucher.helper");
 var VouchersService = /** @class */ (function () {
-    function VouchersService(prisma) {
+    function VouchersService(prisma, notificationService) {
         this.prisma = prisma;
+        this.notificationService = notificationService;
     }
     VouchersService.prototype.create = function (createVoucherDto, user) {
         return __awaiter(this, void 0, Promise, function () {
@@ -88,6 +89,9 @@ var VouchersService = /** @class */ (function () {
                             })];
                     case 1:
                         voucher = _a.sent();
+                        return [4 /*yield*/, this.notificationService.sendAndSaveNotification('New Voucher Available', "A new voucher \"" + voucher.code + "\" has been created!", 'new_vouchers')];
+                    case 2:
+                        _a.sent();
                         return [2 /*return*/, voucher];
                 }
             });

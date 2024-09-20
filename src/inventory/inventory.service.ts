@@ -46,7 +46,10 @@ export class InventoryService {
     }
 
     @Cron(CronExpression.EVERY_5_HOURS)
+    // @Cron('20 4 * * *') 
+    // @Cron(CronExpression.EVERY_MINUTE)
     async checkInventoryLevels() {
+        console.log('Checking inventory levels at 4:30 AM...');
         const inventoryItems = await this.prismaService.inventory.findMany({
             include: {
                 ingredient: true,

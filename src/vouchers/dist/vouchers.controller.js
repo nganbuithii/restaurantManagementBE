@@ -86,9 +86,7 @@ var VouchersController = /** @class */ (function () {
     __decorate([
         common_1.Post(),
         common_1.HttpCode(common_1.HttpStatus.CREATED),
-        permission_1.RequirePermissions('CREATE_VOUCHER')
-        // @UseGuards(JwtAuthGuard, PermissionGuard)
-        ,
+        permission_1.RequirePermissions('CREATE_VOUCHER'),
         common_1.UseGuards(jwt_auth_guard_1.JwtAuthGuard),
         customize_1.ResponseMessage("create new voucher successfully"),
         __param(0, common_1.Body()),

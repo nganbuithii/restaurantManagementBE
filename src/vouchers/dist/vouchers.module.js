@@ -13,15 +13,16 @@ var vouchers_controller_1 = require("./vouchers.controller");
 var prisma_service_1 = require("src/prisma.service");
 var config_1 = require("@nestjs/config");
 var jwt_1 = require("@nestjs/jwt");
+var notification_service_1 = require("src/notification/notification.service");
 var VouchersModule = /** @class */ (function () {
     function VouchersModule() {
     }
     VouchersModule = __decorate([
         common_1.Module({
-            imports: [jwt_1.JwtModule],
+            imports: [jwt_1.JwtModule,],
             controllers: [vouchers_controller_1.VouchersController],
             exports: [vouchers_service_1.VouchersService],
-            providers: [vouchers_service_1.VouchersService, prisma_service_1.PrismaService, config_1.ConfigService]
+            providers: [vouchers_service_1.VouchersService, prisma_service_1.PrismaService, config_1.ConfigService, notification_service_1.NotificationService]
         })
     ], VouchersModule);
     return VouchersModule;

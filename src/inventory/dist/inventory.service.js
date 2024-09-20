@@ -110,11 +110,13 @@ var InventoryService = /** @class */ (function () {
             var inventoryItems, lowStockItems, emailContent;
             return __generator(this, function (_a) {
                 switch (_a.label) {
-                    case 0: return [4 /*yield*/, this.prismaService.inventory.findMany({
-                            include: {
-                                ingredient: true
-                            }
-                        })];
+                    case 0:
+                        console.log('Checking inventory levels at 4:30 AM...');
+                        return [4 /*yield*/, this.prismaService.inventory.findMany({
+                                include: {
+                                    ingredient: true
+                                }
+                            })];
                     case 1:
                         inventoryItems = _a.sent();
                         lowStockItems = inventoryItems.filter(function (item) {

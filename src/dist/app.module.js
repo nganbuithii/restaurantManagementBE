@@ -74,6 +74,7 @@ var payment_module_1 = require("./payment/payment.module");
 var chat_module_1 = require("./chat/chat.module");
 var nestjs_vnpay_1 = require("nestjs-vnpay");
 var vnpay_1 = require("vnpay");
+var schedule_1 = require("@nestjs/schedule");
 var AppModule = /** @class */ (function () {
     function AppModule() {
     }
@@ -81,6 +82,7 @@ var AppModule = /** @class */ (function () {
         common_1.Module({
             imports: [
                 config_1.ConfigModule.forRoot(),
+                schedule_1.ScheduleModule.forRoot(),
                 nestjs_vnpay_1.VnpayModule.registerAsync({
                     imports: [config_1.ConfigModule],
                     useFactory: function (configService) { return __awaiter(void 0, void 0, void 0, function () {

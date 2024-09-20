@@ -4,9 +4,13 @@ import { CreateVoucherDto, UpdateVoucherDto, VoucherFilterType, VoucherPaginatio
 import { IUser } from 'interfaces/user.interface';
 import { Order, Voucher } from '@prisma/client';
 import { generateVoucherCode } from 'helper/voucher.helper';
+import { NotificationService } from 'src/notification/notification.service';
+
 @Injectable()
 export class VouchersService {
-  constructor(private prisma: PrismaService) { }
+  constructor(private prisma: PrismaService,
+    private  notificationService:NotificationService
+  ) { }
 
   async create(createVoucherDto: CreateVoucherDto, user: IUser): Promise<Voucher> {
     const {
@@ -42,7 +46,11 @@ export class VouchersService {
         createdBy: user.sub,
       },
     });
-
+    await this.notificationService.sendAndSaveNotification(
+      'New Voucher Available',
+      `A new voucher "${voucher.code}" has been created!`,
+      'new_vouchers'
+    );
     return voucher;
   }
 
