@@ -1,51 +1,9 @@
 import { Injectable } from '@nestjs/common';
-import { CreateNotificationDto } from './dto/create-notification.dto';
-import { UpdateNotificationDto, } from './dto/update-notification.dto';
-import { sendNotificationDTO } from './dto/send-notification.dto';
 import * as admin from 'firebase-admin';
-
+import { IUser } from 'interfaces/user.interface';
 
 @Injectable()
 export class NotificationService {
-
-  // async sendPush(notification: sendNotificationDTO) {
-  //   try {
-  //     await firebase
-  //       .messaging()
-  //       .send({
-  //         notification: {
-  //           title: notification.title,
-  //           body: notification.body,
-  //         },
-  //         token: notification.deviceId,
-  //         data: {},
-  //         android: {
-  //           priority: 'high',
-  //           notification: {
-  //             sound: 'default',
-  //             channelId: 'default',
-  //           },
-  //         },
-  //         apns: {
-  //           headers: {
-  //             'apns-priority': '10',
-  //           },
-  //           payload: {
-  //             aps: {
-  //               contentAvailable: true,
-  //               sound: 'default',
-  //             },
-  //           },
-  //         },
-  //       })
-  //       .catch((error: any) => {
-  //         console.error(error);
-  //       });
-  //   } catch (error) {
-  //     console.log(error);
-  //     return error;
-  //   }
-  // }
   async sendAndSaveNotification(title: string, body: string, topic: string) {
     const message = {
       notification: { title, body },
@@ -53,15 +11,14 @@ export class NotificationService {
     };
 
     try {
-      // Lưu thông báo vào Firestore
       const notificationRef = await admin.firestore().collection('notifications').add({
         title,
         body,
         topic,
         createdAt: admin.firestore.FieldValue.serverTimestamp(),
+        readBy: {}, 
       });
 
-      // Gửi thông báo qua Firebase Cloud Messaging
       const response = await admin.messaging().send(message);
       console.log('Successfully sent message:', response);
 
@@ -75,15 +32,48 @@ export class NotificationService {
     }
   }
 
-  async getNotifications() {
+  async getNotifications(user:IUser) {
     try {
-      const snapshot = await admin.firestore().collection('notifications').orderBy('createdAt', 'desc').get();
-      return snapshot.docs.map(doc => ({
-        id: doc.id,
-        ...doc.data()
-      }));
+      const snapshot = await admin.firestore().collection('notifications')
+        .orderBy('createdAt', 'desc')
+        .get();
+      
+      return snapshot.docs.map(doc => {
+        const data = doc.data();
+        return {
+          id: doc.id,
+          ...data,
+          isRead: data.readBy && data.readBy[user.sub] ? true : false
+        };
+      });
     } catch (error) {
       console.error('Error getting notifications:', error);
+      throw error;
+    }
+  }
+
+  async getUnreadNotificationsCount(user:IUser) {
+    try {
+      const snapshot = await admin.firestore().collection('notifications').get();
+      const unreadCount = snapshot.docs.filter(doc => {
+        const data = doc.data();
+        return !data.readBy || !data.readBy[user.sub];
+      }).length;
+      return unreadCount;
+    } catch (error) {
+      console.error('Error getting unread notifications count:', error);
+      throw error;
+    }
+  }
+
+  async markNotificationAsRead(notificationId: string, user:IUser) {
+    try {
+      const notificationRef = admin.firestore().collection('notifications').doc(notificationId);
+      await notificationRef.update({
+        [`readBy.${user.sub}`]: true
+      });
+    } catch (error) {
+      console.error('Error marking notification as read:', error);
       throw error;
     }
   }

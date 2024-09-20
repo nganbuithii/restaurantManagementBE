@@ -59,44 +59,6 @@ var admin = require("firebase-admin");
 var NotificationService = /** @class */ (function () {
     function NotificationService() {
     }
-    // async sendPush(notification: sendNotificationDTO) {
-    //   try {
-    //     await firebase
-    //       .messaging()
-    //       .send({
-    //         notification: {
-    //           title: notification.title,
-    //           body: notification.body,
-    //         },
-    //         token: notification.deviceId,
-    //         data: {},
-    //         android: {
-    //           priority: 'high',
-    //           notification: {
-    //             sound: 'default',
-    //             channelId: 'default',
-    //           },
-    //         },
-    //         apns: {
-    //           headers: {
-    //             'apns-priority': '10',
-    //           },
-    //           payload: {
-    //             aps: {
-    //               contentAvailable: true,
-    //               sound: 'default',
-    //             },
-    //           },
-    //         },
-    //       })
-    //       .catch((error: any) => {
-    //         console.error(error);
-    //       });
-    //   } catch (error) {
-    //     console.log(error);
-    //     return error;
-    //   }
-    // }
     NotificationService.prototype.sendAndSaveNotification = function (title, body, topic) {
         return __awaiter(this, void 0, void 0, function () {
             var message, notificationRef, response, error_1;
@@ -114,7 +76,8 @@ var NotificationService = /** @class */ (function () {
                                 title: title,
                                 body: body,
                                 topic: topic,
-                                createdAt: admin.firestore.FieldValue.serverTimestamp()
+                                createdAt: admin.firestore.FieldValue.serverTimestamp(),
+                                readBy: {}
                             })];
                     case 2:
                         notificationRef = _a.sent();
@@ -135,21 +98,74 @@ var NotificationService = /** @class */ (function () {
             });
         });
     };
-    NotificationService.prototype.getNotifications = function () {
+    NotificationService.prototype.getNotifications = function (user) {
         return __awaiter(this, void 0, void 0, function () {
             var snapshot, error_2;
             return __generator(this, function (_a) {
                 switch (_a.label) {
                     case 0:
                         _a.trys.push([0, 2, , 3]);
-                        return [4 /*yield*/, admin.firestore().collection('notifications').orderBy('createdAt', 'desc').get()];
+                        return [4 /*yield*/, admin.firestore().collection('notifications')
+                                .orderBy('createdAt', 'desc')
+                                .get()];
                     case 1:
                         snapshot = _a.sent();
-                        return [2 /*return*/, snapshot.docs.map(function (doc) { return (__assign({ id: doc.id }, doc.data())); })];
+                        return [2 /*return*/, snapshot.docs.map(function (doc) {
+                                var data = doc.data();
+                                return __assign(__assign({ id: doc.id }, data), { isRead: data.readBy && data.readBy[user.sub] ? true : false });
+                            })];
                     case 2:
                         error_2 = _a.sent();
                         console.error('Error getting notifications:', error_2);
                         throw error_2;
+                    case 3: return [2 /*return*/];
+                }
+            });
+        });
+    };
+    NotificationService.prototype.getUnreadNotificationsCount = function (user) {
+        return __awaiter(this, void 0, void 0, function () {
+            var snapshot, unreadCount, error_3;
+            return __generator(this, function (_a) {
+                switch (_a.label) {
+                    case 0:
+                        _a.trys.push([0, 2, , 3]);
+                        return [4 /*yield*/, admin.firestore().collection('notifications').get()];
+                    case 1:
+                        snapshot = _a.sent();
+                        unreadCount = snapshot.docs.filter(function (doc) {
+                            var data = doc.data();
+                            return !data.readBy || !data.readBy[user.sub];
+                        }).length;
+                        return [2 /*return*/, unreadCount];
+                    case 2:
+                        error_3 = _a.sent();
+                        console.error('Error getting unread notifications count:', error_3);
+                        throw error_3;
+                    case 3: return [2 /*return*/];
+                }
+            });
+        });
+    };
+    NotificationService.prototype.markNotificationAsRead = function (notificationId, user) {
+        return __awaiter(this, void 0, void 0, function () {
+            var notificationRef, error_4;
+            var _a;
+            return __generator(this, function (_b) {
+                switch (_b.label) {
+                    case 0:
+                        _b.trys.push([0, 2, , 3]);
+                        notificationRef = admin.firestore().collection('notifications').doc(notificationId);
+                        return [4 /*yield*/, notificationRef.update((_a = {},
+                                _a["readBy." + user.sub] = true,
+                                _a))];
+                    case 1:
+                        _b.sent();
+                        return [3 /*break*/, 3];
+                    case 2:
+                        error_4 = _b.sent();
+                        console.error('Error marking notification as read:', error_4);
+                        throw error_4;
                     case 3: return [2 /*return*/];
                 }
             });
