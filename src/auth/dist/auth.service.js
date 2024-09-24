@@ -68,13 +68,14 @@ exports.AuthService = void 0;
 var common_1 = require("@nestjs/common");
 var bcrypt = require("bcrypt");
 var AuthService = /** @class */ (function () {
-    function AuthService(prismaService, jwtService, userService, otpService, emailService) {
+    function AuthService(prismaService, jwtService, userService, otpService, emailService, googleClient) {
         var _this = this;
         this.prismaService = prismaService;
         this.jwtService = jwtService;
         this.userService = userService;
         this.otpService = otpService;
         this.emailService = emailService;
+        this.googleClient = googleClient;
         this.register = function (userData) { return __awaiter(_this, void 0, Promise, function () {
             var _this = this;
             return __generator(this, function (_a) {
@@ -289,6 +290,65 @@ var AuthService = /** @class */ (function () {
                         // Xóa OTP sau khi sử dụng
                         this.otpService.clearOTP(email);
                         return [2 /*return*/, { message: 'Password reset successfully' }];
+                }
+            });
+        });
+    };
+    AuthService.prototype.googleLogin = function (credential) {
+        return __awaiter(this, void 0, void 0, function () {
+            var ticket, payload, email, user, randomPassword, hashedPassword, token, error_1;
+            return __generator(this, function (_a) {
+                switch (_a.label) {
+                    case 0:
+                        _a.trys.push([0, 6, , 7]);
+                        return [4 /*yield*/, this.googleClient.verifyIdToken({
+                                idToken: credential,
+                                audience: process.env.GOOGLE_CLIENT_ID
+                            })];
+                    case 1:
+                        ticket = _a.sent();
+                        payload = ticket.getPayload();
+                        email = payload.email;
+                        return [4 /*yield*/, this.prismaService.user.findUnique({ where: { email: email } })];
+                    case 2:
+                        user = _a.sent();
+                        if (!!user) return [3 /*break*/, 5];
+                        randomPassword = Math.random().toString(36).slice(-8);
+                        return [4 /*yield*/, bcrypt.hash(randomPassword, 10)];
+                    case 3:
+                        hashedPassword = _a.sent();
+                        return [4 /*yield*/, this.prismaService.user.create({
+                                data: {
+                                    email: email,
+                                    fullName: payload.name,
+                                    username: email,
+                                    password: hashedPassword,
+                                    avatar: payload.picture || '',
+                                    role: {
+                                        connect: { name: 'CUSTOMER' }
+                                    }
+                                }
+                            })];
+                    case 4:
+                        // Tạo người dùng mới nếu chưa tồn tại
+                        user = _a.sent();
+                        _a.label = 5;
+                    case 5:
+                        token = this.jwtService.sign({
+                            sub: user.id,
+                            email: user.email,
+                            fullName: user.fullName
+                        }, {
+                            secret: process.env.JWT_SECRET,
+                            expiresIn: '30h'
+                        });
+                        console.log("user login gg", user);
+                        console.log("tokennn", token);
+                        return [2 /*return*/, { user: user, accessToken: token }];
+                    case 6:
+                        error_1 = _a.sent();
+                        throw new Error('Failed to authenticate with Google');
+                    case 7: return [2 /*return*/];
                 }
             });
         });

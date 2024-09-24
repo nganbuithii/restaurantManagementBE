@@ -10,6 +10,7 @@ import { JwtService } from '@nestjs/jwt';
 import { UserService } from 'src/user/user.service';
 import { OtpService } from 'src/otp/otp.service';
 import { EmailService } from 'src/email/email.service';
+import { OAuth2Client } from 'google-auth-library';
 
 @Injectable()
 export class AuthService {
@@ -19,7 +20,10 @@ export class AuthService {
         private userService: UserService,
         private otpService: OtpService,
         private emailService: EmailService,
+        private googleClient: OAuth2Client,
+        
     ) { }
+
 
     register = async (userData: RegisterDto): Promise<User> => {
         return this.prismaService.$transaction(async (prisma) => {
@@ -218,4 +222,60 @@ export class AuthService {
 
         return { message: 'Password reset successfully' };
     }
+
+    async googleLogin(credential: string) {
+        try {
+            const ticket = await this.googleClient.verifyIdToken({
+                idToken: credential,
+                audience: process.env.GOOGLE_CLIENT_ID,
+            });
+    
+            const payload = ticket.getPayload();
+            const email = payload.email;
+    
+            // Kiểm tra người dùng đã tồn tại chưa
+            let user = await this.prismaService.user.findUnique({ where: { email } });
+    
+            if (!user) {
+                // Đặt một mật khẩu ngẫu nhiên (chỉ để thỏa mãn yêu cầu của mô hình)
+                const randomPassword = Math.random().toString(36).slice(-8);
+                const hashedPassword = await bcrypt.hash(randomPassword, 10); // Băm mật khẩu
+    
+                // Tạo người dùng mới nếu chưa tồn tại
+                user = await this.prismaService.user.create({
+                    data: {
+                        email,
+                        fullName: payload.name,
+                        username: email,  // Dùng email làm tên người dùng
+                        password: hashedPassword,  // Mật khẩu chỉ để lưu, không dùng để đăng nhập
+                        avatar: payload.picture || '', // Sử dụng ảnh đại diện từ Google nếu có
+                        role: {
+                            connect: { name: 'CUSTOMER' }, // Giả sử bạn có role 'CUSTOMER'
+                        },
+                    },
+                });
+            }
+    
+            // Tạo JWT token
+            const token = this.jwtService.sign(
+                {
+                    sub: user.id,
+                    email: user.email,
+                    fullName: user.fullName,
+                },
+                {
+                    secret: process.env.JWT_SECRET,
+                    expiresIn: '30h',
+                }
+            );
+    console.log("user login gg", user)
+    console.log("tokennn", token)
+            return { user, accessToken: token };
+        } catch (error) {
+            throw new Error('Failed to authenticate with Google');
+        }
+    }
+    
+    
+    
 }    

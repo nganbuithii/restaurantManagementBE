@@ -2,6 +2,8 @@ import { BadRequestException, Injectable, NotFoundException } from '@nestjs/comm
 import { PrismaService } from 'src/prisma.service';
 import { CreateTableDto, TableFilterType, TablePaginationResponseType } from './dto/table.dto';
 import { IUser } from 'interfaces/user.interface';
+import { Table } from '@prisma/client';
+
 
 @Injectable()
 export class TableService {
@@ -68,8 +70,38 @@ export class TableService {
             where: { id },
             data: {
                 isActive: false,
-                deletedBy: user.sub, 
+                deletedBy: user.sub,
             },
         });
     }
-}
+
+    async getAvailableTables(date: string, time: string): Promise<Table[]> {
+        const requestedDateTime = new Date(`${date}T${time}:00Z`);
+    
+        const allTables = await this.prisma.table.findMany({
+            where: { isActive: true },
+        });
+    
+        const bookedTables = await this.prisma.reservation.findMany({
+            where: {
+                date: new Date(date), // Giả định date là dạng "YYYY-MM-DD"
+                time: time, // Thời gian theo định dạng "HH:mm"
+                status: { in: ['PENDING', 'CONFIRMED'] },
+            },
+            select: { tableId: true },
+        });
+        
+
+    
+        const bookedTableIds = bookedTables.map((reservation) => reservation.tableId);
+        console.log("Booked Table IDs:", bookedTableIds);
+        const availableTables = allTables.filter(
+            (table) => !bookedTableIds.includes(table.id),
+        );
+    
+        return availableTables;
+    }
+    
+    
+
+} 

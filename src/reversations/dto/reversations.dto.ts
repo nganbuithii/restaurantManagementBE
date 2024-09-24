@@ -30,6 +30,7 @@ export class CreateReservationDto {
 
     @IsInt()
     @ApiProperty()
+    @IsOptional()
     @IsNotEmpty({ message: 'Table ID cannot be empty' })
     tableId: number;
 

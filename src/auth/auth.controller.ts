@@ -38,5 +38,15 @@ export class AuthController {
   async resetPassword(@Body() body: { email: string; otp: string; newPassword: string }) {
     return this.authService.resetPassword(body.email, body.otp, body.newPassword);
   }
+  @Post('google')
+  // @UseGuards(AuthGuard('google'))
+  async googleLogin(@Body() body: { credential: string }) {
+    return this.authService.googleLogin(body.credential);
+  }
 
+  @Get('google/callback')
+  @UseGuards(AuthGuard('google'))
+  googleAuthRedirect(@Req() req) {
+    return req.user;
+  }
 }

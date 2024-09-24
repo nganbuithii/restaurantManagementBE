@@ -62,24 +62,24 @@ var ReversationsService = /** @class */ (function () {
     }
     ReversationsService.prototype.create = function (createReservationDto, user) {
         return __awaiter(this, void 0, void 0, function () {
-            var tableId, time, date, status, reservationDate, reservationDateTime, existingReservations, _i, existingReservations_1, reservation, existingDateTime, newReservation;
+            var tableId, time, date, status, reservationDateTime, existingReservations, _i, existingReservations_1, reservation, existingDateTime, newReservation;
             return __generator(this, function (_a) {
                 switch (_a.label) {
                     case 0:
                         tableId = createReservationDto.tableId, time = createReservationDto.time, date = createReservationDto.date, status = createReservationDto.status;
-                        reservationDate = new Date(date);
-                        reservationDateTime = new Date(reservationDate.toISOString().split('T')[0] + "T" + time + ":00");
-                        console.log('ISO Date:', reservationDate.toISOString().split('T')[0]);
+                        reservationDateTime = new Date(new Date(date).toISOString().split('T')[0] + "T" + time + ":00");
                         console.log('Reservation DateTime:', reservationDateTime.toISOString());
                         return [4 /*yield*/, this.prisma.reservation.findMany({
                                 where: {
-                                    tableId: tableId,
+                                    table: {
+                                        id: tableId
+                                    },
                                     date: {
-                                        gte: new Date(reservationDate.toISOString().split('T')[0] + "T00:00:00Z"),
-                                        lt: new Date(reservationDate.toISOString().split('T')[0] + "T23:59:59Z")
+                                        gte: new Date(reservationDateTime.toISOString().split('T')[0] + "T00:00:00Z"),
+                                        lt: new Date(reservationDateTime.toISOString().split('T')[0] + "T23:59:59Z")
                                     },
                                     status: {
-                                        not: "CANCELLED"
+                                        not: 'CANCELLED'
                                     }
                                 },
                                 select: {
@@ -90,23 +90,24 @@ var ReversationsService = /** @class */ (function () {
                     case 1:
                         existingReservations = _a.sent();
                         console.log('Existing Reservations:', existingReservations);
-                        // Kiểm tra các lịch hẹn hiện tại
                         for (_i = 0, existingReservations_1 = existingReservations; _i < existingReservations_1.length; _i++) {
                             reservation = existingReservations_1[_i];
                             existingDateTime = new Date(reservation.date.toISOString().split('T')[0] + "T" + reservation.time + ":00");
                             console.log('Comparing with Existing Reservation DateTime:', existingDateTime.toISOString());
                             if (reservationDateTime.getTime() === existingDateTime.getTime()) {
-                                console.error('Table is already reserved for the selected time');
                                 throw new common_1.BadRequestException('Table is already reserved for the selected time');
                             }
                         }
                         return [4 /*yield*/, this.prisma.reservation.create({
                                 data: {
                                     time: time,
-                                    date: new Date(date).toISOString(),
+                                    date: reservationDateTime,
                                     status: status || 'PENDING',
                                     user: {
                                         connect: { id: user.sub }
+                                    },
+                                    table: {
+                                        connect: { id: tableId }
                                     }
                                 }
                             })];
@@ -186,7 +187,16 @@ var ReversationsService = /** @class */ (function () {
                     case 0: return [4 /*yield*/, this.prisma.reservation.findUnique({
                             where: { id: id },
                             include: {
-                                user: true
+                                user: true,
+                                order: {
+                                    include: {
+                                        details: {
+                                            include: {
+                                                menuItem: true
+                                            }
+                                        }
+                                    }
+                                }
                             }
                         })];
                     case 1:
@@ -208,7 +218,20 @@ var ReversationsService = /** @class */ (function () {
                                 phone: reservation.user.phone,
                                 username: reservation.user.username,
                                 avatar: reservation.user.avatar
-                            }
+                            },
+                            order: reservation.order ? {
+                                id: reservation.order.id,
+                                totalPrice: reservation.order.totalPrice,
+                                discountPrice: reservation.order.discountPrice,
+                                details: reservation.order.details.map(function (detail) { return ({
+                                    id: detail.id,
+                                    quantity: detail.quantity,
+                                    menuItem: {
+                                        name: detail.menuItem.name,
+                                        price: detail.menuItem.price
+                                    }
+                                }); })
+                            } : null
                         };
                         return [2 /*return*/, { data: data }];
                 }

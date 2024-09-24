@@ -1,4 +1,17 @@
 "use strict";
+var __extends = (this && this.__extends) || (function () {
+    var extendStatics = function (d, b) {
+        extendStatics = Object.setPrototypeOf ||
+            ({ __proto__: [] } instanceof Array && function (d, b) { d.__proto__ = b; }) ||
+            function (d, b) { for (var p in b) if (b.hasOwnProperty(p)) d[p] = b[p]; };
+        return extendStatics(d, b);
+    };
+    return function (d, b) {
+        extendStatics(d, b);
+        function __() { this.constructor = d; }
+        d.prototype = b === null ? Object.create(b) : (__.prototype = b.prototype, new __());
+    };
+})();
 var __decorate = (this && this.__decorate) || function (decorators, target, key, desc) {
     var c = arguments.length, r = c < 3 ? target : desc === null ? desc = Object.getOwnPropertyDescriptor(target, key) : desc, d;
     if (typeof Reflect === "object" && typeof Reflect.decorate === "function") r = Reflect.decorate(decorators, target, key, desc);
@@ -42,58 +55,42 @@ var __generator = (this && this.__generator) || function (thisArg, body) {
     }
 };
 exports.__esModule = true;
-exports.AuthModule = void 0;
-var common_1 = require("@nestjs/common");
-var auth_controller_1 = require("./auth.controller");
-var auth_service_1 = require("./auth.service");
-var prisma_service_1 = require("src/prisma.service");
-var jwt_1 = require("@nestjs/jwt");
-var config_1 = require("@nestjs/config");
-var user_service_1 = require("src/user/user.service");
+exports.GoogleStrategy = void 0;
 var passport_1 = require("@nestjs/passport");
-var local_strategy_1 = require("./passport/local.strategy");
-var user_module_1 = require("src/user/user.module");
-var jwt_strategy_1 = require("./jwt.strategy");
-var cloudinary_module_1 = require("src/cloudinary/cloudinary.module");
-var otp_service_1 = require("src/otp/otp.service");
-var email_service_1 = require("src/email/email.service");
-var google_auth_library_1 = require("google-auth-library");
-var google_strategy_1 = require("./passport/google.strategy");
-var AuthModule = /** @class */ (function () {
-    function AuthModule() {
+var passport_google_oauth20_1 = require("passport-google-oauth20");
+var dotenv_1 = require("dotenv");
+var common_1 = require("@nestjs/common");
+dotenv_1.config();
+var GoogleStrategy = /** @class */ (function (_super) {
+    __extends(GoogleStrategy, _super);
+    function GoogleStrategy() {
+        return _super.call(this, {
+            clientID: process.env.GOOGLE_CLIENT_ID,
+            clientSecret: process.env.GOOGLE_SECRET,
+            callbackURL: 'http://localhost:3000/google/callback',
+            scope: ['email', 'profile']
+        }) || this;
     }
-    AuthModule = __decorate([
-        common_1.Module({
-            imports: [
-                passport_1.PassportModule.register({ defaultStrategy: 'google' }),
-                user_module_1.UserModule, passport_1.PassportModule, cloudinary_module_1.CloudinaryModule,
-                // khai báo jwwt và sự dụng biến trong .env
-                jwt_1.JwtModule.registerAsync({
-                    imports: [config_1.ConfigModule],
-                    useFactory: function (configService) { return __awaiter(void 0, void 0, void 0, function () {
-                        return __generator(this, function (_a) {
-                            return [2 /*return*/, ({
-                                    secret: configService.get('JWT_SECRET'),
-                                    signOptions: {
-                                        expiresIn: configService.get('JWT_EXPIRE')
-                                    }
-                                })];
-                        });
-                    }); },
-                    inject: [config_1.ConfigService]
-                }),
-            ],
-            controllers: [auth_controller_1.AuthController],
-            providers: [google_strategy_1.GoogleStrategy, auth_service_1.AuthService, prisma_service_1.PrismaService, jwt_1.JwtService, jwt_strategy_1.JwtStrategy, config_1.ConfigService, user_service_1.UserService, otp_service_1.OtpService, email_service_1.EmailService, local_strategy_1.LocalStrategy,
-                local_strategy_1.LocalStrategy, {
-                    provide: google_auth_library_1.OAuth2Client,
-                    useFactory: function () {
-                        return new google_auth_library_1.OAuth2Client(process.env.GOOGLE_CLIENT_ID);
-                    }
-                },
-            ]
-        })
-    ], AuthModule);
-    return AuthModule;
-}());
-exports.AuthModule = AuthModule;
+    GoogleStrategy.prototype.validate = function (accessToken, refreshToken, profile, done) {
+        return __awaiter(this, void 0, Promise, function () {
+            var name, emails, photos, user;
+            return __generator(this, function (_a) {
+                name = profile.name, emails = profile.emails, photos = profile.photos;
+                user = {
+                    email: emails[0].value,
+                    firstName: name.givenName,
+                    lastName: name.familyName,
+                    picture: photos[0].value,
+                    accessToken: accessToken
+                };
+                done(null, user);
+                return [2 /*return*/];
+            });
+        });
+    };
+    GoogleStrategy = __decorate([
+        common_1.Injectable()
+    ], GoogleStrategy);
+    return GoogleStrategy;
+}(passport_1.PassportStrategy(passport_google_oauth20_1.Strategy, 'google')));
+exports.GoogleStrategy = GoogleStrategy;

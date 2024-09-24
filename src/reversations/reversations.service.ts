@@ -1,8 +1,8 @@
-import { BadRequestException, Injectable, NotFoundException } from '@nestjs/common';
+import { BadRequestException, HttpException, Injectable, NotFoundException } from '@nestjs/common';
 import { CreateReservationDto, ReservationFilterType, ReservationPaginationResponseType, ReservationStatus, UpdateReservationDto } from './dto/reversations.dto';
 import { PrismaService } from 'src/prisma.service';
 import { IUser } from 'interfaces/user.interface';
-import { Reservation } from '@prisma/client';
+import { Prisma, Reservation } from '@prisma/client';
 import { EmailService } from 'src/email/email.service';
 
 @Injectable()
@@ -13,23 +13,21 @@ export class ReversationsService {
 
     async create(createReservationDto: CreateReservationDto, user: IUser) {
         const { tableId, time, date, status } = createReservationDto;
-
-        const reservationDate = new Date(date);
-        const reservationDateTime = new Date(`${reservationDate.toISOString().split('T')[0]}T${time}:00`);
-
-        console.log('ISO Date:', reservationDate.toISOString().split('T')[0]);
+    
+        const reservationDateTime = new Date(`${new Date(date).toISOString().split('T')[0]}T${time}:00`);
         console.log('Reservation DateTime:', reservationDateTime.toISOString());
-
-        // Kiểm tra xem có đặt chồng lên nhau không
+    
         const existingReservations = await this.prisma.reservation.findMany({
             where: {
-                tableId: tableId,
+                table: {
+                    id: tableId, // Sử dụng kết nối tới bảng Table
+                },
                 date: {
-                    gte: new Date(`${reservationDate.toISOString().split('T')[0]}T00:00:00Z`), // Ngày bắt đầu
-                    lt: new Date(`${reservationDate.toISOString().split('T')[0]}T23:59:59Z`), // Ngày kết thúc
+                    gte: new Date(`${reservationDateTime.toISOString().split('T')[0]}T00:00:00Z`),
+                    lt: new Date(`${reservationDateTime.toISOString().split('T')[0]}T23:59:59Z`),
                 },
                 status: {
-                    not: "CANCELLED",
+                    not: 'CANCELLED',
                 },
             },
             select: {
@@ -37,41 +35,41 @@ export class ReversationsService {
                 date: true,
             },
         });
-
+    
         console.log('Existing Reservations:', existingReservations);
-
-        // Kiểm tra các lịch hẹn hiện tại
+    
         for (const reservation of existingReservations) {
             const existingDateTime = new Date(`${reservation.date.toISOString().split('T')[0]}T${reservation.time}:00`);
             console.log('Comparing with Existing Reservation DateTime:', existingDateTime.toISOString());
             if (reservationDateTime.getTime() === existingDateTime.getTime()) {
-                console.error('Table is already reserved for the selected time');
                 throw new BadRequestException('Table is already reserved for the selected time');
             }
         }
-
+    
         const newReservation = await this.prisma.reservation.create({
             data: {
                 time: time,
-                date: new Date(date).toISOString(),
+                date: reservationDateTime,
                 status: status || 'PENDING',
                 user: {
                     connect: { id: user.sub },
                 },
-
-            },
+                table: {
+                    connect: { id: tableId },
+                },
+            } as Prisma.ReservationCreateInput,
         });
-
-
+    
         console.log('New Reservation Created:', newReservation);
         await this.emailService.sendReservationConfirmation(user.email, {
             date: newReservation.date,
             time: newReservation.time,
             status: newReservation.status,
         });
-
+    
         return newReservation;
     }
+    
 
 
 
@@ -126,6 +124,15 @@ export class ReversationsService {
             where: { id },
             include: {
                 user: true,
+                order: {
+                    include: {
+                        details: {
+                            include: {
+                                menuItem: true,  // Bao gồm thông tin về từng món ăn trong đơn hàng
+                            }
+                        }
+                    }
+                }
             },
         });
 
@@ -148,10 +155,25 @@ export class ReversationsService {
                 username: reservation.user.username,
                 avatar: reservation.user.avatar,
             },
+            order: reservation.order ? {
+                id: reservation.order.id,
+                totalPrice: reservation.order.totalPrice,
+                discountPrice: reservation.order.discountPrice,
+                details: reservation.order.details.map(detail => ({
+                    id: detail.id,
+                    quantity: detail.quantity,
+                    menuItem: {
+                        name: detail.menuItem.name,
+                        price: detail.menuItem.price,
+                    }
+                })),
+            } : null
         };
 
         return { data };
     }
+
+
 
     async update(id: number, data: UpdateReservationDto, user: IUser): Promise<Reservation> {
         const reservation = await this.prisma.reservation.findUnique({

@@ -47,6 +47,7 @@ var __generator = (this && this.__generator) || function (thisArg, body) {
 exports.__esModule = true;
 exports.AuthController = void 0;
 var common_1 = require("@nestjs/common");
+var passport_1 = require("@nestjs/passport");
 var swagger_1 = require("@nestjs/swagger");
 var AuthController = /** @class */ (function () {
     function AuthController(authService, userService) {
@@ -83,6 +84,16 @@ var AuthController = /** @class */ (function () {
             });
         });
     };
+    AuthController.prototype.googleLogin = function (body) {
+        return __awaiter(this, void 0, void 0, function () {
+            return __generator(this, function (_a) {
+                return [2 /*return*/, this.authService.googleLogin(body.credential)];
+            });
+        });
+    };
+    AuthController.prototype.googleAuthRedirect = function (req) {
+        return req.user;
+    };
     __decorate([
         common_1.Post('register'),
         __param(0, common_1.Body())
@@ -99,6 +110,15 @@ var AuthController = /** @class */ (function () {
         common_1.Post('reset-password'),
         __param(0, common_1.Body())
     ], AuthController.prototype, "resetPassword");
+    __decorate([
+        common_1.Post('google'),
+        __param(0, common_1.Body())
+    ], AuthController.prototype, "googleLogin");
+    __decorate([
+        common_1.Get('google/callback'),
+        common_1.UseGuards(passport_1.AuthGuard('google')),
+        __param(0, common_1.Req())
+    ], AuthController.prototype, "googleAuthRedirect");
     AuthController = __decorate([
         swagger_1.ApiTags("Auth"),
         common_1.Controller('auth')

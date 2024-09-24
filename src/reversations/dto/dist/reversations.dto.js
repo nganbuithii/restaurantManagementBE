@@ -41,6 +41,7 @@ var CreateReservationDto = /** @class */ (function () {
     __decorate([
         class_validator_1.IsInt(),
         swagger_1.ApiProperty(),
+        class_validator_1.IsOptional(),
         class_validator_1.IsNotEmpty({ message: 'Table ID cannot be empty' })
     ], CreateReservationDto.prototype, "tableId");
     __decorate([

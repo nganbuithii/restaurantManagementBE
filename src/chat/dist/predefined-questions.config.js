@@ -3,27 +3,27 @@ exports.__esModule = true;
 exports.predefinedQuestions = void 0;
 exports.predefinedQuestions = [
     {
-        keywords: ['mở', 'cửa', 'giờ', 'giờ mở cửa', 'thời gian ', 'khi nào mở cửa'],
-        answer: 'Nhà hàng chúng tôi mở cửa từ 10:00 sáng đến 22:00 tối hàng ngày.'
+        keywords: ['open', 'hours', 'opening hours', 'when open', 'time'],
+        answer: 'Our restaurant is open daily from 10:00 AM to 10:00 PM.'
     },
     {
-        keywords: ['món ăn', 'thực đơn', 'menu'],
-        answer: 'Nhà hàng chúng tôi phục vụ các món ăn truyền thống Việt Nam như phở, bún chả, và gỏi cuốn. Bạn có thể xem menu đầy đủ trên trang web của chúng tôi.'
+        keywords: ['menu', 'food', 'dishes'],
+        answer: 'Our restaurant serves traditional Vietnamese dishes like pho, bun cha, and spring rolls. You can view the full menu on our website.'
     },
     {
-        keywords: ['đặt bàn', 'reservation'],
-        answer: 'Để đặt bàn, bạn có thể gọi số 0123456789 hoặc đặt trực tuyến trên trang web của chúng tôi.'
+        keywords: ['reservation', 'book a table'],
+        answer: 'To make a reservation, you can call 0123456789 or book online through our website.'
     },
     {
-        keywords: ['giá', 'chi phí', 'bảng giá', 'price'],
-        answer: 'Giá các món ăn trong nhà hàng của chúng tôi dao động từ 50.000 VNĐ đến 200.000 VNĐ. Bạn có thể xem bảng giá chi tiết trên trang web của chúng tôi.'
+        keywords: ['price', 'cost', 'pricing'],
+        answer: 'The prices of our dishes range from 50,000 VND to 200,000 VND. You can view the detailed price list on our website.'
     },
     {
-        keywords: ['khuyến mãi', 'giảm giá', 'ưu đãi', 'voucher'],
-        answer: 'Chúng tôi thường xuyên có các chương trình khuyến mãi và ưu đãi đặc biệt. Vui lòng theo dõi trang web hoặc fanpage của chúng tôi để cập nhật thông tin mới nhất.'
+        keywords: ['promotion', 'discount', 'voucher', 'offers'],
+        answer: 'We regularly have special promotions and offers. Please check our website or fanpage for the latest updates.'
     },
     {
-        keywords: ['địa chỉ', 'điện thoại', 'liên hệ', 'phone'],
-        answer: 'Nhà hàng chúng tôi tọa lạc tại số 123 Đường ABC, Quận XYZ, Thành phố Hồ Chí Minh. Bạn có thể gọi điện thoại đến số 0123456789 để biết thêm thông tin.'
+        keywords: ['address', 'phone', 'contact'],
+        answer: 'Our restaurant is located at 123 ABC Street, XYZ District, Ho Chi Minh City. You can call 0123456789 for more information.'
     },
 ];

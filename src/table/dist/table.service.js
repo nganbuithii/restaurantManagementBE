@@ -140,6 +140,36 @@ var TableService = /** @class */ (function () {
             });
         });
     };
+    TableService.prototype.getAvailableTables = function (date, time) {
+        return __awaiter(this, void 0, Promise, function () {
+            var requestedDateTime, allTables, bookedTables, bookedTableIds, availableTables;
+            return __generator(this, function (_a) {
+                switch (_a.label) {
+                    case 0:
+                        requestedDateTime = new Date(date + "T" + time + ":00Z");
+                        return [4 /*yield*/, this.prisma.table.findMany({
+                                where: { isActive: true }
+                            })];
+                    case 1:
+                        allTables = _a.sent();
+                        return [4 /*yield*/, this.prisma.reservation.findMany({
+                                where: {
+                                    date: new Date(date),
+                                    time: time,
+                                    status: { "in": ['PENDING', 'CONFIRMED'] }
+                                },
+                                select: { tableId: true }
+                            })];
+                    case 2:
+                        bookedTables = _a.sent();
+                        bookedTableIds = bookedTables.map(function (reservation) { return reservation.tableId; });
+                        console.log("Booked Table IDs:", bookedTableIds);
+                        availableTables = allTables.filter(function (table) { return !bookedTableIds.includes(table.id); });
+                        return [2 /*return*/, availableTables];
+                }
+            });
+        });
+    };
     TableService = __decorate([
         common_1.Injectable()
     ], TableService);

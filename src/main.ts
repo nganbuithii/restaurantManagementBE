@@ -10,7 +10,7 @@ async function bootstrap() {
   const app = await NestFactory.create(AppModule);
     // Cấu hình CORS
     app.enableCors({
-      origin: 'http://localhost:3000', //  địa chỉ frontend 
+      origin: ['http://localhost:3000', 'https://accounts.google.com'],
       methods: 'GET,HEAD,PUT,PATCH,POST,DELETE',
       allowedHeaders: 'Content-Type, Authorization',
     });

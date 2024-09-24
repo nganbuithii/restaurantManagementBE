@@ -5,6 +5,7 @@ import { CreateTableDto, TableFilterType, TablePaginationResponseType } from './
 import { JwtAuthGuard } from 'src/auth/jwt-auth.guard';
 import { IUser } from 'interfaces/user.interface';
 import { ApiTags } from '@nestjs/swagger';
+import { Table } from '@prisma/client';
 
 @ApiTags("Table")
 @Controller('table')
@@ -38,4 +39,15 @@ export class TableController {
         return this.tableService.delete(id, user);
     }
 
+
+    @Post('available')
+async getAvailableTables(
+  @Body('date') date: string,
+  @Body('time') time: string
+): Promise<Table[]> {
+  // Gọi service để kiểm tra các bàn trống
+  return this.tableService.getAvailableTables(date, time);
+}
+
+    
 }

@@ -12,9 +12,12 @@ import { JwtStrategy } from './jwt.strategy';
 import { CloudinaryModule } from 'src/cloudinary/cloudinary.module';
 import { OtpService } from 'src/otp/otp.service';
 import { EmailService } from 'src/email/email.service';
-
+import { OAuth2Client } from 'google-auth-library';
+import { GoogleStrategy } from './passport/google.strategy';
 @Module({
-  imports: [UserModule, PassportModule,CloudinaryModule,
+  imports: [
+    PassportModule.register({ defaultStrategy: 'google' }),
+    UserModule, PassportModule,CloudinaryModule,
     // khai báo jwwt và sự dụng biến trong .env
     JwtModule.registerAsync({
       imports: [ConfigModule],
@@ -28,6 +31,14 @@ import { EmailService } from 'src/email/email.service';
     }),
   ],
   controllers: [AuthController],
-  providers: [AuthService, PrismaService, JwtService  , JwtStrategy, ConfigService, UserService,  OtpService, EmailService,LocalStrategy]
+  providers: [GoogleStrategy,AuthService, PrismaService, JwtService  , JwtStrategy, ConfigService, UserService,  OtpService, EmailService,LocalStrategy,
+    LocalStrategy,
+    {
+      provide: OAuth2Client,
+      useFactory: () => {
+        return new OAuth2Client(process.env.GOOGLE_CLIENT_ID);
+      },
+    },
+  ]
 })
 export class AuthModule {}
