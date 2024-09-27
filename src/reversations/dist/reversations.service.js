@@ -188,6 +188,7 @@ var ReversationsService = /** @class */ (function () {
                             where: { id: id },
                             include: {
                                 user: true,
+                                table: true,
                                 order: {
                                     include: {
                                         details: {
@@ -212,6 +213,10 @@ var ReversationsService = /** @class */ (function () {
                             createdAt: reservation.createdAt,
                             updatedAt: reservation.updatedAt,
                             userId: reservation.userId,
+                            table: reservation.table ? {
+                                id: reservation.table.id,
+                                number: reservation.table.number
+                            } : null,
                             user: {
                                 id: reservation.user.id,
                                 fullName: reservation.user.fullName,
@@ -240,11 +245,12 @@ var ReversationsService = /** @class */ (function () {
     };
     ReversationsService.prototype.update = function (id, data, user) {
         return __awaiter(this, void 0, Promise, function () {
-            var reservation, updatedReservation;
+            var reservation, updateData, updatedReservation;
             return __generator(this, function (_a) {
                 switch (_a.label) {
                     case 0: return [4 /*yield*/, this.prisma.reservation.findUnique({
-                            where: { id: id }
+                            where: { id: id },
+                            include: { menuItems: true }
                         })];
                     case 1:
                         reservation = _a.sent();
@@ -252,9 +258,24 @@ var ReversationsService = /** @class */ (function () {
                             throw new common_1.NotFoundException('Reservation not found');
                         }
                         console.log("Data sent for updating reservation:", data);
+                        updateData = __assign(__assign({}, data), { updatedAt: new Date() });
+                        // If menuItemIds is provided, update the menu items
+                        if (data.menuItemIds) {
+                            updateData.menuItems = {
+                                set: data.menuItemIds.map(function (menuItemId) { return ({ id: menuItemId }); })
+                            };
+                            // Remove menuItemIds from updateData as it's not a direct field of Reservation
+                            delete updateData.menuItemIds;
+                        }
                         return [4 /*yield*/, this.prisma.reservation.update({
                                 where: { id: id },
-                                data: __assign(__assign({}, data), { updatedAt: new Date() })
+                                data: updateData,
+                                include: {
+                                    menuItems: true,
+                                    user: true,
+                                    table: true,
+                                    order: true
+                                }
                             })];
                     case 2:
                         updatedReservation = _a.sent();

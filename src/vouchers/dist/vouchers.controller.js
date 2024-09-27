@@ -83,6 +83,20 @@ var VouchersController = /** @class */ (function () {
             });
         });
     };
+    VouchersController.prototype.saveVoucher = function (voucherId, user) {
+        return __awaiter(this, void 0, void 0, function () {
+            return __generator(this, function (_a) {
+                return [2 /*return*/, this.vouchersService.saveVoucherForCustomer(voucherId, user)];
+            });
+        });
+    };
+    VouchersController.prototype.getSavedVouchers = function (user) {
+        return __awaiter(this, void 0, Promise, function () {
+            return __generator(this, function (_a) {
+                return [2 /*return*/, this.vouchersService.getSavedVouchers(user)];
+            });
+        });
+    };
     __decorate([
         common_1.Post(),
         common_1.HttpCode(common_1.HttpStatus.CREATED),
@@ -123,6 +137,18 @@ var VouchersController = /** @class */ (function () {
         __param(1, common_1.Body()),
         __param(2, customize_1.CurrentUser())
     ], VouchersController.prototype, "changeStatus");
+    __decorate([
+        common_1.Post(':id/save'),
+        common_1.UseGuards(jwt_auth_guard_1.JwtAuthGuard),
+        customize_1.ResponseMessage("Voucher saved successfully"),
+        __param(0, common_1.Param('id', common_1.ParseIntPipe)),
+        __param(1, customize_1.CurrentUser())
+    ], VouchersController.prototype, "saveVoucher");
+    __decorate([
+        common_1.UseGuards(jwt_auth_guard_1.JwtAuthGuard),
+        common_1.Post('saved'),
+        __param(0, customize_1.CurrentUser())
+    ], VouchersController.prototype, "getSavedVouchers");
     VouchersController = __decorate([
         swagger_1.ApiTags("Vouchers"),
         common_1.Controller('vouchers')

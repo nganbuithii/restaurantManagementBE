@@ -28,6 +28,7 @@ model User {
   orders       Order[]
   slips        WarehouseSlip[]
   reservations Reservation[]
+  customerVouchers CustomerVoucher[]
 }
 
 model Role {
@@ -79,7 +80,7 @@ model Customer {
   id Int @id @default(autoincrement())
 
   points           Int               @default(0)
-  customerVouchers CustomerVoucher[]
+  // customerVouchers CustomerVoucher[]
 
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
@@ -260,15 +261,16 @@ model Voucher {
 
 model CustomerVoucher {
   id         Int       @id @default(autoincrement())
-  customerId Int
+  userId Int
   voucherId  Int
   obtainedAt DateTime  @default(now())
   usedAt     DateTime?
 
-  customer Customer @relation(fields: [customerId], references: [id])
+  user User @relation(fields: [userId], references: [id])
+  
   voucher  Voucher  @relation(fields: [voucherId], references: [id])
 
-  @@unique([customerId, voucherId])
+  @@unique([userId, voucherId])
 }
 
 model Feedback {

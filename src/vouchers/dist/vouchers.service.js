@@ -261,6 +261,79 @@ var VouchersService = /** @class */ (function () {
             });
         });
     };
+    VouchersService.prototype.saveVoucherForCustomer = function (voucherId, user) {
+        return __awaiter(this, void 0, void 0, function () {
+            var voucher, existingCustomerVoucher, customer, _a, customerVoucher, _;
+            return __generator(this, function (_b) {
+                switch (_b.label) {
+                    case 0: return [4 /*yield*/, this.prisma.voucher.findFirst({
+                            where: { id: voucherId, isActive: true, status: 'ACTIVE' }
+                        })];
+                    case 1:
+                        voucher = _b.sent();
+                        if (!voucher) {
+                            throw new common_1.NotFoundException('Voucher not found or is not active');
+                        }
+                        return [4 /*yield*/, this.prisma.customerVoucher.findUnique({
+                                where: {
+                                    userId_voucherId: {
+                                        userId: user.sub,
+                                        voucherId: voucherId
+                                    }
+                                }
+                            })];
+                    case 2:
+                        existingCustomerVoucher = _b.sent();
+                        if (existingCustomerVoucher) {
+                            throw new common_1.BadRequestException('You have already saved this voucher');
+                        }
+                        return [4 /*yield*/, this.prisma.customer.findUnique({
+                                where: { userId: user.sub }
+                            })];
+                    case 3:
+                        customer = _b.sent();
+                        if (!customer) {
+                            throw new common_1.NotFoundException('Customer not found');
+                        }
+                        return [4 /*yield*/, this.prisma.$transaction([
+                                this.prisma.customerVoucher.create({
+                                    data: {
+                                        userId: user.sub,
+                                        voucherId: voucherId
+                                    }
+                                }),
+                                this.prisma.customer.update({
+                                    where: { userId: user.sub },
+                                    data: { points: { decrement: voucher.pointCost } }
+                                })
+                            ])];
+                    case 4:
+                        _a = _b.sent(), customerVoucher = _a[0], _ = _a[1];
+                        return [2 /*return*/, customerVoucher];
+                }
+            });
+        });
+    };
+    VouchersService.prototype.getSavedVouchers = function (user) {
+        return __awaiter(this, void 0, Promise, function () {
+            var savedVouchers;
+            return __generator(this, function (_a) {
+                switch (_a.label) {
+                    case 0: return [4 /*yield*/, this.prisma.customerVoucher.findMany({
+                            where: {
+                                userId: user.sub
+                            },
+                            include: {
+                                voucher: true
+                            }
+                        })];
+                    case 1:
+                        savedVouchers = _a.sent();
+                        return [2 /*return*/, savedVouchers.map(function (savedVoucher) { return savedVoucher.voucher; })];
+                }
+            });
+        });
+    };
     VouchersService = __decorate([
         common_1.Injectable()
     ], VouchersService);

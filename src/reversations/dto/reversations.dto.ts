@@ -89,6 +89,6 @@ export class UpdateReservationDto {
     @ApiProperty()
     orderId: number;
 
-    // @IsNotEmpty({ message: 'Customer ID cannot be empty' })
-    // customerId: number;
+    @IsOptional()
+    menuItemIds: number[];
 }

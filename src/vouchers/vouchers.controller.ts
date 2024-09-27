@@ -73,8 +73,20 @@ export class VouchersController {
       return this.vouchersService.updateStatus(id, body.status, user);
     }
     
-
-
+    @Post(':id/save')
+    @UseGuards(JwtAuthGuard)
+    @ResponseMessage("Voucher saved successfully")
+    async saveVoucher(
+      @Param('id', ParseIntPipe) voucherId: number,
+      @CurrentUser() user: IUser
+    ) {
+      return this.vouchersService.saveVoucherForCustomer(voucherId, user);
+    }
+    @UseGuards(JwtAuthGuard) 
+    @Post('saved')
+    async getSavedVouchers(@CurrentUser() user: IUser): Promise<any> {
+      return this.vouchersService.getSavedVouchers(user);
+    }
 }
 
 

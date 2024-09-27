@@ -86,6 +86,9 @@ var UpdateReservationDto = /** @class */ (function () {
         class_validator_1.IsOptional(),
         swagger_1.ApiProperty()
     ], UpdateReservationDto.prototype, "orderId");
+    __decorate([
+        class_validator_1.IsOptional()
+    ], UpdateReservationDto.prototype, "menuItemIds");
     return UpdateReservationDto;
 }());
 exports.UpdateReservationDto = UpdateReservationDto;

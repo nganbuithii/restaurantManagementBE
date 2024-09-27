@@ -192,6 +192,70 @@ export class VouchersService {
       select: { id: true, status: true, code: true, percent: true },  
     });
   }
+  async saveVoucherForCustomer(voucherId: number, user:IUser) {
+    const voucher = await this.prisma.voucher.findFirst({
+      where: { id: voucherId, isActive: true, status: 'ACTIVE' }
+    });
+
+    if (!voucher) {
+      throw new NotFoundException('Voucher not found or is not active');
+    }
+
+    const existingCustomerVoucher = await this.prisma.customerVoucher.findUnique({
+      where: {
+        userId_voucherId: {
+          userId: user.sub,
+          voucherId: voucherId
+        }
+      }
+    });
+
+    if (existingCustomerVoucher) {
+      throw new BadRequestException('You have already saved this voucher');
+    }
+
+    // Check if the user has enough points to save the voucher
+    const customer = await this.prisma.customer.findUnique({
+      where: { userId: user.sub }
+    });
+
+    if (!customer) {
+      throw new NotFoundException('Customer not found');
+    }
+
+    // if (customer.points < voucher.pointCost) {
+    //   throw new BadRequestException('Not enough points to save this voucher');
+    // }
+
+    const [customerVoucher, _] = await this.prisma.$transaction([
+      this.prisma.customerVoucher.create({
+        data: {
+          userId: user.sub,
+          voucherId: voucherId,
+        }
+      }),
+      this.prisma.customer.update({
+        where: { userId: user.sub },
+        data: { points: { decrement: voucher.pointCost } }
+      })
+    ]);
+
+    return customerVoucher;
+  }
+
+  async getSavedVouchers(user: IUser): Promise<Voucher[]> {
+    const savedVouchers = await this.prisma.customerVoucher.findMany({
+      where: {
+        userId: user.sub, 
+      },
+      include: {
+        voucher: true, 
+      },
+    });
+  
+
+    return savedVouchers.map((savedVoucher) => savedVoucher.voucher);
+  }
   
   
 }

@@ -13,10 +13,10 @@ export class ReversationsService {
 
     async create(createReservationDto: CreateReservationDto, user: IUser) {
         const { tableId, time, date, status } = createReservationDto;
-    
+
         const reservationDateTime = new Date(`${new Date(date).toISOString().split('T')[0]}T${time}:00`);
         console.log('Reservation DateTime:', reservationDateTime.toISOString());
-    
+
         const existingReservations = await this.prisma.reservation.findMany({
             where: {
                 table: {
@@ -35,9 +35,9 @@ export class ReversationsService {
                 date: true,
             },
         });
-    
+
         console.log('Existing Reservations:', existingReservations);
-    
+
         for (const reservation of existingReservations) {
             const existingDateTime = new Date(`${reservation.date.toISOString().split('T')[0]}T${reservation.time}:00`);
             console.log('Comparing with Existing Reservation DateTime:', existingDateTime.toISOString());
@@ -45,7 +45,7 @@ export class ReversationsService {
                 throw new BadRequestException('Table is already reserved for the selected time');
             }
         }
-    
+
         const newReservation = await this.prisma.reservation.create({
             data: {
                 time: time,
@@ -59,17 +59,17 @@ export class ReversationsService {
                 },
             } as Prisma.ReservationCreateInput,
         });
-    
+
         console.log('New Reservation Created:', newReservation);
         await this.emailService.sendReservationConfirmation(user.email, {
             date: newReservation.date,
             time: newReservation.time,
             status: newReservation.status,
         });
-    
+
         return newReservation;
     }
-    
+
 
 
 
@@ -124,11 +124,12 @@ export class ReversationsService {
             where: { id },
             include: {
                 user: true,
+                table: true,
                 order: {
                     include: {
                         details: {
                             include: {
-                                menuItem: true,  // Bao gồm thông tin về từng món ăn trong đơn hàng
+                                menuItem: true,
                             }
                         }
                     }
@@ -148,6 +149,11 @@ export class ReversationsService {
             createdAt: reservation.createdAt,
             updatedAt: reservation.updatedAt,
             userId: reservation.userId,
+            table: reservation.table ? {
+                id: reservation.table.id,
+                number: reservation.table.number,
+
+            } : null,
             user: {
                 id: reservation.user.id,
                 fullName: reservation.user.fullName,
@@ -175,20 +181,42 @@ export class ReversationsService {
 
 
 
-    async update(id: number, data: UpdateReservationDto, user: IUser): Promise<Reservation> {
+    async update(id: number, data: UpdateReservationDto, user: IUser): Promise<any> {
         const reservation = await this.prisma.reservation.findUnique({
             where: { id },
+            include: { menuItems: true },
         });
 
         if (!reservation) {
             throw new NotFoundException('Reservation not found');
         }
+
         console.log("Data sent for updating reservation:", data);
+
+        // Prepare the data for update
+        const updateData: any = {
+            ...data,
+            updatedAt: new Date(),
+        };
+
+        // If menuItemIds is provided, update the menu items
+        if (data.menuItemIds) {
+            updateData.menuItems = {
+                set: data.menuItemIds.map(menuItemId => ({ id: menuItemId })),
+            };
+
+            // Remove menuItemIds from updateData as it's not a direct field of Reservation
+            delete updateData.menuItemIds;
+        }
+
         const updatedReservation = await this.prisma.reservation.update({
             where: { id },
-            data: {
-                ...data,
-                updatedAt: new Date(),
+            data: updateData,
+            include: {
+                menuItems: true,
+                user: true,
+                table: true,
+                order: true
             },
         });
 
