@@ -32,6 +32,7 @@ import { ignoreLogger } from 'vnpay';
 import { ScheduleModule } from '@nestjs/schedule';
 import { FirebaseModule } from './firebase/firebase.module';
 import { NotificationModule } from './notification/notification.module';
+import { CartModule } from './cart/cart.module';
 
 @Module({
   imports: [
@@ -57,7 +58,7 @@ import { NotificationModule } from './notification/notification.module';
     
     ConfigModule,
     UserModule,
-    AuthModule, RoleModule, PermissionModule, MenuItemModule, CloudinaryModule, IngredientModule, MenuModule, TableModule, ReversationsModule, OrdersModule, FeeckbacksModule, VouchersModule, SuppliersModule, WarehouseSlipsModule, EmailModule, InventoryModule, PaymentModule, ChatModule, FirebaseModule, NotificationModule,
+    AuthModule, RoleModule, PermissionModule, MenuItemModule, CloudinaryModule, IngredientModule, MenuModule, TableModule, ReversationsModule, OrdersModule, FeeckbacksModule, VouchersModule, SuppliersModule, WarehouseSlipsModule, EmailModule, InventoryModule, PaymentModule, ChatModule, FirebaseModule, NotificationModule, CartModule,
   ],
   controllers: [AppController],
   providers: [
