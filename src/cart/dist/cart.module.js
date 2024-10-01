@@ -19,7 +19,8 @@ var CartModule = /** @class */ (function () {
     CartModule = __decorate([
         common_1.Module({
             controllers: [cart_controller_1.CartController],
-            providers: [cart_service_1.CartService, prisma_service_1.PrismaService, jwt_1.JwtService, config_1.ConfigService]
+            providers: [cart_service_1.CartService, prisma_service_1.PrismaService, jwt_1.JwtService, config_1.ConfigService],
+            exports: [cart_service_1.CartService]
         })
     ], CartModule);
     return CartModule;

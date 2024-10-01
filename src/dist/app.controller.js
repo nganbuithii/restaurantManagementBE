@@ -62,8 +62,8 @@ var AppController = /** @class */ (function () {
             return __generator(this, function (_a) {
                 switch (_a.label) {
                     case 0:
-                        userId = req.user.sub;
-                        return [4 /*yield*/, this.userService.getUserWithRole(userId)];
+                        userId = req.user;
+                        return [4 /*yield*/, this.userService.getUserWithRoleAndCart(userId)];
                     case 1:
                         userWithRole = _a.sent();
                         return [2 /*return*/, userWithRole];

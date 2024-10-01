@@ -49,14 +49,9 @@ var CartService = /** @class */ (function () {
     function CartService(prisma) {
         this.prisma = prisma;
     }
-    /**
-     * Lấy giỏ hàng của người dùng
-     * @param user
-     * @returns CartResponseDto
-     */
     CartService.prototype.getCart = function (user) {
         return __awaiter(this, void 0, Promise, function () {
-            var cart, newCart;
+            var cart, newCart, totalItems;
             return __generator(this, function (_a) {
                 switch (_a.label) {
                     case 0: return [4 /*yield*/, this.prisma.cart.findUnique({
@@ -64,7 +59,11 @@ var CartService = /** @class */ (function () {
                             include: {
                                 items: {
                                     include: {
-                                        menuItem: true
+                                        menuItem: {
+                                            include: {
+                                                images: true
+                                            }
+                                        }
                                     }
                                 }
                             }
@@ -82,28 +81,28 @@ var CartService = /** @class */ (function () {
                                 include: {
                                     items: {
                                         include: {
-                                            menuItem: true
+                                            menuItem: {
+                                                include: {
+                                                    images: true
+                                                }
+                                            }
                                         }
                                     }
                                 }
                             })];
                     case 2:
                         newCart = _a.sent();
-                        return [2 /*return*/, { cart: newCart }];
-                    case 3: return [2 /*return*/, { cart: cart }];
+                        return [2 /*return*/, { cart: newCart, totalItems: 0 }];
+                    case 3:
+                        totalItems = cart.items.reduce(function (acc, item) { return acc + item.quantity; }, 0);
+                        return [2 /*return*/, { cart: cart, totalItems: totalItems }];
                 }
             });
         });
     };
-    /**
-     * Thêm món ăn vào giỏ hàng
-     * @param user
-     * @param addToCartDto
-     * @returns CartResponseDto
-     */
     CartService.prototype.addToCart = function (user, addToCartDto) {
         return __awaiter(this, void 0, Promise, function () {
-            var menuItemId, quantity, menuItem, cart, existingCartItem, updatedCart;
+            var menuItemId, quantity, menuItem, cart, existingCartItem, updatedCart, totalItems;
             return __generator(this, function (_a) {
                 switch (_a.label) {
                     case 0:
@@ -128,7 +127,7 @@ var CartService = /** @class */ (function () {
                                 }
                             })];
                     case 3:
-                        // Tạo giỏ hàng nếu chưa có
+                        // Create cart if it doesn't exist
                         cart = _a.sent();
                         _a.label = 4;
                     case 4: return [4 /*yield*/, this.prisma.cartItem.findUnique({
@@ -142,7 +141,6 @@ var CartService = /** @class */ (function () {
                     case 5:
                         existingCartItem = _a.sent();
                         if (!existingCartItem) return [3 /*break*/, 7];
-                        // Nếu đã tồn tại, cập nhật số lượng
                         return [4 /*yield*/, this.prisma.cartItem.update({
                                 where: {
                                     cartId_menuItemId: {
@@ -155,12 +153,9 @@ var CartService = /** @class */ (function () {
                                 }
                             })];
                     case 6:
-                        // Nếu đã tồn tại, cập nhật số lượng
                         _a.sent();
                         return [3 /*break*/, 9];
-                    case 7: 
-                    // Nếu chưa tồn tại, tạo mới cartItem
-                    return [4 /*yield*/, this.prisma.cartItem.create({
+                    case 7: return [4 /*yield*/, this.prisma.cartItem.create({
                             data: {
                                 cartId: cart.id,
                                 menuItemId: menuItemId,
@@ -168,7 +163,6 @@ var CartService = /** @class */ (function () {
                             }
                         })];
                     case 8:
-                        // Nếu chưa tồn tại, tạo mới cartItem
                         _a.sent();
                         _a.label = 9;
                     case 9: return [4 /*yield*/, this.prisma.cart.findUnique({
@@ -183,20 +177,15 @@ var CartService = /** @class */ (function () {
                         })];
                     case 10:
                         updatedCart = _a.sent();
-                        return [2 /*return*/, { cart: updatedCart, message: 'Item added to cart successfully' }];
+                        totalItems = updatedCart.items.reduce(function (acc, item) { return acc + item.quantity; }, 0);
+                        return [2 /*return*/, { cart: updatedCart, totalItems: totalItems, message: 'Item added to cart successfully' }];
                 }
             });
         });
     };
-    /**
-     * Xóa món ăn khỏi giỏ hàng
-     * @param user
-     * @param itemId
-     * @returns CartResponseDto
-     */
-    CartService.prototype.removeFromCart = function (user, itemId) {
+    CartService.prototype.removeFromCart = function (user, menuItemId) {
         return __awaiter(this, void 0, Promise, function () {
-            var cart, cartItem, updatedCart;
+            var cart, menuItemIdInt, cartItem, updatedCart, totalItems;
             return __generator(this, function (_a) {
                 switch (_a.label) {
                     case 0: return [4 /*yield*/, this.prisma.cart.findUnique({
@@ -207,25 +196,20 @@ var CartService = /** @class */ (function () {
                         })];
                     case 1:
                         cart = _a.sent();
+                        console.log("Cart", cart);
                         if (!cart) {
                             throw new common_1.NotFoundException('Cart not found');
                         }
-                        return [4 /*yield*/, this.prisma.cartItem.findUnique({
-                                where: {
-                                    id: itemId
-                                }
+                        menuItemIdInt = parseInt(menuItemId, 10);
+                        console.log("MenuOtem Int", menuItemIdInt);
+                        cartItem = cart.items.find(function (item) { return item.menuItemId === menuItemIdInt; });
+                        if (!cartItem) {
+                            throw new common_1.NotFoundException('Cart item not found or does not belong to the current cart');
+                        }
+                        return [4 /*yield*/, this.prisma.cartItem["delete"]({
+                                where: { id: cartItem.id }
                             })];
                     case 2:
-                        cartItem = _a.sent();
-                        if (!cartItem || cartItem.cartId !== cart.id) {
-                            throw new common_1.NotFoundException('Cart item not found');
-                        }
-                        // Xóa cartItem
-                        return [4 /*yield*/, this.prisma.cartItem["delete"]({
-                                where: { id: itemId }
-                            })];
-                    case 3:
-                        // Xóa cartItem
                         _a.sent();
                         return [4 /*yield*/, this.prisma.cart.findUnique({
                                 where: { id: cart.id },
@@ -237,9 +221,56 @@ var CartService = /** @class */ (function () {
                                     }
                                 }
                             })];
-                    case 4:
+                    case 3:
                         updatedCart = _a.sent();
-                        return [2 /*return*/, { cart: updatedCart, message: 'Item removed from cart successfully' }];
+                        totalItems = updatedCart.items.reduce(function (acc, item) { return acc + item.quantity; }, 0);
+                        return [2 /*return*/, { cart: updatedCart, totalItems: totalItems, message: 'Item removed from cart successfully' }];
+                }
+            });
+        });
+    };
+    CartService.prototype.updateCart = function (user, updateCartDto) {
+        return __awaiter(this, void 0, Promise, function () {
+            var itemId, quantity, cart, cartItem, updatedCart, totalItems;
+            return __generator(this, function (_a) {
+                switch (_a.label) {
+                    case 0:
+                        itemId = updateCartDto.itemId, quantity = updateCartDto.quantity;
+                        return [4 /*yield*/, this.prisma.cart.findUnique({
+                                where: { userId: user.sub },
+                                include: { items: true }
+                            })];
+                    case 1:
+                        cart = _a.sent();
+                        console.log("Item Id", itemId);
+                        console.log("cart", cart);
+                        if (!cart) {
+                            throw new common_1.NotFoundException('Cart not found');
+                        }
+                        cartItem = cart.items.find(function (item) { return item.menuItemId === itemId; });
+                        if (!cartItem) {
+                            throw new common_1.NotFoundException('Cart item not found or does not belong to the current cart');
+                        }
+                        return [4 /*yield*/, this.prisma.cartItem.update({
+                                where: { id: cartItem.id },
+                                data: { quantity: quantity }
+                            })];
+                    case 2:
+                        _a.sent();
+                        return [4 /*yield*/, this.prisma.cart.findUnique({
+                                where: { id: cart.id },
+                                include: {
+                                    items: {
+                                        include: {
+                                            menuItem: true
+                                        }
+                                    }
+                                }
+                            })];
+                    case 3:
+                        updatedCart = _a.sent();
+                        totalItems = updatedCart.items.reduce(function (acc, item) { return acc + item.quantity; }, 0);
+                        return [2 /*return*/, { cart: updatedCart, totalItems: totalItems, message: 'Cart updated successfully' }];
                 }
             });
         });

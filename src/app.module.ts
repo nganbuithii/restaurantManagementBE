@@ -33,6 +33,7 @@ import { ScheduleModule } from '@nestjs/schedule';
 import { FirebaseModule } from './firebase/firebase.module';
 import { NotificationModule } from './notification/notification.module';
 import { CartModule } from './cart/cart.module';
+import { CartService } from './cart/cart.service';
 
 @Module({
   imports: [
@@ -70,7 +71,7 @@ import { CartModule } from './cart/cart.module';
     },
     CloudinaryService,
     OtpService,
-    PrismaService
+    PrismaService, CartService
   ],
 })
 export class AppModule {}

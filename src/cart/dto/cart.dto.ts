@@ -1,5 +1,4 @@
-// src/cart/dto/cart.dto.ts
-import { IsInt, IsPositive } from 'class-validator';
+import { IsInt, IsNotEmpty, IsNumber, IsPositive, IsString } from 'class-validator';
 
 export class AddToCartDto {
     @IsInt()
@@ -9,7 +8,6 @@ export class AddToCartDto {
     @IsPositive()
     quantity: number;
 }
-// src/cart/dto/cart.dto.ts
 import { Cart, CartItem, MenuItem } from '@prisma/client';
 export class CartResponseDto {
     cart: {
@@ -23,5 +21,16 @@ export class CartResponseDto {
             }
         )[];
     };
+    totalItems: number;
     message?: string;
+}
+
+export class UpdateCartDto {
+    @IsNumber()
+    @IsNotEmpty()
+    itemId: number;
+
+    @IsNumber()
+    @IsNotEmpty()
+    quantity: number;
 }

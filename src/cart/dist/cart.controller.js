@@ -83,6 +83,16 @@ var CartController = /** @class */ (function () {
             });
         });
     };
+    CartController.prototype.updateCart = function (user, updateCartDto) {
+        return __awaiter(this, void 0, Promise, function () {
+            return __generator(this, function (_a) {
+                switch (_a.label) {
+                    case 0: return [4 /*yield*/, this.cartService.updateCart(user, updateCartDto)];
+                    case 1: return [2 /*return*/, _a.sent()];
+                }
+            });
+        });
+    };
     __decorate([
         common_1.Get(),
         common_1.UseGuards(jwt_auth_guard_1.JwtAuthGuard),
@@ -100,6 +110,12 @@ var CartController = /** @class */ (function () {
         __param(0, customize_1.CurrentUser()),
         __param(1, common_1.Param('itemId'))
     ], CartController.prototype, "removeFromCart");
+    __decorate([
+        common_1.Patch(),
+        common_1.UseGuards(jwt_auth_guard_1.JwtAuthGuard),
+        __param(0, customize_1.CurrentUser()),
+        __param(1, common_1.Body())
+    ], CartController.prototype, "updateCart");
     CartController = __decorate([
         common_1.Controller('cart')
     ], CartController);

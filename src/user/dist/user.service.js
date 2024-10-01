@@ -71,9 +71,10 @@ var bcrypt_1 = require("bcrypt");
 var class_transformer_1 = require("class-transformer");
 var date_fns_1 = require("date-fns");
 var UserService = /** @class */ (function () {
-    function UserService(prismaService, cloudinaryService) {
+    function UserService(prismaService, cloudinaryService, cartService) {
         this.prismaService = prismaService;
         this.cloudinaryService = cloudinaryService;
+        this.cartService = cartService;
     }
     UserService.prototype.create = function (body) {
         return __awaiter(this, void 0, Promise, function () {
@@ -393,6 +394,25 @@ var UserService = /** @class */ (function () {
                     case 2:
                         role = _a.sent();
                         return [2 /*return*/, __assign(__assign({}, user), { roleName: role === null || role === void 0 ? void 0 : role.name })];
+                }
+            });
+        });
+    };
+    UserService.prototype.getUserWithRoleAndCart = function (user) {
+        return __awaiter(this, void 0, void 0, function () {
+            var userWithRole, cartInfo;
+            return __generator(this, function (_a) {
+                switch (_a.label) {
+                    case 0: return [4 /*yield*/, this.getUserWithRole(user.sub)];
+                    case 1:
+                        userWithRole = _a.sent();
+                        return [4 /*yield*/, this.cartService.getCart(user)];
+                    case 2:
+                        cartInfo = _a.sent();
+                        return [2 /*return*/, __assign(__assign({}, userWithRole), { cart: {
+                                    items: cartInfo.cart.items,
+                                    totalItems: cartInfo.totalItems
+                                } })];
                 }
             });
         });

@@ -1,32 +1,29 @@
 // src/cart/cart.service.ts
 import { Injectable, NotFoundException } from '@nestjs/common';
 import { PrismaService } from '../prisma.service';
-import { AddToCartDto, CartResponseDto } from './dto/cart.dto';
+import { AddToCartDto, CartResponseDto, UpdateCartDto } from './dto/cart.dto';
 import { IUser } from 'interfaces/user.interface';
 
 @Injectable()
 export class CartService {
     constructor(private readonly prisma: PrismaService) { }
-
-    /**
-     * Lấy giỏ hàng của người dùng
-     * @param user 
-     * @returns CartResponseDto
-     */
     async getCart(user: IUser): Promise<CartResponseDto> {
         const cart = await this.prisma.cart.findUnique({
             where: { userId: user.sub },
             include: {
                 items: {
                     include: {
-                        menuItem: true, // Giả sử bạn muốn lấy thông tin chi tiết của menuItem
+                        menuItem: {
+                            include: {
+                                images: true,
+                            },
+                        },
                     },
                 },
             },
         });
 
         if (!cart) {
-            // Nếu người dùng chưa có giỏ hàng, có thể tạo một giỏ hàng trống
             const newCart = await this.prisma.cart.create({
                 data: {
                     userId: user.sub,
@@ -37,28 +34,29 @@ export class CartService {
                 include: {
                     items: {
                         include: {
-                            menuItem: true,
+                            menuItem: {
+                                include: {
+                                    images: true,
+                                },
+                            },
                         },
                     },
                 },
             });
 
-            return { cart: newCart };
+            return { cart: newCart, totalItems: 0 };
         }
 
-        return { cart };
+        const totalItems = cart.items.reduce((acc, item) => acc + item.quantity, 0);
+
+        return { cart, totalItems };
     }
 
-    /**
-     * Thêm món ăn vào giỏ hàng
-     * @param user 
-     * @param addToCartDto 
-     * @returns CartResponseDto
-     */
+
+
     async addToCart(user: IUser, addToCartDto: AddToCartDto): Promise<CartResponseDto> {
         const { menuItemId, quantity } = addToCartDto;
 
-        // Kiểm tra xem menuItem có tồn tại không
         const menuItem = await this.prisma.menuItem.findUnique({
             where: { id: menuItemId },
         });
@@ -67,13 +65,12 @@ export class CartService {
             throw new NotFoundException('Menu item not found');
         }
 
-        // Kiểm tra xem người dùng đã có giỏ hàng chưa
         let cart = await this.prisma.cart.findUnique({
             where: { userId: user.sub },
         });
 
         if (!cart) {
-            // Tạo giỏ hàng nếu chưa có
+            // Create cart if it doesn't exist
             cart = await this.prisma.cart.create({
                 data: {
                     userId: user.sub,
@@ -81,7 +78,7 @@ export class CartService {
             });
         }
 
-        // Kiểm tra xem món ăn đã tồn tại trong giỏ hàng chưa
+        // Check if the menu item already exists in the cart
         const existingCartItem = await this.prisma.cartItem.findUnique({
             where: {
                 cartId_menuItemId: {
@@ -92,7 +89,6 @@ export class CartService {
         });
 
         if (existingCartItem) {
-            // Nếu đã tồn tại, cập nhật số lượng
             await this.prisma.cartItem.update({
                 where: {
                     cartId_menuItemId: {
@@ -105,7 +101,6 @@ export class CartService {
                 },
             });
         } else {
-            // Nếu chưa tồn tại, tạo mới cartItem
             await this.prisma.cartItem.create({
                 data: {
                     cartId: cart.id,
@@ -115,7 +110,7 @@ export class CartService {
             });
         }
 
-        // Lấy lại giỏ hàng sau khi thêm
+        // Get the updated cart
         const updatedCart = await this.prisma.cart.findUnique({
             where: { id: cart.id },
             include: {
@@ -127,45 +122,36 @@ export class CartService {
             },
         });
 
-        return { cart: updatedCart, message: 'Item added to cart successfully' };
+        const totalItems = updatedCart.items.reduce((acc, item) => acc + item.quantity, 0);
+
+        return { cart: updatedCart, totalItems, message: 'Item added to cart successfully' };
     }
 
-    /**
-     * Xóa món ăn khỏi giỏ hàng
-     * @param user 
-     * @param itemId 
-     * @returns CartResponseDto
-     */
-    async removeFromCart(user: IUser, itemId: number): Promise<CartResponseDto> {
-        // Kiểm tra xem người dùng có giỏ hàng không
+    async removeFromCart(user: IUser, menuItemId: string): Promise<CartResponseDto> {
         const cart = await this.prisma.cart.findUnique({
             where: { userId: user.sub },
             include: {
                 items: true,
             },
         });
-
+        console.log("Cart", cart)
         if (!cart) {
             throw new NotFoundException('Cart not found');
         }
 
-        // Kiểm tra xem cartItem có tồn tại trong giỏ hàng không
-        const cartItem = await this.prisma.cartItem.findUnique({
-            where: {
-                id: itemId,
-            },
-        });
+        const menuItemIdInt = parseInt(menuItemId, 10);
+        console.log("MenuOtem Int", menuItemIdInt)
 
-        if (!cartItem || cartItem.cartId !== cart.id) {
-            throw new NotFoundException('Cart item not found');
+        const cartItem = cart.items.find(item => item.menuItemId === menuItemIdInt);
+
+        if (!cartItem) {
+            throw new NotFoundException('Cart item not found or does not belong to the current cart');
         }
 
-        // Xóa cartItem
         await this.prisma.cartItem.delete({
-            where: { id: itemId },
+            where: { id: cartItem.id },
         });
 
-        // Lấy lại giỏ hàng sau khi xóa
         const updatedCart = await this.prisma.cart.findUnique({
             where: { id: cart.id },
             include: {
@@ -177,6 +163,48 @@ export class CartService {
             },
         });
 
-        return { cart: updatedCart, message: 'Item removed from cart successfully' };
+        const totalItems = updatedCart.items.reduce((acc, item) => acc + item.quantity, 0);
+
+        return { cart: updatedCart, totalItems, message: 'Item removed from cart successfully' };
     }
+
+    async updateCart(user: IUser, updateCartDto: UpdateCartDto): Promise<CartResponseDto> {
+        const { itemId, quantity } = updateCartDto;
+            const cart = await this.prisma.cart.findUnique({
+            where: { userId: user.sub },
+            include: { items: true }, 
+        });
+    console.log("Item Id", itemId)
+    console.log("cart", cart)
+        if (!cart) {
+            throw new NotFoundException('Cart not found');
+        }
+    
+        const cartItem = cart.items.find(item => item.menuItemId === itemId);
+        if (!cartItem) {
+            throw new NotFoundException('Cart item not found or does not belong to the current cart');
+        }
+    
+        await this.prisma.cartItem.update({
+            where: { id: cartItem.id },
+            data: { quantity: quantity },
+        });
+    
+        const updatedCart = await this.prisma.cart.findUnique({
+            where: { id: cart.id },
+            include: {
+                items: {
+                    include: {
+                        menuItem: true,
+                    },
+                },
+            },
+        });
+    
+        const totalItems = updatedCart.items.reduce((acc, item) => acc + item.quantity, 0);
+    
+        return { cart: updatedCart, totalItems, message: 'Cart updated successfully' };
+    }
+    
+
 }

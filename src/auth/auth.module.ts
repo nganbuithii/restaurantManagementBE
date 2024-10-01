@@ -14,6 +14,7 @@ import { OtpService } from 'src/otp/otp.service';
 import { EmailService } from 'src/email/email.service';
 import { OAuth2Client } from 'google-auth-library';
 import { GoogleStrategy } from './passport/google.strategy';
+import { CartService } from 'src/cart/cart.service';
 @Module({
   imports: [
     PassportModule.register({ defaultStrategy: 'google' }),
@@ -31,7 +32,7 @@ import { GoogleStrategy } from './passport/google.strategy';
     }),
   ],
   controllers: [AuthController],
-  providers: [GoogleStrategy,AuthService, PrismaService, JwtService  , JwtStrategy, ConfigService, UserService,  OtpService, EmailService,LocalStrategy,
+  providers: [GoogleStrategy,AuthService, PrismaService, JwtService  , JwtStrategy, ConfigService, UserService,  OtpService, EmailService,LocalStrategy,CartService,
     LocalStrategy,
     {
       provide: OAuth2Client,

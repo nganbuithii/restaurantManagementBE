@@ -7,11 +7,13 @@ import { plainToClass } from 'class-transformer';
 import { CloudinaryService } from 'src/cloudinary/cloudinary.service';
 import { IUser } from 'interfaces/user.interface';
 import { startOfMonth, endOfMonth, parse } from 'date-fns';
+import { CartService } from 'src/cart/cart.service';
 
 @Injectable()
 export class UserService {
     constructor(private prismaService: PrismaService,
         private cloudinaryService: CloudinaryService,
+        private cartService:CartService,
     ) { }
 
     async create(body: CreateUserDto): Promise<Omit<User, 'password'>> {
@@ -294,7 +296,18 @@ export class UserService {
             roleName: role?.name,
         };
     }
+    async getUserWithRoleAndCart(user: IUser) {
+        const userWithRole = await this.getUserWithRole(user.sub);
+        const cartInfo = await this.cartService.getCart(user);
 
+        return {
+            ...userWithRole,
+            cart: {
+                items: cartInfo.cart.items,
+                totalItems: cartInfo.totalItems
+            }
+        };
+    }
 
     async delete(id: number, user: IUser): Promise<void> {
         const userToDelete = await this.prismaService.user.findUnique({

@@ -6,8 +6,7 @@ var __decorate = (this && this.__decorate) || function (decorators, target, key,
     return c > 3 && r && Object.defineProperty(target, key, r), r;
 };
 exports.__esModule = true;
-exports.CartResponseDto = exports.AddToCartDto = void 0;
-// src/cart/dto/cart.dto.ts
+exports.UpdateCartDto = exports.CartResponseDto = exports.AddToCartDto = void 0;
 var class_validator_1 = require("class-validator");
 var AddToCartDto = /** @class */ (function () {
     function AddToCartDto() {
@@ -28,3 +27,17 @@ var CartResponseDto = /** @class */ (function () {
     return CartResponseDto;
 }());
 exports.CartResponseDto = CartResponseDto;
+var UpdateCartDto = /** @class */ (function () {
+    function UpdateCartDto() {
+    }
+    __decorate([
+        class_validator_1.IsNumber(),
+        class_validator_1.IsNotEmpty()
+    ], UpdateCartDto.prototype, "itemId");
+    __decorate([
+        class_validator_1.IsNumber(),
+        class_validator_1.IsNotEmpty()
+    ], UpdateCartDto.prototype, "quantity");
+    return UpdateCartDto;
+}());
+exports.UpdateCartDto = UpdateCartDto;

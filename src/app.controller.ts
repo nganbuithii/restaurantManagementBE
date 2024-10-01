@@ -16,8 +16,8 @@ export class AppController {
   @Get('/me')
   @UseGuards(JwtAuthGuard)
   async me(@Req() req) {
-    const userId = req.user.sub; // `sub` là userId trong JWT payload
-    const userWithRole = await this.userService.getUserWithRole(userId);
+    const userId = req.user
+    const userWithRole = await this.userService.getUserWithRoleAndCart(userId);
 
     return userWithRole;
 }

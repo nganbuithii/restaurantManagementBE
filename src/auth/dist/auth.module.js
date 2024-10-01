@@ -59,6 +59,7 @@ var otp_service_1 = require("src/otp/otp.service");
 var email_service_1 = require("src/email/email.service");
 var google_auth_library_1 = require("google-auth-library");
 var google_strategy_1 = require("./passport/google.strategy");
+var cart_service_1 = require("src/cart/cart.service");
 var AuthModule = /** @class */ (function () {
     function AuthModule() {
     }
@@ -84,7 +85,7 @@ var AuthModule = /** @class */ (function () {
                 }),
             ],
             controllers: [auth_controller_1.AuthController],
-            providers: [google_strategy_1.GoogleStrategy, auth_service_1.AuthService, prisma_service_1.PrismaService, jwt_1.JwtService, jwt_strategy_1.JwtStrategy, config_1.ConfigService, user_service_1.UserService, otp_service_1.OtpService, email_service_1.EmailService, local_strategy_1.LocalStrategy,
+            providers: [google_strategy_1.GoogleStrategy, auth_service_1.AuthService, prisma_service_1.PrismaService, jwt_1.JwtService, jwt_strategy_1.JwtStrategy, config_1.ConfigService, user_service_1.UserService, otp_service_1.OtpService, email_service_1.EmailService, local_strategy_1.LocalStrategy, cart_service_1.CartService,
                 local_strategy_1.LocalStrategy, {
                     provide: google_auth_library_1.OAuth2Client,
                     useFactory: function () {

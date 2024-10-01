@@ -1,6 +1,6 @@
-import { Body, Controller, Delete, Get, Param, Post, UseGuards } from '@nestjs/common';
+import { Body, Controller, Delete, Get, Param, Post, UseGuards , Patch} from '@nestjs/common';
 import { CartService } from './cart.service';
-import { AddToCartDto, CartResponseDto } from './dto/cart.dto';
+import { AddToCartDto, CartResponseDto, UpdateCartDto } from './dto/cart.dto';
 import { CurrentUser } from 'decorators/customize';
 import { IUser } from 'interfaces/user.interface';
 import { Cart } from '@prisma/client';
@@ -29,8 +29,18 @@ export class CartController {
   @UseGuards(JwtAuthGuard)
   async removeFromCart(
     @CurrentUser() user: IUser,
-    @Param('itemId') itemId: number,
+    @Param('itemId') itemId: string,
   ): Promise<CartResponseDto> {
     return await this.cartService.removeFromCart(user, itemId);
   }
+
+  @Patch()
+  @UseGuards(JwtAuthGuard)
+  async updateCart(
+    @CurrentUser() user: IUser,
+    @Body() updateCartDto: UpdateCartDto,
+  ): Promise<CartResponseDto> {
+    return await this.cartService.updateCart(user, updateCartDto);
+  }
+  
 }

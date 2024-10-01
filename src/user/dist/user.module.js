@@ -14,6 +14,7 @@ var prisma_service_1 = require("src/prisma.service");
 var config_1 = require("@nestjs/config");
 var jwt_1 = require("@nestjs/jwt");
 var cloudinary_module_1 = require("src/cloudinary/cloudinary.module");
+var cart_service_1 = require("src/cart/cart.service");
 var UserModule = /** @class */ (function () {
     function UserModule() {
     }
@@ -21,7 +22,7 @@ var UserModule = /** @class */ (function () {
         common_1.Module({
             controllers: [user_controller_1.UserController],
             imports: [jwt_1.JwtModule, cloudinary_module_1.CloudinaryModule],
-            providers: [user_service_1.UserService, prisma_service_1.PrismaService, config_1.ConfigService],
+            providers: [user_service_1.UserService, prisma_service_1.PrismaService, config_1.ConfigService, cart_service_1.CartService],
             exports: [user_service_1.UserService]
         })
     ], UserModule);

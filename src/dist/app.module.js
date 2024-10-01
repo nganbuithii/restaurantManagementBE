@@ -75,6 +75,10 @@ var chat_module_1 = require("./chat/chat.module");
 var nestjs_vnpay_1 = require("nestjs-vnpay");
 var vnpay_1 = require("vnpay");
 var schedule_1 = require("@nestjs/schedule");
+var firebase_module_1 = require("./firebase/firebase.module");
+var notification_module_1 = require("./notification/notification.module");
+var cart_module_1 = require("./cart/cart.module");
+var cart_service_1 = require("./cart/cart.service");
 var AppModule = /** @class */ (function () {
     function AppModule() {
     }
@@ -110,7 +114,7 @@ var AppModule = /** @class */ (function () {
                 }),
                 config_1.ConfigModule,
                 user_module_1.UserModule,
-                auth_module_1.AuthModule, role_module_1.RoleModule, permission_module_1.PermissionModule, menu_item_module_1.MenuItemModule, cloudinary_module_1.CloudinaryModule, ingredient_module_1.IngredientModule, menu_module_1.MenuModule, table_module_1.TableModule, reversations_module_1.ReversationsModule, orders_module_1.OrdersModule, feedbacks_module_1.FeeckbacksModule, vouchers_module_1.VouchersModule, suppliers_module_1.SuppliersModule, warehouse_slips_module_1.WarehouseSlipsModule, email_module_1.EmailModule, inventory_module_1.InventoryModule, payment_module_1.PaymentModule, chat_module_1.ChatModule,
+                auth_module_1.AuthModule, role_module_1.RoleModule, permission_module_1.PermissionModule, menu_item_module_1.MenuItemModule, cloudinary_module_1.CloudinaryModule, ingredient_module_1.IngredientModule, menu_module_1.MenuModule, table_module_1.TableModule, reversations_module_1.ReversationsModule, orders_module_1.OrdersModule, feedbacks_module_1.FeeckbacksModule, vouchers_module_1.VouchersModule, suppliers_module_1.SuppliersModule, warehouse_slips_module_1.WarehouseSlipsModule, email_module_1.EmailModule, inventory_module_1.InventoryModule, payment_module_1.PaymentModule, chat_module_1.ChatModule, firebase_module_1.FirebaseModule, notification_module_1.NotificationModule, cart_module_1.CartModule,
             ],
             controllers: [app_controller_1.AppController],
             providers: [
@@ -122,7 +126,7 @@ var AppModule = /** @class */ (function () {
                 },
                 cloudinary_service_1.CloudinaryService,
                 otp_service_1.OtpService,
-                prisma_service_1.PrismaService
+                prisma_service_1.PrismaService, cart_service_1.CartService
             ]
         })
     ], AppModule);

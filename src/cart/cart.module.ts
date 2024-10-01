@@ -8,5 +8,6 @@ import { ConfigService } from '@nestjs/config';
 @Module({
   controllers: [CartController],
   providers: [CartService,PrismaService, JwtService, ConfigService],
+  exports: [CartService],
 })
 export class CartModule {}
