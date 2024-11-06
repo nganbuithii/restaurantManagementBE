@@ -95,12 +95,12 @@ var OrdersController = /** @class */ (function () {
             });
         });
     };
-    OrdersController.prototype.getOrdersByUserId = function (user) {
+    OrdersController.prototype.getOrdersByUserIdAndDate = function (user, year, month) {
         return __awaiter(this, void 0, void 0, function () {
             var orders;
             return __generator(this, function (_a) {
                 switch (_a.label) {
-                    case 0: return [4 /*yield*/, this.ordersService.getOrdersByUserId(user)];
+                    case 0: return [4 /*yield*/, this.ordersService.getOrdersByUserIdAndDate(user, year, month)];
                     case 1:
                         orders = _a.sent();
                         return [2 /*return*/, { orders: orders }];
@@ -174,8 +174,10 @@ var OrdersController = /** @class */ (function () {
     __decorate([
         common_1.UseGuards(jwt_auth_guard_1.JwtAuthGuard),
         common_1.Post('/me'),
-        __param(0, customize_1.CurrentUser())
-    ], OrdersController.prototype, "getOrdersByUserId");
+        __param(0, customize_1.CurrentUser()),
+        __param(1, common_1.Body('year')),
+        __param(2, common_1.Body('month'))
+    ], OrdersController.prototype, "getOrdersByUserIdAndDate");
     OrdersController = __decorate([
         swagger_1.ApiTags("Orders"),
         common_1.Controller('orders')

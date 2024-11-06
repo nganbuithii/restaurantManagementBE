@@ -62,8 +62,10 @@ export class ReversationsController {
     @UseGuards(JwtAuthGuard)
     @ResponseMessage('get all reservations of a user')
     getAllReservationsByUser(
-     @CurrentUser() user:IUser
+        @CurrentUser() user: IUser,
+        @Query('month') month?: number,
+        @Query('year') year?: number
     ): Promise<Reservation[]> {
-      return this.reversationsService.getAllByUserId(user);
+        return this.reversationsService.getAllByUserId(user, month, year);
     }
 }

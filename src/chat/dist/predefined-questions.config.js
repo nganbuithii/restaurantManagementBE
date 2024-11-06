@@ -24,6 +24,6 @@ exports.predefinedQuestions = [
     },
     {
         keywords: ['address', 'phone', 'contact'],
-        answer: 'Our restaurant is located at 123 ABC Street, XYZ District, Ho Chi Minh City. You can call 0123456789 for more information.'
+        answer: 'Our restaurant is located at 123 ABC Street, Nguyen kiem, Phu Nhuan District, Ho Chi Minh City. You can call 0123456789 for more information.'
     },
 ];

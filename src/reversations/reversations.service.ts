@@ -236,14 +236,24 @@ export class ReversationsService {
             data: { status }
         });
     }
-    async getAllByUserId(user: IUser): Promise<Reservation[]> {
-        return this.prisma.reservation.findMany({
-            where: {
-                userId: user.sub,
-            },
-            orderBy: {
-                createdAt: 'desc',
-            },
-        });
+   
+async getAllByUserId(user: IUser, month?: number, year?: number): Promise<Reservation[]> {
+    const where: Prisma.ReservationWhereInput = {
+        userId: user.sub,
+    };
+
+    if (month && year) {
+        where.date = {
+            gte: new Date(year, month - 1, 1),
+            lt: new Date(year, month, 1),
+        };
     }
+
+    return this.prisma.reservation.findMany({
+        where,
+        orderBy: {
+            createdAt: 'desc',
+        },
+    });
+}
 }

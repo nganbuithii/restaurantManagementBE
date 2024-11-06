@@ -33,8 +33,8 @@ var ReversationsController = /** @class */ (function () {
     ReversationsController.prototype.changeReservationStatus = function (id, status, user) {
         return this.reversationsService.changeStatus(id, status, user);
     };
-    ReversationsController.prototype.getAllReservationsByUser = function (user) {
-        return this.reversationsService.getAllByUserId(user);
+    ReversationsController.prototype.getAllReservationsByUser = function (user, month, year) {
+        return this.reversationsService.getAllByUserId(user, month, year);
     };
     __decorate([
         common_1.Post(),
@@ -74,7 +74,9 @@ var ReversationsController = /** @class */ (function () {
         common_1.Post('/me'),
         common_1.UseGuards(jwt_auth_guard_1.JwtAuthGuard),
         customize_1.ResponseMessage('get all reservations of a user'),
-        __param(0, customize_1.CurrentUser())
+        __param(0, customize_1.CurrentUser()),
+        __param(1, common_1.Query('month')),
+        __param(2, common_1.Query('year'))
     ], ReversationsController.prototype, "getAllReservationsByUser");
     ReversationsController = __decorate([
         swagger_1.ApiTags("Reservation"),

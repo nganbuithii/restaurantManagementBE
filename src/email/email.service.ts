@@ -55,7 +55,7 @@ export class EmailService {
   async sendEmail(to: string, subject: string, content: string): Promise<void> {
     await this.transporter.sendMail({
       from: '"Nabity Restaurant" <noreply@nabity.com>',
-      to: 'ngantailieu2311@gmail.com,',
+      to: '2151050271ngan@ou.edu.vn',
       subject: subject,
       html: content,
     });

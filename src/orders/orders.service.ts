@@ -251,10 +251,14 @@ export class OrdersService {
     };
   }
 
-  async getOrdersByUserId(user:IUser): Promise<Order[]> {
+  async getOrdersByUserIdAndDate(user: IUser, year: number, month: number): Promise<Order[]> {
     return this.prisma.order.findMany({
       where: {
         userId: user.sub,
+        createdAt: {
+          gte: new Date(year, month - 1, 1),
+          lt: new Date(year, month, 1),
+        },
       },
       include: {
         details: true,
@@ -265,4 +269,5 @@ export class OrdersService {
       },
     });
   }
+
 }

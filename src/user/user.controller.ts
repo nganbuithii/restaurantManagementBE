@@ -47,7 +47,7 @@ export class UserController {
     @UseGuards(JwtAuthGuard)
     @RequirePermissions('UPDATE_AVATAR_USER')
     @UseInterceptors(FileInterceptor('avatar', {
-        storage: storageConfig('avatar'),
+        storage: storageConfig(),
         fileFilter: (req, file, cb) => {
             const ext = extname(file.originalname).toLowerCase();
             const allowedExtArr = ['.jpg', '.png', '.jpeg'];
@@ -59,6 +59,7 @@ export class UserController {
         }
     }))
     async uploadAvatar(@Req() req: any, @UploadedFile() file: Express.Multer.File) {
+        
         if (req.fileValidationErr) {
             throw new BadRequestException(req.fileValidationErr);
         }

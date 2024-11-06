@@ -303,13 +303,21 @@ var ReversationsService = /** @class */ (function () {
             });
         });
     };
-    ReversationsService.prototype.getAllByUserId = function (user) {
+    ReversationsService.prototype.getAllByUserId = function (user, month, year) {
         return __awaiter(this, void 0, Promise, function () {
+            var where;
             return __generator(this, function (_a) {
+                where = {
+                    userId: user.sub
+                };
+                if (month && year) {
+                    where.date = {
+                        gte: new Date(year, month - 1, 1),
+                        lt: new Date(year, month, 1)
+                    };
+                }
                 return [2 /*return*/, this.prisma.reservation.findMany({
-                        where: {
-                            userId: user.sub
-                        },
+                        where: where,
                         orderBy: {
                             createdAt: 'desc'
                         }

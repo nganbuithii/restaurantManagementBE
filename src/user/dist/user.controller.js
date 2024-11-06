@@ -142,7 +142,7 @@ var UserController = /** @class */ (function () {
         common_1.UseGuards(jwt_auth_guard_1.JwtAuthGuard),
         permission_1.RequirePermissions('UPDATE_AVATAR_USER'),
         common_1.UseInterceptors(platform_express_1.FileInterceptor('avatar', {
-            storage: config_1.storageConfig('avatar'),
+            storage: config_1.storageConfig(),
             fileFilter: function (req, file, cb) {
                 var ext = path_1.extname(file.originalname).toLowerCase();
                 var allowedExtArr = ['.jpg', '.png', '.jpeg'];

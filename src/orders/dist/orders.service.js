@@ -333,12 +333,16 @@ var OrdersService = /** @class */ (function () {
             });
         });
     };
-    OrdersService.prototype.getOrdersByUserId = function (user) {
+    OrdersService.prototype.getOrdersByUserIdAndDate = function (user, year, month) {
         return __awaiter(this, void 0, Promise, function () {
             return __generator(this, function (_a) {
                 return [2 /*return*/, this.prisma.order.findMany({
                         where: {
-                            userId: user.sub
+                            userId: user.sub,
+                            createdAt: {
+                                gte: new Date(year, month - 1, 1),
+                                lt: new Date(year, month, 1)
+                            }
                         },
                         include: {
                             details: true,
